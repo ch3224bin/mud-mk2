@@ -13,11 +13,14 @@
 ### 게임 시스템
 - 실시간 채팅 (WebSocket)
 - 지역(Area) 관리 (생성, 조회, 수정, 삭제)
+- 방(Room) 관리 (생성, 조회, 수정, 삭제)
+- 방 연결 및 문(Door) 관리
+- 방 지도 시각화
 - 터미널 스타일의 사용자 인터페이스
 
 ## 기술 스택
 
-- Spring Boot 3.4.5
+- Spring Boot 3.4.5 (실제 버전은 다를 수 있음)
 - Spring Security (OAuth2)
 - Spring Data JPA
 - Spring WebSocket
@@ -71,16 +74,20 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 #### 게임 관련
 - `com.jefflife.mudmk2.gamedata.adapter.in`: 게임 컨트롤러
   - `AreaController`: 지역 관리 API 컨트롤러
+  - `RoomController`: 방 관리 API 컨트롤러
 
 - `com.jefflife.mudmk2.gamedata.application.domain.model.map`: 게임 맵 도메인 모델
   - `Area`: 지역 엔티티
-  - `AreaType`: 지역 타입 enum
+  - `AreaType`: 지역 타입 enum (INSTANCE_MAP, OPEN_MAP)
   - `Room`: 방 엔티티
-  - `Door`: 문 엔티티
-  - `WayOut`: 출구 엔티티
+  - `Door`: 문 엔티티 (잠금/해제 기능)
+  - `WayOut`: 출구 엔티티 (방 간 연결)
+  - `WayOuts`: 출구 컬렉션 (방의 모든 출구 관리)
+  - `Direction`: 방향 enum (동, 서, 남, 북)
 
 - `com.jefflife.mudmk2.gamedata.application.service`: 게임 서비스
   - `AreaService`: 지역 관리 서비스
+  - `RoomService`: 방 관리 서비스 (방 생성, 수정, 삭제, 연결)
 
 #### 채팅 관련
 - `com.jefflife.mudmk2.chat.controller`: 채팅 컨트롤러
@@ -115,6 +122,13 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - 채팅 화면에서 "AREA MANAGEMENT" 버튼을 클릭합니다.
 - 지역 생성 폼에서 이름과 타입을 입력하여 새 지역을 생성합니다.
 - 기존 지역을 수정하거나 삭제할 수 있습니다.
+
+### 방 관리
+- 채팅 화면에서 "ROOM MANAGEMENT" 버튼을 클릭합니다.
+- 방 생성 폼에서 지역, 요약, 설명을 입력하여 새 방을 생성합니다.
+- 기존 방을 수정하거나 삭제할 수 있습니다.
+- 방 연결 기능을 통해 두 방 사이에 출구를 생성하고 문을 설치할 수 있습니다.
+- 방 지도 기능을 통해 방들의 연결 관계를 시각적으로 확인할 수 있습니다.
 
 ### 프로필 관리
 - "PROFILE" 버튼을 클릭하여 사용자 프로필을 확인할 수 있습니다.
