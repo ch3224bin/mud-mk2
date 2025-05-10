@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -120,4 +121,39 @@ public class RoomControllerSystemTest {
                 + "\"description\": \"" + description + "\""
                 + "}";
     }
+
+    @Test
+    @Transactional
+    void getRoom_shouldReturnRoomAndOkResponse() throws Exception {
+        // Given
+        // First create a room
+        long areaId = 1L;
+        String summary = "Test Room for Get";
+        String description = "This is a test room for the get method";
+        String createRequestJson = createRoomJson(areaId, summary, description);
+
+        MvcResult createResult = mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createRequestJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String createResponseJson = createResult.getResponse().getContentAsString();
+        RoomResponse createResponse = objectMapper.readValue(createResponseJson, RoomResponse.class);
+        long roomId = createResponse.id();
+
+        // When
+        MvcResult getResult = mockMvc.perform(get(BASE_URL + "/" + roomId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Then
+        String getResponseJson = getResult.getResponse().getContentAsString();
+        RoomResponse getResponse = objectMapper.readValue(getResponseJson, RoomResponse.class);
+
+        assertThat(getResponse.id()).isEqualTo(roomId);
+        assertRoomEquals(getResponse, areaId, summary, description);
+    }
+
 }
