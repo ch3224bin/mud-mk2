@@ -69,17 +69,17 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
   - `UserRepository`: 사용자 저장소
 
 #### 게임 관련
-- `com.jefflife.mudmk2.game.adapter.in`: 게임 컨트롤러
+- `com.jefflife.mudmk2.gamedata.adapter.in`: 게임 컨트롤러
   - `AreaController`: 지역 관리 API 컨트롤러
 
-- `com.jefflife.mudmk2.game.application.domain.model.map`: 게임 맵 도메인 모델
+- `com.jefflife.mudmk2.gamedata.application.domain.model.map`: 게임 맵 도메인 모델
   - `Area`: 지역 엔티티
   - `AreaType`: 지역 타입 enum
   - `Room`: 방 엔티티
   - `Door`: 문 엔티티
   - `WayOut`: 출구 엔티티
 
-- `com.jefflife.mudmk2.game.application.service`: 게임 서비스
+- `com.jefflife.mudmk2.gamedata.application.service`: 게임 서비스
   - `AreaService`: 지역 관리 서비스
 
 #### 채팅 관련
