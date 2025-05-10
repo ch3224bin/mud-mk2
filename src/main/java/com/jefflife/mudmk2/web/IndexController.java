@@ -57,4 +57,14 @@ public class IndexController {
         }
         return "area-management";
     }
+
+    @GetMapping("/room-management")
+    public String roomManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "room-management";
+    }
 }

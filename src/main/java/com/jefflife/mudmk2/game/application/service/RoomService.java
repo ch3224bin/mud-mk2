@@ -11,6 +11,7 @@ import com.jefflife.mudmk2.game.application.service.model.response.RoomResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoomUseCase, DeleteRoomUseCase, LinkedRoomUseCase {
@@ -21,6 +22,7 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 		this.roomRepository = roomRepository;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public RoomResponse getRoom(final long id) {
 		final Room room = roomRepository.findById(id)
@@ -28,12 +30,14 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 		return RoomResponse.of(room);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public Page<RoomResponse> getPagedRooms(final Pageable pageable, final long areaId) {
 		return roomRepository.findByAreaId(pageable, areaId)
 				.map(RoomResponse::of);
 	}
 
+	@Transactional
 	@Override
 	public RoomResponse updateRoom(final long id, final UpdateRoomRequest updateRoomRequest) {
 		final Room room = roomRepository.findById(id)
@@ -43,6 +47,7 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 		return RoomResponse.of(room);
 	}
 
+	@Transactional
 	@Override
 	public RoomResponse createRoom(final CreateRoomRequest createRoomRequest) {
 		return RoomResponse.of(roomRepository.save(createRoomRequest.toDomain()));
@@ -55,6 +60,7 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 		roomRepository.delete(room);
 	}
 
+	@Transactional
 	@Override
 	public LinkedRoomResponse linkAnotherRoom(LinkRoomRequest linkRoomRequest) {
 		final Room room1 = roomRepository.findById(linkRoomRequest.sourceRoomId())
