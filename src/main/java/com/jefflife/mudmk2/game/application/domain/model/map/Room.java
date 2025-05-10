@@ -50,6 +50,7 @@ public class Room {
 
 	public WayOut createWayOut(Room nextRoom, Direction direction) {
 		WayOut wayout = WayOut.builder()
+				.isShow(true)
 				.direction(direction)
 				.room(this)
 				.nextRoom(nextRoom)
