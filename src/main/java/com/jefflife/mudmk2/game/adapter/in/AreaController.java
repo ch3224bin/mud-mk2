@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.game.adapter.in;
 
 import com.jefflife.mudmk2.game.application.port.in.CreateAreaUseCase;
+import com.jefflife.mudmk2.game.application.port.in.DeleteAreaUseCase;
 import com.jefflife.mudmk2.game.application.port.in.GetAreaUseCase;
 import com.jefflife.mudmk2.game.application.port.in.UpdateAreaUseCase;
 import com.jefflife.mudmk2.game.application.service.model.request.CreateAreaRequest;
@@ -19,15 +20,18 @@ public class AreaController {
     private final CreateAreaUseCase createAreaUseCase;
     private final UpdateAreaUseCase updateAreaUseCase;
     private final GetAreaUseCase getAreaUseCase;
+    private final DeleteAreaUseCase deleteAreaUseCase;
 
     public AreaController(
             final CreateAreaUseCase createAreaUseCase,
             final UpdateAreaUseCase updateAreaUseCase,
-            final GetAreaUseCase getAreaUseCase
+            final GetAreaUseCase getAreaUseCase,
+            final DeleteAreaUseCase deleteAreaUseCase
     ) {
         this.createAreaUseCase = createAreaUseCase;
         this.updateAreaUseCase = updateAreaUseCase;
         this.getAreaUseCase = getAreaUseCase;
+        this.deleteAreaUseCase = deleteAreaUseCase;
     }
 
     @PostMapping
@@ -54,9 +58,14 @@ public class AreaController {
         return ResponseEntity.ok(getAreaUseCase.getAreas());
     }
 
-    @GetMapping
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AreaResponse> getArea(@PathVariable final Long id) {
         return ResponseEntity.ok(getAreaUseCase.getArea(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteArea(@PathVariable final Long id) {
+        deleteAreaUseCase.deleteArea(id);
+        return ResponseEntity.noContent().build();
     }
 }

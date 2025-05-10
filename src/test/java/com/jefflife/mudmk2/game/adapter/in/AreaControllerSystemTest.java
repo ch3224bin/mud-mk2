@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -229,5 +230,54 @@ public class AreaControllerSystemTest {
         AreaResponse retrievedArea = objectMapper.readValue(getResponseJson, AreaResponse.class);
 
         assertThat(retrievedArea.getName()).isEqualTo(updatedAreaName);
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com", roles = "USER")
+    void deleteArea_shouldDeleteAreaAndReturnNoContent() throws Exception {
+        // Given
+        // Create a test area
+        String areaName = "Test Area for Delete";
+        String areaType = "OPEN_MAP";
+        String createRequestJson = "{"
+                + "\"name\": \"" + areaName + "\","
+                + "\"type\": \"" + areaType + "\""
+                + "}";
+
+        MvcResult createResult = mockMvc.perform(post("/api/v1/areas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createRequestJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        AreaResponse createdArea = objectMapper.readValue(
+                createResult.getResponse().getContentAsString(), 
+                AreaResponse.class);
+
+        // When
+        mockMvc.perform(delete("/api/v1/areas/" + createdArea.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        // Then
+        // Verify that the area was actually deleted from the database by checking that
+        // it's not in the list of all areas
+        MvcResult getResult = mockMvc.perform(get("/api/v1/areas")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = getResult.getResponse().getContentAsString();
+        List<AreaResponse> areas = objectMapper.readValue(responseJson, new TypeReference<List<AreaResponse>>() {});
+
+        boolean areaStillExists = false;
+        for (AreaResponse area : areas) {
+            if (area.getId().equals(createdArea.getId())) {
+                areaStillExists = true;
+                break;
+            }
+        }
+
+        assertThat(areaStillExists).isFalse();
     }
 }

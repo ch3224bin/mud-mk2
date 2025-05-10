@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.game.application.service;
 import com.jefflife.mudmk2.game.application.domain.model.map.Area;
 import com.jefflife.mudmk2.game.application.domain.repository.AreaRepository;
 import com.jefflife.mudmk2.game.application.port.in.CreateAreaUseCase;
+import com.jefflife.mudmk2.game.application.port.in.DeleteAreaUseCase;
 import com.jefflife.mudmk2.game.application.port.in.GetAreaUseCase;
 import com.jefflife.mudmk2.game.application.port.in.UpdateAreaUseCase;
 import com.jefflife.mudmk2.game.application.service.model.request.CreateAreaRequest;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 @Service
-public class AreaService implements CreateAreaUseCase, UpdateAreaUseCase, GetAreaUseCase {
+public class AreaService implements CreateAreaUseCase, UpdateAreaUseCase, GetAreaUseCase, DeleteAreaUseCase {
     private final AreaRepository areaRepository;
 
     public AreaService(AreaRepository areaRepository) {
@@ -48,5 +49,12 @@ public class AreaService implements CreateAreaUseCase, UpdateAreaUseCase, GetAre
         area.changeName(updateAreaRequest.getName());
         Area savedArea = areaRepository.save(area);
         return AreaResponse.of(savedArea);
+    }
+
+    @Override
+    public void deleteArea(Long id) {
+        Area area = areaRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+        areaRepository.delete(area);
     }
 }

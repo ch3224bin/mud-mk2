@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - Area Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .area-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .area-form {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .form-select {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00aa00 0%, #00ff00 100%);
+            color: #000;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #00cc00 0%, #00ff88 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid #9ca3af;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(156, 163, 175, 0.1);
+            color: #e4e4e7;
+            border-color: #e4e4e7;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .area-list {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .area-list-header {
+            color: #00ff00;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .area-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .area-item:last-child {
+            border-bottom: none;
+        }
+
+        .area-item-info {
+            flex: 1;
+        }
+
+        .area-item-name {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .area-item-type {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .area-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: right;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-profile {
+            background: transparent;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .btn-profile:hover {
+            background: #60a5fa;
+            color: #000;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .alert-danger {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .area-container {
+                padding: 16px;
+            }
+
+            .area-form, .area-list {
+                padding: 16px;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>AREA MANAGEMENT</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="area-container">
+                        <div id="alertContainer" class="alert"></div>
+
+                        <!-- Create/Edit Area Form -->
+                        <div class="area-form">
+                            <h4 class="mb-4" id="formTitle">Create New Area</h4>
+                            <form id="areaForm">
+                                <input type="hidden" id="areaId" value="">
+                                <div class="mb-3">
+                                    <label for="areaName" class="form-label">Area Name</label>
+                                    <input type="text" class="form-control" id="areaName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="areaType" class="form-label">Area Type</label>
+                                    <select class="form-select" id="areaType" required>
+                                        <option value="">Select Area Type</option>
+                                        <option value="INSTANCE_MAP">INSTANCE_MAP</option>
+                                        <option value="OPEN_MAP">OPEN_MAP</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary" id="saveButton">Create Area</button>
+                                    <button type="button" class="btn btn-secondary" id="cancelButton" style="display: none;">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Area List -->
+                        <div class="area-list">
+                            <h4 class="area-list-header">Registered Areas</h4>
+                            <div id="areaListContainer">
+                                <!-- Area items will be loaded here -->
+                                <div class="text-center py-4 text-muted">Loading areas...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/profile" class="btn btn-system btn-profile me-2">PROFILE</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the Area Management system.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get username from Thymeleaf
+        const username = /*[[${userName}]]*/ 'default-user';
+        
+        // DOM Elements
+        const areaForm = document.getElementById('areaForm');
+        const formTitle = document.getElementById('formTitle');
+        const areaId = document.getElementById('areaId');
+        const areaName = document.getElementById('areaName');
+        const areaType = document.getElementById('areaType');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const areaListContainer = document.getElementById('areaListContainer');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        // Base API URL
+        const API_URL = '/api/v1/areas';
+        
+        // Load all areas
+        function loadAreas() {
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load areas');
+                    }
+                    return response.json();
+                })
+                .then(areas => {
+                    displayAreas(areas);
+                })
+                .catch(error => {
+                    showAlert('Error loading areas: ' + error.message, 'danger');
+                });
+        }
+        
+        // Display areas in the list
+        function displayAreas(areas) {
+            if (!areas || areas.length === 0) {
+                areaListContainer.innerHTML = '<div class="text-center py-4 text-muted">No areas found. Create your first area above.</div>';
+                return;
+            }
+            
+            let html = '';
+            areas.forEach(area => {
+                html += `
+                <div class="area-item">
+                    <div class="area-item-info">
+                        <div class="area-item-name">${area.name}</div>
+                        <div class="area-item-type">${area.type}</div>
+                    </div>
+                    <div class="area-item-actions">
+                        <button class="btn btn-secondary btn-sm edit-btn" data-id="${area.id}" data-name="${area.name}" data-type="${area.type}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${area.id}" data-name="${area.name}">Delete</button>
+                    </div>
+                </div>
+                `;
+            });
+            
+            areaListContainer.innerHTML = html;
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    const type = this.getAttribute('data-type');
+                    
+                    // Set form to edit mode
+                    setEditMode(id, name, type);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    
+                    if (confirm(`Are you sure you want to delete the area "${name}"?`)) {
+                        deleteArea(id);
+                    }
+                });
+            });
+        }
+        
+        // Set form to create mode
+        function setCreateMode() {
+            formTitle.textContent = 'Create New Area';
+            saveButton.textContent = 'Create Area';
+            areaId.value = '';
+            areaName.value = '';
+            areaType.value = '';
+            areaType.disabled = false;
+            cancelButton.style.display = 'none';
+        }
+        
+        // Set form to edit mode
+        function setEditMode(id, name, type) {
+            formTitle.textContent = 'Edit Area';
+            saveButton.textContent = 'Update Area';
+            areaId.value = id;
+            areaName.value = name;
+            areaType.value = type;
+            areaType.disabled = true; // Type cannot be changed when editing
+            cancelButton.style.display = 'block';
+            
+            // Scroll to form
+            areaForm.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Create a new area
+        function createArea(name, type) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    type: type
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create area');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`Area "${name}" created successfully!`, 'success');
+                setCreateMode();
+                loadAreas();
+            })
+            .catch(error => {
+                showAlert('Error creating area: ' + error.message, 'danger');
+            });
+        }
+        
+        // Update an existing area
+        function updateArea(id, name) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update area');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`Area "${name}" updated successfully!`, 'success');
+                setCreateMode();
+                loadAreas();
+            })
+            .catch(error => {
+                showAlert('Error updating area: ' + error.message, 'danger');
+            });
+        }
+        
+        // Delete an area
+        function deleteArea(id) {
+            // Note: This is a placeholder for the future delete API
+            // The issue description mentioned that delete API will be added later
+            fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete area');
+                }
+                showAlert('Area deleted successfully!', 'success');
+                loadAreas();
+            })
+            .catch(error => {
+                showAlert('Error deleting area: ' + error.message, 'danger');
+                console.error('Note: The delete API is not implemented yet according to the issue description.');
+            });
+        }
+        
+        // Show alert message
+        function showAlert(message, type) {
+            alertContainer.textContent = message;
+            alertContainer.className = `alert alert-${type}`;
+            alertContainer.style.display = 'block';
+            
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertContainer.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Event Listeners
+        areaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = areaName.value.trim();
+            const type = areaType.value;
+            const id = areaId.value;
+            
+            if (!name) {
+                showAlert('Please enter an area name', 'danger');
+                return;
+            }
+            
+            if (!id) {
+                // Create mode
+                if (!type) {
+                    showAlert('Please select an area type', 'danger');
+                    return;
+                }
+                createArea(name, type);
+            } else {
+                // Edit mode
+                updateArea(id, name);
+            }
+        });
+        
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
+        
+        // Initialize
+        if (username) {
+            loadAreas();
+        }
+    });
+</script>
+</body>
+</html>
