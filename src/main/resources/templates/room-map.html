@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - Room Map</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .map-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .area-selector {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .form-select {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .map-view {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .map-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 24px;
+        }
+
+        .room-node {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .room-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .room-name {
+            color: #00ff00;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background-color: #00ff00;
+            transform-origin: 0 0;
+            z-index: 5;
+        }
+
+        .connection-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 6;
+        }
+
+        .connection-hidden {
+            color: #ff9900;
+            border-color: #ff9900;
+        }
+
+        .connection-locked {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: right;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-profile {
+            background: transparent;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .btn-profile:hover {
+            background: #60a5fa;
+            color: #000;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-area {
+            background: transparent;
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .btn-area:hover {
+            background: #f59e0b;
+            color: #000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-room {
+            background: transparent;
+            color: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+
+        .btn-room:hover {
+            background: #8b5cf6;
+            color: #000;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .alert-danger {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .map-container {
+                padding: 16px;
+            }
+
+            .area-selector, .map-view {
+                padding: 16px;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>ROOM MAP</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="map-container">
+                        <div id="alertContainer" class="alert"></div>
+
+                        <!-- Area Selector -->
+                        <div class="area-selector">
+                            <h4 class="mb-4">Select Area</h4>
+                            <div class="mb-3">
+                                <label for="areaSelect" class="form-label">Area</label>
+                                <select class="form-select" id="areaSelect" required>
+                                    <option value="">Select an Area</option>
+                                    <!-- Areas will be loaded here -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Map View -->
+                        <div class="map-view">
+                            <div id="mapCanvas" class="map-canvas">
+                                <!-- Room nodes and connections will be rendered here -->
+                                <div class="text-center py-4 text-muted">Please select an area to view the map</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/area-management" class="btn btn-system btn-area me-2">AREA MANAGEMENT</a>
+                        <a href="/room-management" class="btn btn-system btn-room me-2">ROOM MANAGEMENT</a>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/profile" class="btn btn-system btn-profile me-2">PROFILE</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the Room Map system.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get username from Thymeleaf
+        const username = /*[[${userName}]]*/ 'default-user';
+
+        // DOM Elements
+        const areaSelect = document.getElementById('areaSelect');
+        const mapCanvas = document.getElementById('mapCanvas');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Base API URLs
+        const AREAS_API_URL = '/api/v1/areas';
+        const ROOMS_API_URL = '/api/v1/rooms';
+
+        // Grid settings for room placement
+        const GRID_SIZE = 150; // Distance between rooms
+        const ROOM_WIDTH = 120;
+        const ROOM_HEIGHT = 80;
+
+        // Load all areas for the dropdown
+        function loadAreas() {
+            fetch(AREAS_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load areas');
+                    }
+                    return response.json();
+                })
+                .then(areas => {
+                    populateAreaDropdown(areas);
+                })
+                .catch(error => {
+                    showAlert('Error loading areas: ' + error.message, 'danger');
+                });
+        }
+
+        // Populate area dropdown
+        function populateAreaDropdown(areas) {
+            if (!areas || areas.length === 0) {
+                areaSelect.innerHTML = '<option value="">No areas available</option>';
+                return;
+            }
+
+            let html = '<option value="">Select an Area</option>';
+            areas.forEach(area => {
+                html += `<option value="${area.id}">${area.name} (${area.type})</option>`;
+            });
+
+            areaSelect.innerHTML = html;
+        }
+
+        // Load rooms for selected area
+        function loadRooms(selectedAreaId) {
+            if (!selectedAreaId) {
+                mapCanvas.innerHTML = '<div class="text-center py-4 text-muted">Please select an area to view the map</div>';
+                return;
+            }
+
+            mapCanvas.innerHTML = '<div class="text-center py-4 text-muted">Loading rooms...</div>';
+
+            fetch(`${ROOMS_API_URL}?areaId=${selectedAreaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load rooms');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.content || data.content.length === 0) {
+                        mapCanvas.innerHTML = '<div class="text-center py-4 text-muted">No rooms found in this area</div>';
+                        return;
+                    }
+                    renderMap(data.content);
+                })
+                .catch(error => {
+                    showAlert('Error loading rooms: ' + error.message, 'danger');
+                    mapCanvas.innerHTML = '<div class="text-center py-4 text-muted">Error loading rooms</div>';
+                });
+        }
+
+        // Render the map with rooms and connections
+        function renderMap(rooms) {
+            // Clear the canvas
+            mapCanvas.innerHTML = '';
+            
+            // Create a map of rooms by ID for easy lookup
+            const roomsById = {};
+            rooms.forEach(room => {
+                roomsById[room.id] = room;
+            });
+            
+            // Calculate positions for each room
+            const positions = calculateRoomPositions(rooms);
+            
+            // Create room nodes
+            rooms.forEach(room => {
+                const position = positions[room.id];
+                createRoomNode(room, position.x, position.y);
+            });
+            
+            // Create connections between rooms
+            rooms.forEach(room => {
+                if (room.wayOuts && room.wayOuts.length > 0) {
+                    room.wayOuts.forEach(wayOut => {
+                        const nextRoom = roomsById[wayOut.nextRoomId];
+                        if (nextRoom) {
+                            createConnection(room, nextRoom, wayOut, positions);
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Calculate positions for rooms based on their connections
+        function calculateRoomPositions(rooms) {
+            const positions = {};
+            const visited = new Set();
+            
+            // Start with the first room at the center
+            const startRoom = rooms[0];
+            positions[startRoom.id] = { x: mapCanvas.offsetWidth / 2 - ROOM_WIDTH / 2, y: mapCanvas.offsetHeight / 2 - ROOM_HEIGHT / 2 };
+            
+            // Use BFS to position connected rooms
+            const queue = [startRoom];
+            visited.add(startRoom.id);
+            
+            while (queue.length > 0) {
+                const currentRoom = queue.shift();
+                const currentPos = positions[currentRoom.id];
+                
+                // Process each wayOut
+                if (currentRoom.wayOuts && currentRoom.wayOuts.length > 0) {
+                    currentRoom.wayOuts.forEach(wayOut => {
+                        const nextRoomId = wayOut.nextRoomId;
+                        
+                        // Skip if already visited
+                        if (visited.has(nextRoomId)) return;
+                        
+                        // Calculate position based on direction
+                        let nextX = currentPos.x;
+                        let nextY = currentPos.y;
+                        
+                        switch (wayOut.direction) {
+                            case 'NORTH':
+                                nextY = currentPos.y - GRID_SIZE;
+                                break;
+                            case 'SOUTH':
+                                nextY = currentPos.y + GRID_SIZE;
+                                break;
+                            case 'EAST':
+                                nextX = currentPos.x + GRID_SIZE;
+                                break;
+                            case 'WEST':
+                                nextX = currentPos.x - GRID_SIZE;
+                                break;
+                        }
+                        
+                        // Assign position to next room
+                        positions[nextRoomId] = { x: nextX, y: nextY };
+                        
+                        // Add to queue for processing
+                        const nextRoom = rooms.find(r => r.id === nextRoomId);
+                        if (nextRoom) {
+                            queue.push(nextRoom);
+                            visited.add(nextRoomId);
+                        }
+                    });
+                }
+            }
+            
+            // Handle any rooms that weren't connected (place them in a row at the bottom)
+            let offsetX = 50;
+            rooms.forEach(room => {
+                if (!positions[room.id]) {
+                    positions[room.id] = { x: offsetX, y: mapCanvas.offsetHeight - ROOM_HEIGHT - 50 };
+                    offsetX += GRID_SIZE;
+                }
+            });
+            
+            return positions;
+        }
+        
+        // Create a room node on the map
+        function createRoomNode(room, x, y) {
+            const roomNode = document.createElement('div');
+            roomNode.className = 'room-node';
+            roomNode.style.left = `${x}px`;
+            roomNode.style.top = `${y}px`;
+            roomNode.innerHTML = `
+                <div class="room-name">${room.summary}</div>
+                <div class="room-id">ID: ${room.id}</div>
+            `;
+            
+            // Add click event to show room details
+            roomNode.addEventListener('click', () => {
+                showRoomDetails(room);
+            });
+            
+            mapCanvas.appendChild(roomNode);
+        }
+        
+        // Create a connection line between two rooms
+        function createConnection(sourceRoom, targetRoom, wayOut, positions) {
+            const sourcePos = positions[sourceRoom.id];
+            const targetPos = positions[targetRoom.id];
+            
+            // Calculate line start and end points (center of rooms)
+            const startX = sourcePos.x + ROOM_WIDTH / 2;
+            const startY = sourcePos.y + ROOM_HEIGHT / 2;
+            const endX = targetPos.x + ROOM_WIDTH / 2;
+            const endY = targetPos.y + ROOM_HEIGHT / 2;
+            
+            // Calculate line length and angle
+            const dx = endX - startX;
+            const dy = endY - startY;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            // Create the line
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            line.style.width = `${length}px`;
+            line.style.left = `${startX}px`;
+            line.style.top = `${startY}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+            
+            // Create the connection label
+            const label = document.createElement('div');
+            label.className = 'connection-label';
+            
+            // Position the label at the middle of the line
+            const labelX = startX + dx / 2 - 30;
+            const labelY = startY + dy / 2 - 10;
+            label.style.left = `${labelX}px`;
+            label.style.top = `${labelY}px`;
+            
+            // Set label content based on wayOut properties
+            let labelText = getDirectionName(wayOut.direction);
+            
+            // Check if the wayOut is hidden
+            if (!wayOut.isShow) {
+                labelText += ' (숨겨짐)';
+                label.classList.add('connection-hidden');
+            }
+            
+            // Check if the door is locked
+            if (wayOut.door && wayOut.door.isLocked) {
+                labelText += ' (잠겨짐)';
+                label.classList.add('connection-locked');
+            }
+            
+            label.textContent = labelText;
+            
+            mapCanvas.appendChild(line);
+            mapCanvas.appendChild(label);
+        }
+        
+        // Show room details in an alert
+        function showRoomDetails(room) {
+            let detailsHtml = `<strong>${room.summary}</strong><br>`;
+            detailsHtml += `${room.description}<br><br>`;
+            
+            if (room.wayOuts && room.wayOuts.length > 0) {
+                detailsHtml += '<strong>Exits:</strong><br>';
+                room.wayOuts.forEach(wayOut => {
+                    let exitText = `${getDirectionName(wayOut.direction)}`;
+                    
+                    if (!wayOut.isShow) {
+                        exitText += ' (숨겨짐)';
+                    }
+                    
+                    if (wayOut.door && wayOut.door.isLocked) {
+                        exitText += ' (잠겨짐)';
+                    }
+                    
+                    detailsHtml += `${exitText}<br>`;
+                });
+            } else {
+                detailsHtml += '<strong>No exits</strong>';
+            }
+            
+            showAlert(detailsHtml, 'success');
+        }
+        
+        // Helper function to get direction name
+        function getDirectionName(direction) {
+            switch(direction) {
+                case 'EAST': return '동(East)';
+                case 'WEST': return '서(West)';
+                case 'SOUTH': return '남(South)';
+                case 'NORTH': return '북(North)';
+                default: return direction;
+            }
+        }
+        
+        // Show alert message
+        function showAlert(message, type) {
+            alertContainer.innerHTML = message;
+            alertContainer.className = `alert alert-${type}`;
+            alertContainer.style.display = 'block';
+            
+            // Hide alert after 10 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertContainer.style.display = 'none';
+                }, 10000);
+            }
+        }
+        
+        // Event Listeners
+        areaSelect.addEventListener('change', function() {
+            const selectedAreaId = this.value;
+            
+            if (selectedAreaId) {
+                loadRooms(selectedAreaId);
+            } else {
+                mapCanvas.innerHTML = '<div class="text-center py-4 text-muted">Please select an area to view the map</div>';
+            }
+        });
+        
+        // Initialize
+        if (username) {
+            loadAreas();
+        }
+    });
+</script>
+</body>
+</html>
