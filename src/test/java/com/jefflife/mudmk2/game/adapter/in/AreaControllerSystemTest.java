@@ -16,15 +16,17 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username = "test@example.com", roles = "USER")
 public class AreaControllerSystemTest {
+
+    private static final String BASE_URL = "/api/v1/areas";
+    private static final String OPEN_MAP = "OPEN_MAP";
+    private static final String INSTANCE_MAP = "INSTANCE_MAP";
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,22 +35,15 @@ public class AreaControllerSystemTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "test@example.com", roles = "USER")
     void createArea_shouldCreateAreaAndReturnCreatedResponse() throws Exception {
         // Given
         String areaName = "Test Area";
-        String areaType = "OPEN_MAP";
-
-        // Create request JSON
-        String requestJson = "{"
-                + "\"name\": \"" + areaName + "\","
-                + "\"type\": \"" + areaType + "\""
-                + "}";
+        String requestJson = createAreaJson(areaName, OPEN_MAP);
 
         // When
-        MvcResult result = mockMvc.perform(post("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson))
+        MvcResult result = mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -56,228 +51,176 @@ public class AreaControllerSystemTest {
         String responseJson = result.getResponse().getContentAsString();
         AreaResponse response = objectMapper.readValue(responseJson, AreaResponse.class);
 
-        assertThat(response).isNotNull();
         assertThat(response.getId()).isNotNull();
-        assertThat(response.getName()).isEqualTo(areaName);
-        assertThat(response.getType()).isEqualTo(AreaType.valueOf(areaType));
+        assertAreaEquals(response, areaName, OPEN_MAP);
 
         // Verify Location header
         String locationHeader = result.getResponse().getHeader("Location");
-        assertThat(locationHeader).isEqualTo("/api/v1/areas/" + response.getId());
+        assertThat(locationHeader).isEqualTo(BASE_URL + "/" + response.getId());
     }
 
     @Test
-    @WithMockUser(username = "test@example.com", roles = "USER")
     void getAreas_shouldReturnAllAreas() throws Exception {
         // Given
-        // Create first test area
         String areaName1 = "Test Area 1";
-        String areaType1 = "OPEN_MAP";
-        String requestJson1 = "{"
-                + "\"name\": \"" + areaName1 + "\","
-                + "\"type\": \"" + areaType1 + "\""
-                + "}";
+        AreaResponse createdArea1 = createTestArea(areaName1, OPEN_MAP);
 
-        MvcResult createResult1 = mockMvc.perform(post("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson1))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        AreaResponse createdArea1 = objectMapper.readValue(
-                createResult1.getResponse().getContentAsString(), 
-                AreaResponse.class);
-
-        // Create second test area
         String areaName2 = "Test Area 2";
-        String areaType2 = "INSTANCE_MAP";
-        String requestJson2 = "{"
-                + "\"name\": \"" + areaName2 + "\","
-                + "\"type\": \"" + areaType2 + "\""
-                + "}";
-
-        MvcResult createResult2 = mockMvc.perform(post("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson2))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        AreaResponse createdArea2 = objectMapper.readValue(
-                createResult2.getResponse().getContentAsString(), 
-                AreaResponse.class);
+        AreaResponse createdArea2 = createTestArea(areaName2, INSTANCE_MAP);
 
         // When
-        MvcResult getResult = mockMvc.perform(get("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        List<AreaResponse> areas = getAllAreas();
 
         // Then
-        String responseJson = getResult.getResponse().getContentAsString();
-        List<AreaResponse> areas = objectMapper.readValue(responseJson, new TypeReference<List<AreaResponse>>() {});
-
         assertThat(areas).isNotNull();
         assertThat(areas.size()).isGreaterThanOrEqualTo(2);
 
         // Verify that the created areas are in the response
-        boolean foundArea1 = false;
-        boolean foundArea2 = false;
-
-        for (AreaResponse area : areas) {
-            if (area.getId().equals(createdArea1.getId())) {
-                foundArea1 = true;
-                assertThat(area.getName()).isEqualTo(areaName1);
-                assertThat(area.getType()).isEqualTo(AreaType.valueOf(areaType1));
-            } else if (area.getId().equals(createdArea2.getId())) {
-                foundArea2 = true;
-                assertThat(area.getName()).isEqualTo(areaName2);
-                assertThat(area.getType()).isEqualTo(AreaType.valueOf(areaType2));
-            }
-        }
-
-        assertThat(foundArea1).isTrue();
-        assertThat(foundArea2).isTrue();
+        assertAreaInList(areas, createdArea1, areaName1, OPEN_MAP);
+        assertAreaInList(areas, createdArea2, areaName2, INSTANCE_MAP);
     }
     @Test
-    @WithMockUser(username = "test@example.com", roles = "USER")
     void getArea_shouldReturnAreaById() throws Exception {
         // Given
-        // Create a test area
         String areaName = "Test Area for GetById";
-        String areaType = "OPEN_MAP";
-        String requestJson = "{"
-                + "\"name\": \"" + areaName + "\","
-                + "\"type\": \"" + areaType + "\""
-                + "}";
+        AreaResponse createdArea = createTestArea(areaName, OPEN_MAP);
 
-        MvcResult createResult = mockMvc.perform(post("/api/v1/areas")
+        // When
+        AreaResponse retrievedArea = getAreaById(createdArea.getId());
+
+        // Then
+        assertThat(retrievedArea.getId()).isEqualTo(createdArea.getId());
+        assertAreaEquals(retrievedArea, areaName, OPEN_MAP);
+    }
+
+    @Test
+    void updateArea_shouldUpdateAreaNameAndReturnUpdatedResponse() throws Exception {
+        // Given
+        String originalAreaName = "Original Area Name";
+        AreaResponse createdArea = createTestArea(originalAreaName, OPEN_MAP);
+
+        // When
+        String updatedAreaName = "Updated Area Name";
+        AreaResponse updatedArea = updateArea(createdArea.getId(), updatedAreaName);
+
+        // Then
+        assertThat(updatedArea.getId()).isEqualTo(createdArea.getId());
+        assertThat(updatedArea.getName()).isEqualTo(updatedAreaName);
+        assertThat(updatedArea.getType()).isEqualTo(AreaType.valueOf(OPEN_MAP));
+
+        // Verify that the area was actually updated in the database
+        AreaResponse retrievedArea = getAreaById(createdArea.getId());
+        assertThat(retrievedArea.getName()).isEqualTo(updatedAreaName);
+    }
+
+    @Test
+    void deleteArea_shouldDeleteAreaAndReturnNoContent() throws Exception {
+        // Given
+        String areaName = "Test Area for Delete";
+        AreaResponse createdArea = createTestArea(areaName, OPEN_MAP);
+
+        // When
+        deleteArea(createdArea.getId());
+
+        // Then
+        // Verify that the area was actually deleted from the database
+        List<AreaResponse> areas = getAllAreas();
+        assertAreaNotInList(areas, createdArea.getId());
+    }
+
+    private String createAreaJson(String name, String type) {
+        return "{"
+                + "\"name\": \"" + name + "\","
+                + "\"type\": \"" + type + "\""
+                + "}";
+    }
+
+    private String createUpdateAreaJson(String name) {
+        return "{"
+                + "\"name\": \"" + name + "\""
+                + "}";
+    }
+
+    private AreaResponse createTestArea(String name, String type) throws Exception {
+        String requestJson = createAreaJson(name, type);
+
+        MvcResult result = mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        AreaResponse createdArea = objectMapper.readValue(
-                createResult.getResponse().getContentAsString(), 
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(), 
                 AreaResponse.class);
+    }
 
-        // When
-        MvcResult getResult = mockMvc.perform(get("/api/v1/areas/" + createdArea.getId())
+    private AreaResponse getAreaById(Long id) throws Exception {
+        MvcResult result = mockMvc.perform(get(BASE_URL + "/" + id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Then
-        String responseJson = getResult.getResponse().getContentAsString();
-        AreaResponse retrievedArea = objectMapper.readValue(responseJson, AreaResponse.class);
-
-        assertThat(retrievedArea).isNotNull();
-        assertThat(retrievedArea.getId()).isEqualTo(createdArea.getId());
-        assertThat(retrievedArea.getName()).isEqualTo(areaName);
-        assertThat(retrievedArea.getType()).isEqualTo(AreaType.valueOf(areaType));
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(), 
+                AreaResponse.class);
     }
 
-    @Test
-    @WithMockUser(username = "test@example.com", roles = "USER")
-    void updateArea_shouldUpdateAreaNameAndReturnUpdatedResponse() throws Exception {
-        // Given
-        // Create a test area
-        String originalAreaName = "Original Area Name";
-        String areaType = "OPEN_MAP";
-        String createRequestJson = "{"
-                + "\"name\": \"" + originalAreaName + "\","
-                + "\"type\": \"" + areaType + "\""
-                + "}";
-
-        MvcResult createResult = mockMvc.perform(post("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createRequestJson))
-                .andExpect(status().isCreated())
+    private List<AreaResponse> getAllAreas() throws Exception {
+        MvcResult result = mockMvc.perform(get(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
 
-        AreaResponse createdArea = objectMapper.readValue(
-                createResult.getResponse().getContentAsString(), 
-                AreaResponse.class);
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(), 
+                new TypeReference<List<AreaResponse>>() {});
+    }
 
-        // Prepare update request with new name
-        String updatedAreaName = "Updated Area Name";
-        String updateRequestJson = "{"
-                + "\"name\": \"" + updatedAreaName + "\""
-                + "}";
+    private void assertAreaEquals(AreaResponse area, String expectedName, String expectedType) {
+        assertThat(area).isNotNull();
+        assertThat(area.getName()).isEqualTo(expectedName);
+        assertThat(area.getType()).isEqualTo(AreaType.valueOf(expectedType));
+    }
 
-        // When
-        MvcResult updateResult = mockMvc.perform(patch("/api/v1/areas/" + createdArea.getId())
+    private void assertAreaInList(List<AreaResponse> areas, AreaResponse expectedArea, String expectedName, String expectedType) {
+        boolean found = false;
+
+        for (AreaResponse area : areas) {
+            if (area.getId().equals(expectedArea.getId())) {
+                found = true;
+                assertAreaEquals(area, expectedName, expectedType);
+                break;
+            }
+        }
+
+        assertThat(found).isTrue();
+    }
+
+    private void assertAreaNotInList(List<AreaResponse> areas, Long areaId) {
+        boolean areaExists = areas.stream()
+                .anyMatch(area -> area.getId().equals(areaId));
+
+        assertThat(areaExists).isFalse();
+    }
+
+    private AreaResponse updateArea(Long areaId, String newName) throws Exception {
+        String updateRequestJson = createUpdateAreaJson(newName);
+
+        MvcResult result = mockMvc.perform(patch(BASE_URL + "/" + areaId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateRequestJson))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Then
-        String responseJson = updateResult.getResponse().getContentAsString();
-        AreaResponse updatedArea = objectMapper.readValue(responseJson, AreaResponse.class);
-
-        assertThat(updatedArea).isNotNull();
-        assertThat(updatedArea.getId()).isEqualTo(createdArea.getId());
-        assertThat(updatedArea.getName()).isEqualTo(updatedAreaName);
-        assertThat(updatedArea.getType()).isEqualTo(AreaType.valueOf(areaType));
-
-        // Verify that the area was actually updated in the database
-        MvcResult getResult = mockMvc.perform(get("/api/v1/areas/" + createdArea.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String getResponseJson = getResult.getResponse().getContentAsString();
-        AreaResponse retrievedArea = objectMapper.readValue(getResponseJson, AreaResponse.class);
-
-        assertThat(retrievedArea.getName()).isEqualTo(updatedAreaName);
+        return objectMapper.readValue(
+                result.getResponse().getContentAsString(), 
+                AreaResponse.class);
     }
 
-    @Test
-    @WithMockUser(username = "test@example.com", roles = "USER")
-    void deleteArea_shouldDeleteAreaAndReturnNoContent() throws Exception {
-        // Given
-        // Create a test area
-        String areaName = "Test Area for Delete";
-        String areaType = "OPEN_MAP";
-        String createRequestJson = "{"
-                + "\"name\": \"" + areaName + "\","
-                + "\"type\": \"" + areaType + "\""
-                + "}";
-
-        MvcResult createResult = mockMvc.perform(post("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createRequestJson))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        AreaResponse createdArea = objectMapper.readValue(
-                createResult.getResponse().getContentAsString(), 
-                AreaResponse.class);
-
-        // When
-        mockMvc.perform(delete("/api/v1/areas/" + createdArea.getId())
+    private void deleteArea(Long areaId) throws Exception {
+        mockMvc.perform(delete(BASE_URL + "/" + areaId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        // Then
-        // Verify that the area was actually deleted from the database by checking that
-        // it's not in the list of all areas
-        MvcResult getResult = mockMvc.perform(get("/api/v1/areas")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String responseJson = getResult.getResponse().getContentAsString();
-        List<AreaResponse> areas = objectMapper.readValue(responseJson, new TypeReference<List<AreaResponse>>() {});
-
-        boolean areaStillExists = false;
-        for (AreaResponse area : areas) {
-            if (area.getId().equals(createdArea.getId())) {
-                areaStillExists = true;
-                break;
-            }
-        }
-
-        assertThat(areaStillExists).isFalse();
     }
 }
