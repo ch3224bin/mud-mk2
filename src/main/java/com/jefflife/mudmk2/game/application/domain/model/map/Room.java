@@ -3,7 +3,6 @@ package com.jefflife.mudmk2.game.application.domain.model.map;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +30,7 @@ public class Room {
 	@Builder
 	public Room(final long id, final long areaId, final String summary, final String description, final WayOuts wayOuts) {
 		this.id = id;
+		this.areaId = areaId;
 		this.summary = summary;
 		this.description = description;
 		this.wayOuts = wayOuts;

@@ -31,9 +31,10 @@ public class RoomControllerSystemTest {
     @Test
     void createRoom_shouldCreateRoomAndReturnCreatedResponse() throws Exception {
         // Given
+        long areaId = 1L;
         String summary = "Test Room";
         String description = "This is a test room description";
-        String requestJson = createRoomJson(summary, description);
+        String requestJson = createRoomJson(areaId, summary, description);
 
         // When
         MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -47,22 +48,24 @@ public class RoomControllerSystemTest {
         RoomResponse response = objectMapper.readValue(responseJson, RoomResponse.class);
 
         assertThat(response.id()).isNotNull();
-        assertRoomEquals(response, summary, description);
+        assertRoomEquals(response, areaId, summary, description);
 
         // Verify Location header
         String locationHeader = result.getResponse().getHeader("Location");
         assertThat(locationHeader).isEqualTo(BASE_URL + "/" + response.id());
     }
 
-    private String createRoomJson(String summary, String description) {
+    private String createRoomJson(long areaId, String summary, String description) {
         return "{"
+                + "\"areaId\": " + areaId + ","
                 + "\"summary\": \"" + summary + "\","
                 + "\"description\": \"" + description + "\""
                 + "}";
     }
 
-    private void assertRoomEquals(RoomResponse room, String expectedSummary, String expectedDescription) {
+    private void assertRoomEquals(RoomResponse room, long expectedAreaId, String expectedSummary, String expectedDescription) {
         assertThat(room).isNotNull();
+        assertThat(room.areaId()).isEqualTo(expectedAreaId);
         assertThat(room.summary()).isEqualTo(expectedSummary);
         assertThat(room.description()).isEqualTo(expectedDescription);
     }
