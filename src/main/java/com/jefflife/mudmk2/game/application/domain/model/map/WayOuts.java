@@ -1,12 +1,18 @@
 package com.jefflife.mudmk2.game.application.domain.model.map;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Embeddable
 public class WayOuts {
-  private final List<WayOut> wayOuts;
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<WayOut> wayOuts = new ArrayList<>();
 
   public WayOuts() {
     wayOuts = new ArrayList<>();

@@ -1,41 +1,36 @@
 package com.jefflife.mudmk2.game.application.domain.model.map;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @EqualsAndHashCode(of = "id")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Entity
 public class Room {
-	@Getter private final Long id;
-	@Getter private String summary;
-	@Getter private String description;
-	@Getter private long floorId;
-	private final WayOuts wayOuts;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
-	private Room(Long id, String summary, String description, List<WayOut> wayOuts, long floorId) {
-		this(id, summary, description, new WayOuts(wayOuts), floorId);
-	}
+	@Column(name = "summary", nullable = false)
+	private String summary;
 
-	private Room(Long id, String summary, String description, WayOuts wayOuts, long floorId) {
+	@Column(name = "description", nullable = false)
+	private String description;
+
+	@Embedded
+	private WayOuts wayOuts = new WayOuts();
+
+	@Builder
+	public Room(final long id, final String summary, final String description, final WayOuts wayOuts) {
 		this.id = id;
 		this.summary = summary;
 		this.description = description;
 		this.wayOuts = wayOuts;
-		this.floorId = floorId;
-	}
-
-	public static Room of(long id, String summary, String description, List<WayOut> wayOuts, long floorId) {
-		return new Room(id, summary, description, wayOuts, floorId);
-	}
-
-	public static Room withOutWayOuts(long id, String summary, String description) {
-		return new Room(id, summary, description, new WayOuts(), 0L);
-	}
-
-	public static Room withOutId(String summary, String description) {
-		return new Room(null, summary, description, new WayOuts(), 0L);
 	}
 
 	public List<WayOut> getSortedWayOuts() {
@@ -53,8 +48,8 @@ public class Room {
 	public WayOut createWayOut(Room nextRoom, Direction direction) {
 		WayOut wayout = WayOut.builder()
 				.direction(direction)
-				.roomId(id)
-				.nextRoomId(nextRoom.id)
+				.room(this)
+				.nextRoom(nextRoom)
 				.build();
 		wayOuts.add(wayout);
 		return wayout;
