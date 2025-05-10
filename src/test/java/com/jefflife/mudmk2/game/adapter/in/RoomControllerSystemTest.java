@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -246,5 +244,54 @@ public class RoomControllerSystemTest {
         // Verify both rooms were found in the response
         assertThat(foundRoom1).withFailMessage("Room 1 (ID: %d) was not found in the response", createResponse1.id()).isTrue();
         assertThat(foundRoom2).withFailMessage("Room 2 (ID: %d) was not found in the response", createResponse2.id()).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void deleteRoom_shouldDeleteRoomAndReturnNoContent() throws Exception {
+        // Given
+        // First create a room
+        long areaId = 1L;
+        String summary = "Test Room for Delete";
+        String description = "This is a test room for the delete method";
+        String createRequestJson = createRoomJson(areaId, summary, description);
+
+        MvcResult createResult = mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createRequestJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String createResponseJson = createResult.getResponse().getContentAsString();
+        RoomResponse createResponse = objectMapper.readValue(createResponseJson, RoomResponse.class);
+        long roomId = createResponse.id();
+
+        // When
+        deleteRoom(roomId);
+
+        // Then
+        // Verify that the room was actually deleted by checking it's not in the list of all rooms
+        MvcResult getResult = mockMvc.perform(get(BASE_URL)
+                        .param("page", "0")
+                        .param("size", "100") // Use a larger size to ensure we get all rooms
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String getResponseJson = getResult.getResponse().getContentAsString();
+        Map<String, Object> pageResponse = objectMapper.readValue(getResponseJson, new TypeReference<Map<String, Object>>() {});
+        List<Map<String, Object>> content = (List<Map<String, Object>>) pageResponse.get("content");
+
+        // Check that the deleted room is not in the list
+        boolean roomExists = content.stream()
+                .anyMatch(room -> ((Number) room.get("id")).longValue() == roomId);
+
+        assertThat(roomExists).withFailMessage("Room (ID: %d) was found in the response but should have been deleted", roomId).isFalse();
+    }
+
+    private void deleteRoom(Long roomId) throws Exception {
+        mockMvc.perform(delete(BASE_URL + "/" + roomId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }
