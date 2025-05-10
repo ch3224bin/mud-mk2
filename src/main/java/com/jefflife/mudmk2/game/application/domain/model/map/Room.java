@@ -22,11 +22,14 @@ public class Room {
 	@Column(name = "description", nullable = false)
 	private String description;
 
+	@Column(name = "area_id", nullable = false)
+	private long areaId;
+
 	@Embedded
 	private WayOuts wayOuts = new WayOuts();
 
 	@Builder
-	public Room(final long id, final String summary, final String description, final WayOuts wayOuts) {
+	public Room(final long id, final long areaId, final String summary, final String description, final WayOuts wayOuts) {
 		this.id = id;
 		this.summary = summary;
 		this.description = description;
