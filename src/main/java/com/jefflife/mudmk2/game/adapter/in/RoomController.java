@@ -63,8 +63,8 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable) {
-        return ResponseEntity.ok(getRoomUseCase.getPagedRooms(pageable));
+    public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable, @RequestParam(value = "areaId", required = true) final long areaId) {
+        return ResponseEntity.ok(getRoomUseCase.getPagedRooms(pageable, areaId));
     }
 
     @DeleteMapping("/{id}")

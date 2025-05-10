@@ -127,7 +127,7 @@ public class RoomControllerSystemTest {
 
         // When
         // Request with a large page size to ensure we get all rooms
-        Map<String, Object> pageResponse = getPagedRooms(0, 100);
+        Map<String, Object> pageResponse = getPagedRooms(0, 100, areaId);
 
         // Then
         // Verify pagination information
@@ -183,7 +183,7 @@ public class RoomControllerSystemTest {
 
         // Then
         // Verify that the room was actually deleted by checking it's not in the list of all rooms
-        Map<String, Object> pageResponse = getPagedRooms(0, 100);
+        Map<String, Object> pageResponse = getPagedRooms(0, 100, areaId);
         List<Map<String, Object>> content = (List<Map<String, Object>>) pageResponse.get("content");
 
         // Check that the deleted room is not in the list
@@ -350,10 +350,11 @@ public class RoomControllerSystemTest {
     /**
      * Helper method to get paged rooms
      */
-    private Map<String, Object> getPagedRooms(int page, int size) throws Exception {
+    private Map<String, Object> getPagedRooms(int page, int size, long areaId) throws Exception {
         MvcResult result = mockMvc.perform(get(BASE_URL)
                         .param("page", String.valueOf(page))
                         .param("size", String.valueOf(size))
+                        .param("areaId", String.valueOf(areaId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();

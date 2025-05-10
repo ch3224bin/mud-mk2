@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface GetRoomUseCase {
     RoomResponse getRoom(long id);
-    Page<RoomResponse> getPagedRooms(Pageable pageable);
+    Page<RoomResponse> getPagedRooms(Pageable pageable, long areaId);
 }

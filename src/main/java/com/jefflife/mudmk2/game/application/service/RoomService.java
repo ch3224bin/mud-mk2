@@ -29,8 +29,8 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 	}
 
 	@Override
-	public Page<RoomResponse> getPagedRooms(final Pageable pageable) {
-		return roomRepository.findAll(pageable)
+	public Page<RoomResponse> getPagedRooms(final Pageable pageable, final long areaId) {
+		return roomRepository.findByAreaId(pageable, areaId)
 				.map(RoomResponse::of);
 	}
 
