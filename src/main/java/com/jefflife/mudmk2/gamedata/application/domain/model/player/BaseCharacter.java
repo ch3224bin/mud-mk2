@@ -1,13 +1,11 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Embeddable
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder @AllArgsConstructor
 public class BaseCharacter {
     private String name;
     
@@ -30,38 +28,6 @@ public class BaseCharacter {
     private Long roomId;
     
     // 생존 여부
+    @Builder.Default
     private boolean alive = true;
-
-    @Builder
-    public BaseCharacter(
-            final String name,
-            final String background,
-            final int hp,
-            final int maxHp,
-            final int mp,
-            final int maxMp,
-            final int str,
-            final int dex,
-            final int con,
-            final int intelligence,
-            final int pow,
-            final int cha,
-            final Long roomId,
-            final boolean alive
-    ) {
-        this.name = name;
-        this.background = background;
-        this.hp = hp;
-        this.maxHp = maxHp;
-        this.mp = mp;
-        this.maxMp = maxMp;
-        this.str = str;
-        this.dex = dex;
-        this.con = con;
-        this.intelligence = intelligence;
-        this.pow = pow;
-        this.cha = cha;
-        this.roomId = roomId;
-        this.alive = alive;
-    }
 }
