@@ -1,6 +1,8 @@
 package com.jefflife.mudmk2.chat.controller;
 
+import com.jefflife.mudmk2.chat.event.ChatMessageEvent;
 import com.jefflife.mudmk2.chat.model.ChatMessage;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -14,9 +16,11 @@ import java.time.LocalDateTime;
 public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public ChatController(SimpMessagingTemplate messagingTemplate) {
+    public ChatController(SimpMessagingTemplate messagingTemplate, ApplicationEventPublisher eventPublisher) {
         this.messagingTemplate = messagingTemplate;
+        this.eventPublisher = eventPublisher;
     }
 
     @MessageMapping("/chat.sendMessage")
@@ -31,6 +35,9 @@ public class ChatController {
 
         // Send the original message to all subscribers (public channel)
         messagingTemplate.convertAndSend("/topic/public", chatMessage);
+
+        // Publish event for the chat message
+        eventPublisher.publishEvent(ChatMessageEvent.from(chatMessage));
 
         // Create a response message only for the sender
         ChatMessage responseMessage = ChatMessage.builder()
