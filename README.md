@@ -16,6 +16,9 @@
 - 방(Room) 관리 (생성, 조회, 수정, 삭제)
 - 방 연결 및 문(Door) 관리
 - 방 지도 시각화
+- NPC(Non-Player Character) 관리 (생성, 조회, 수정, 삭제)
+- 명령어 처리 시스템 (Chain of Responsibility 패턴)
+- 한국어 명령어 지원 (이동, 대화 등)
 - 터미널 스타일의 사용자 인터페이스
 
 ## 기술 스택
@@ -75,6 +78,7 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - `com.jefflife.mudmk2.gamedata.adapter.in`: 게임 컨트롤러
   - `AreaController`: 지역 관리 API 컨트롤러
   - `RoomController`: 방 관리 API 컨트롤러
+  - `NonPlayerCharacterController`: NPC 관리 API 컨트롤러
 
 - `com.jefflife.mudmk2.gamedata.application.domain.model.map`: 게임 맵 도메인 모델
   - `Area`: 지역 엔티티
@@ -85,9 +89,22 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
   - `WayOuts`: 출구 컬렉션 (방의 모든 출구 관리)
   - `Direction`: 방향 enum (동, 서, 남, 북)
 
+- `com.jefflife.mudmk2.gamedata.application.domain.model.player`: 게임 캐릭터 도메인 모델
+  - `BaseCharacter`: 기본 캐릭터 엔티티 (이름, 능력치, 상태 등)
+  - `PlayableCharacter`: 플레이 가능한 캐릭터 엔티티 (레벨, 경험치 등)
+  - `NonPlayerCharacter`: NPC 엔티티 (페르소나, 타입, 스폰 위치 등)
+  - `NPCType`: NPC 타입 enum
+
 - `com.jefflife.mudmk2.gamedata.application.service`: 게임 서비스
   - `AreaService`: 지역 관리 서비스
   - `RoomService`: 방 관리 서비스 (방 생성, 수정, 삭제, 연결)
+  - `NonPlayerCharacterService`: NPC 관리 서비스 (NPC 생성, 수정, 삭제)
+
+- `com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser`: 명령어 파싱 시스템
+  - `CommandParser`: 명령어 파서 인터페이스
+  - `CommandParserChain`: 명령어 파서 체인 (Chain of Responsibility 패턴)
+  - `MoveCommandParser`: 이동 명령어 파서 (동, 서, 남, 북, 위, 아래)
+  - `SpeakCommandParser`: 대화 명령어 파서 ("말" 명령어)
 
 #### 채팅 관련
 - `com.jefflife.mudmk2.chat.controller`: 채팅 컨트롤러
@@ -118,6 +135,11 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - 명령어를 입력하고 "Execute" 버튼을 클릭하거나 Enter 키를 누릅니다.
 - 다른 사용자와 실시간으로 채팅할 수 있습니다.
 
+### 명령어 사용
+- 이동 명령어: "동", "서", "남", "북", "위", "아래" 입력으로 해당 방향으로 이동합니다.
+- 대화 명령어: "[메시지] 말" 형식으로 입력하여 대화할 수 있습니다. (예: "안녕하세요 말")
+- 명령어는 한국어로 지원됩니다.
+
 ### 지역 관리
 - 채팅 화면에서 "AREA MANAGEMENT" 버튼을 클릭합니다.
 - 지역 생성 폼에서 이름과 타입을 입력하여 새 지역을 생성합니다.
@@ -129,6 +151,12 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - 기존 방을 수정하거나 삭제할 수 있습니다.
 - 방 연결 기능을 통해 두 방 사이에 출구를 생성하고 문을 설치할 수 있습니다.
 - 방 지도 기능을 통해 방들의 연결 관계를 시각적으로 확인할 수 있습니다.
+
+### NPC 관리
+- 채팅 화면에서 "NPC MANAGEMENT" 버튼을 클릭합니다.
+- NPC 생성 폼에서 이름, 배경, 능력치, 페르소나, 타입 등을 입력하여 새 NPC를 생성합니다.
+- 기존 NPC를 수정하거나 삭제할 수 있습니다.
+- NPC는 게임 내에서 대화하거나 상호작용할 수 있는 캐릭터입니다.
 
 ### 프로필 관리
 - "PROFILE" 버튼을 클릭하여 사용자 프로필을 확인할 수 있습니다.
