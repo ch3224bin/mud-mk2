@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - NPC Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .npc-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .room-selector {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .npc-form {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .form-select {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .form-check-input {
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .form-check-input:checked {
+            background-color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00aa00 0%, #00ff00 100%);
+            color: #000;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #00cc00 0%, #00ff88 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid #9ca3af;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(156, 163, 175, 0.1);
+            color: #e4e4e7;
+            border-color: #e4e4e7;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .npc-list {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .npc-list-header {
+            color: #00ff00;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .npc-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .npc-item:last-child {
+            border-bottom: none;
+        }
+
+        .npc-item-info {
+            flex: 1;
+        }
+
+        .npc-item-name {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .npc-item-description {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .npc-item-details {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .detail-badge.npc-type {
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+
+        .detail-badge.stats {
+            border-color: #00ccff;
+            color: #00ccff;
+        }
+
+        .detail-badge.essential {
+            border-color: #cc00ff;
+            color: #cc00ff;
+        }
+
+        .detail-badge.conversable {
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+
+        .detail-badge i {
+            margin-right: 4px;
+        }
+
+        .npc-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: right;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-profile {
+            background: transparent;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .btn-profile:hover {
+            background: #60a5fa;
+            color: #000;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-area {
+            background: transparent;
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .btn-area:hover {
+            background: #f59e0b;
+            color: #000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-room {
+            background: transparent;
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-room:hover {
+            background: #3b82f6;
+            color: #000;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .alert-danger {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .npc-container {
+                padding: 16px;
+            }
+
+            .room-selector, .npc-form, .npc-list {
+                padding: 16px;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>NPC MANAGEMENT</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="npc-container">
+                        <div id="alertContainer" class="alert"></div>
+
+                        <!-- Area and Room Selector -->
+                        <div class="room-selector">
+                            <h4 class="mb-4">Select Area and Room</h4>
+                            <div class="mb-3">
+                                <label for="areaSelect" class="form-label">Area</label>
+                                <select class="form-select" id="areaSelect">
+                                    <option value="">Select an Area</option>
+                                    <!-- Areas will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="roomSelect" class="form-label">Room</label>
+                                <select class="form-select" id="roomSelect" disabled>
+                                    <option value="">Select an Area first</option>
+                                    <!-- Rooms will be loaded here -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Create/Edit NPC Form -->
+                        <div class="npc-form">
+                            <h4 class="mb-4" id="formTitle">Create New NPC</h4>
+                            <form id="npcForm">
+                                <input type="hidden" id="npcId" value="">
+                                <input type="hidden" id="roomId" value="">
+
+                                <!-- Basic Information -->
+                                <h5 class="mb-3">Basic Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="npcName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="npcName" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="npcType" class="form-label">NPC Type</label>
+                                        <select class="form-select" id="npcType" required>
+                                            <option value="">Select NPC Type</option>
+                                            <option value="QUEST_GIVER">Quest Giver</option>
+                                            <option value="MERCHANT">Merchant</option>
+                                            <option value="TRAINER">Trainer</option>
+                                            <option value="ENEMY">Enemy</option>
+                                            <option value="FRIENDLY">Friendly</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="npcBackground" class="form-label">Background</label>
+                                    <textarea class="form-control" id="npcBackground" rows="2" required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="npcPersona" class="form-label">Persona</label>
+                                    <textarea class="form-control" id="npcPersona" rows="3" required></textarea>
+                                </div>
+
+                                <!-- Stats -->
+                                <h5 class="mb-3 mt-4">Stats</h5>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="npcHp" class="form-label">HP</label>
+                                        <input type="number" class="form-control" id="npcHp" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="npcMaxHp" class="form-label">Max HP</label>
+                                        <input type="number" class="form-control" id="npcMaxHp" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="npcMp" class="form-label">MP</label>
+                                        <input type="number" class="form-control" id="npcMp" min="0" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="npcMaxMp" class="form-label">Max MP</label>
+                                        <input type="number" class="form-control" id="npcMaxMp" min="0" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcStr" class="form-label">STR</label>
+                                        <input type="number" class="form-control" id="npcStr" min="1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcDex" class="form-label">DEX</label>
+                                        <input type="number" class="form-control" id="npcDex" min="1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcCon" class="form-label">CON</label>
+                                        <input type="number" class="form-control" id="npcCon" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcInt" class="form-label">INT</label>
+                                        <input type="number" class="form-control" id="npcInt" min="1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcPow" class="form-label">POW</label>
+                                        <input type="number" class="form-control" id="npcPow" min="1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcCha" class="form-label">CHA</label>
+                                        <input type="number" class="form-control" id="npcCha" min="1" required>
+                                    </div>
+                                </div>
+
+                                <!-- Character Attributes -->
+                                <h5 class="mb-3 mt-4">Character Attributes</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcLevel" class="form-label">Level</label>
+                                        <input type="number" class="form-control" id="npcLevel" min="1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcExp" class="form-label">Experience</label>
+                                        <input type="number" class="form-control" id="npcExp" min="0" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="npcNextLevelExp" class="form-label">Next Level Exp</label>
+                                        <input type="number" class="form-control" id="npcNextLevelExp" min="0" required>
+                                    </div>
+                                </div>
+
+                                <!-- Spawn Settings -->
+                                <h5 class="mb-3 mt-4">Spawn Settings</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="spawnRoomSelect" class="form-label">Spawn Room</label>
+                                        <select class="form-select" id="spawnRoomSelect" required>
+                                            <option value="">Select an Area first</option>
+                                            <!-- Rooms will be loaded here -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Options -->
+                                <h5 class="mb-3 mt-4">Options</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="npcConversable">
+                                            <label class="form-check-label" for="npcConversable">
+                                                Conversable
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="npcEssential">
+                                            <label class="form-check-label" for="npcEssential">
+                                                Essential
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary" id="saveButton">Create NPC</button>
+                                    <button type="button" class="btn btn-secondary" id="cancelButton" style="display: none;">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- NPC List -->
+                        <div class="npc-list">
+                            <h4 class="npc-list-header">NPCs in Selected Room</h4>
+                            <div id="npcListContainer">
+                                <!-- NPC items will be loaded here -->
+                                <div class="text-center py-4 text-muted">Please select a room to view NPCs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/area-management" class="btn btn-system btn-area me-2">AREA MANAGEMENT</a>
+                        <a href="/room-management" class="btn btn-system btn-room me-2">ROOM MANAGEMENT</a>
+                        <a href="/room-map" class="btn btn-system btn-chat me-2">ROOM MAP</a>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/profile" class="btn btn-system btn-profile me-2">PROFILE</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the NPC Management system.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get username from Thymeleaf
+        const username = /*[[${userName}]]*/ 'default-user';
+
+        // DOM Elements
+        const areaSelect = document.getElementById('areaSelect');
+        const roomSelect = document.getElementById('roomSelect');
+        const spawnRoomSelect = document.getElementById('spawnRoomSelect');
+        const npcForm = document.getElementById('npcForm');
+        const formTitle = document.getElementById('formTitle');
+        const npcId = document.getElementById('npcId');
+        const roomId = document.getElementById('roomId');
+        const npcName = document.getElementById('npcName');
+        const npcType = document.getElementById('npcType');
+        const npcBackground = document.getElementById('npcBackground');
+        const npcPersona = document.getElementById('npcPersona');
+        const npcHp = document.getElementById('npcHp');
+        const npcMaxHp = document.getElementById('npcMaxHp');
+        const npcMp = document.getElementById('npcMp');
+        const npcMaxMp = document.getElementById('npcMaxMp');
+        const npcStr = document.getElementById('npcStr');
+        const npcDex = document.getElementById('npcDex');
+        const npcCon = document.getElementById('npcCon');
+        const npcInt = document.getElementById('npcInt');
+        const npcPow = document.getElementById('npcPow');
+        const npcCha = document.getElementById('npcCha');
+        const npcLevel = document.getElementById('npcLevel');
+        const npcExp = document.getElementById('npcExp');
+        const npcNextLevelExp = document.getElementById('npcNextLevelExp');
+        const npcConversable = document.getElementById('npcConversable');
+        const npcEssential = document.getElementById('npcEssential');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const npcListContainer = document.getElementById('npcListContainer');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Base API URLs
+        const AREAS_API_URL = '/api/v1/areas';
+        const ROOMS_API_URL = '/api/v1/rooms';
+        const NPCS_API_URL = '/api/v1/npcs';
+
+        // Load all areas for the dropdown
+        function loadAreas() {
+            fetch(AREAS_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load areas');
+                    }
+                    return response.json();
+                })
+                .then(areas => {
+                    populateAreaDropdown(areas);
+                })
+                .catch(error => {
+                    showAlert('Error loading areas: ' + error.message, 'danger');
+                });
+        }
+
+        // Populate area dropdown
+        function populateAreaDropdown(areas) {
+            if (!areas || areas.length === 0) {
+                areaSelect.innerHTML = '<option value="">No areas available</option>';
+                return;
+            }
+
+            let html = '<option value="">Select an Area</option>';
+            areas.forEach(area => {
+                html += `<option value="${area.id}">${area.name}</option>`;
+            });
+
+            areaSelect.innerHTML = html;
+        }
+
+        // Load rooms for the selected area
+        function loadRooms(areaId) {
+            if (!areaId) {
+                roomSelect.innerHTML = '<option value="">Select an Area first</option>';
+                spawnRoomSelect.innerHTML = '<option value="">Select an Area first</option>';
+                roomSelect.disabled = true;
+                spawnRoomSelect.disabled = true;
+                return;
+            }
+
+            roomSelect.disabled = true;
+            spawnRoomSelect.disabled = true;
+            roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
+            spawnRoomSelect.innerHTML = '<option value="">Loading rooms...</option>';
+
+            fetch(`${ROOMS_API_URL}?areaId=${areaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load rooms');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateRoomDropdowns(data.content);
+                    roomSelect.disabled = false;
+                    spawnRoomSelect.disabled = false;
+                })
+                .catch(error => {
+                    showAlert('Error loading rooms: ' + error.message, 'danger');
+                    roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+                    spawnRoomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+                });
+        }
+
+        // Populate room dropdowns
+        function populateRoomDropdowns(rooms) {
+            if (!rooms || rooms.length === 0) {
+                roomSelect.innerHTML = '<option value="">No rooms available</option>';
+                spawnRoomSelect.innerHTML = '<option value="">No rooms available</option>';
+                return;
+            }
+
+            let html = '<option value="">Select a Room</option>';
+            rooms.forEach(room => {
+                html += `<option value="${room.id}">${room.summary}</option>`;
+            });
+
+            roomSelect.innerHTML = html;
+            spawnRoomSelect.innerHTML = html;
+        }
+
+        // Load NPCs for selected room
+        function loadNPCs(selectedRoomId) {
+            if (!selectedRoomId) {
+                npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">Please select a room to view NPCs</div>';
+                return;
+            }
+
+            npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">Loading NPCs...</div>';
+
+            fetch(`${NPCS_API_URL}?roomId=${selectedRoomId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load NPCs');
+                    }
+                    return response.json();
+                })
+                .then(npcs => {
+                    displayNPCs(npcs);
+                })
+                .catch(error => {
+                    showAlert('Error loading NPCs: ' + error.message, 'danger');
+                    npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">Error loading NPCs</div>';
+                });
+        }
+
+        // Display NPCs in the list
+        function displayNPCs(npcs) {
+            if (!npcs || npcs.length === 0) {
+                npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">No NPCs found in this room. Create your first NPC above.</div>';
+                return;
+            }
+
+            let html = '';
+            npcs.forEach(npc => {
+                // Create detail badges
+                let detailsHtml = '<div class="npc-item-details">';
+
+                // NPC Type badge
+                detailsHtml += `
+                <div class="detail-badge npc-type">
+                    <i class="fas fa-user-tag"></i>
+                    ${npc.npcType}
+                </div>`;
+
+                // Stats badge
+                detailsHtml += `
+                <div class="detail-badge stats">
+                    <i class="fas fa-heart"></i>
+                    HP: ${npc.hp}/${npc.maxHp} | MP: ${npc.mp}/${npc.maxMp}
+                </div>`;
+
+                // Essential badge if applicable
+                if (npc.essential) {
+                    detailsHtml += `
+                    <div class="detail-badge essential">
+                        <i class="fas fa-shield-alt"></i>
+                        Essential
+                    </div>`;
+                }
+
+                // Conversable badge if applicable
+                if (npc.conversable) {
+                    detailsHtml += `
+                    <div class="detail-badge conversable">
+                        <i class="fas fa-comments"></i>
+                        Conversable
+                    </div>`;
+                }
+
+                detailsHtml += '</div>';
+
+                html += `
+                <div class="npc-item">
+                    <div class="npc-item-info">
+                        <div class="npc-item-name">${npc.name}</div>
+                        <div class="npc-item-description">${npc.background}</div>
+                        ${detailsHtml}
+                    </div>
+                    <div class="npc-item-actions">
+                        <button class="btn btn-secondary btn-sm edit-btn" data-id="${npc.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${npc.id}" data-name="${npc.name}">Delete</button>
+                    </div>
+                </div>
+                `;
+            });
+
+            npcListContainer.innerHTML = html;
+
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    loadNPCForEdit(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+
+                    if (confirm(`Are you sure you want to delete the NPC "${name}"?`)) {
+                        deleteNPC(id);
+                    }
+                });
+            });
+        }
+
+        // Load NPC for editing
+        function loadNPCForEdit(id) {
+            fetch(`${NPCS_API_URL}/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load NPC details');
+                    }
+                    return response.json();
+                })
+                .then(npc => {
+                    setEditMode(npc);
+                })
+                .catch(error => {
+                    showAlert('Error loading NPC details: ' + error.message, 'danger');
+                });
+        }
+
+        // Set form to create mode
+        function setCreateMode() {
+            formTitle.textContent = 'Create New NPC';
+            saveButton.textContent = 'Create NPC';
+            npcId.value = '';
+            npcName.value = '';
+            npcType.value = '';
+            npcBackground.value = '';
+            npcPersona.value = '';
+            npcHp.value = '100';
+            npcMaxHp.value = '100';
+            npcMp.value = '50';
+            npcMaxMp.value = '50';
+            npcStr.value = '10';
+            npcDex.value = '10';
+            npcCon.value = '10';
+            npcInt.value = '10';
+            npcPow.value = '10';
+            npcCha.value = '10';
+            npcLevel.value = '1';
+            npcExp.value = '0';
+            npcNextLevelExp.value = '100';
+            npcConversable.checked = false;
+            npcEssential.checked = false;
+            cancelButton.style.display = 'none';
+        }
+
+        // Set form to edit mode
+        function setEditMode(npc) {
+            formTitle.textContent = 'Edit NPC';
+            saveButton.textContent = 'Update NPC';
+            npcId.value = npc.id;
+            npcName.value = npc.name;
+            npcType.value = npc.npcType;
+            npcBackground.value = npc.background;
+            npcPersona.value = npc.persona;
+            npcHp.value = npc.hp;
+            npcMaxHp.value = npc.maxHp;
+            npcMp.value = npc.mp;
+            npcMaxMp.value = npc.maxMp;
+            npcStr.value = npc.str;
+            npcDex.value = npc.dex;
+            npcCon.value = npc.con;
+            npcInt.value = npc.intelligence;
+            npcPow.value = npc.pow;
+            npcCha.value = npc.cha;
+            npcLevel.value = npc.level;
+            npcExp.value = npc.experience;
+            npcNextLevelExp.value = npc.nextLevelExp;
+            npcConversable.checked = npc.conversable;
+            npcEssential.checked = npc.essential;
+            spawnRoomSelect.value = npc.spawnRoomId;
+            cancelButton.style.display = 'block';
+
+            // Scroll to form
+            npcForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Create a new NPC
+        function createNPC(npcData) {
+            fetch(NPCS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(npcData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create NPC');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`NPC "${npcData.name}" created successfully!`, 'success');
+                setCreateMode();
+                loadNPCs(roomSelect.value);
+            })
+            .catch(error => {
+                showAlert('Error creating NPC: ' + error.message, 'danger');
+            });
+        }
+
+        // Update an existing NPC
+        function updateNPC(id, npcData) {
+            fetch(`${NPCS_API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(npcData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update NPC');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`NPC "${npcData.name}" updated successfully!`, 'success');
+                setCreateMode();
+                loadNPCs(roomSelect.value);
+            })
+            .catch(error => {
+                showAlert('Error updating NPC: ' + error.message, 'danger');
+            });
+        }
+
+        // Delete an NPC
+        function deleteNPC(id) {
+            fetch(`${NPCS_API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete NPC');
+                }
+                showAlert('NPC deleted successfully!', 'success');
+                loadNPCs(roomSelect.value);
+            })
+            .catch(error => {
+                showAlert('Error deleting NPC: ' + error.message, 'danger');
+            });
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            alertContainer.textContent = message;
+            alertContainer.className = `alert alert-${type}`;
+            alertContainer.style.display = 'block';
+
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // Event Listeners
+        areaSelect.addEventListener('change', function() {
+            const selectedAreaId = this.value;
+
+            // Reset room selection
+            roomSelect.value = '';
+            roomId.value = '';
+            npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">Please select a room to view NPCs</div>';
+            npcForm.style.display = 'none';
+
+            if (selectedAreaId) {
+                loadRooms(selectedAreaId);
+            } else {
+                roomSelect.innerHTML = '<option value="">Select an Area first</option>';
+                spawnRoomSelect.innerHTML = '<option value="">Select an Area first</option>';
+                roomSelect.disabled = true;
+                spawnRoomSelect.disabled = true;
+            }
+        });
+
+        roomSelect.addEventListener('change', function() {
+            const selectedRoomId = this.value;
+            roomId.value = selectedRoomId;
+
+            if (selectedRoomId) {
+                loadNPCs(selectedRoomId);
+                npcForm.style.display = 'block';
+            } else {
+                npcListContainer.innerHTML = '<div class="text-center py-4 text-muted">Please select a room to view NPCs</div>';
+                npcForm.style.display = 'none';
+            }
+        });
+
+        npcForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = npcId.value;
+            const npcData = {
+                name: npcName.value.trim(),
+                background: npcBackground.value.trim(),
+                hp: parseInt(npcHp.value),
+                maxHp: parseInt(npcMaxHp.value),
+                mp: parseInt(npcMp.value),
+                maxMp: parseInt(npcMaxMp.value),
+                str: parseInt(npcStr.value),
+                dex: parseInt(npcDex.value),
+                con: parseInt(npcCon.value),
+                intelligence: parseInt(npcInt.value),
+                pow: parseInt(npcPow.value),
+                cha: parseInt(npcCha.value),
+                roomId: parseInt(roomSelect.value),
+                level: parseInt(npcLevel.value),
+                experience: parseInt(npcExp.value),
+                nextLevelExp: parseInt(npcNextLevelExp.value),
+                conversable: npcConversable.checked,
+                persona: npcPersona.value.trim(),
+                npcType: npcType.value,
+                spawnRoomId: parseInt(spawnRoomSelect.value),
+                essential: npcEssential.checked
+            };
+
+            if (!npcData.name) {
+                showAlert('Please enter an NPC name', 'danger');
+                return;
+            }
+
+            if (!npcData.background) {
+                showAlert('Please enter an NPC background', 'danger');
+                return;
+            }
+
+            if (!npcData.persona) {
+                showAlert('Please enter an NPC persona', 'danger');
+                return;
+            }
+
+            if (!npcData.npcType) {
+                showAlert('Please select an NPC type', 'danger');
+                return;
+            }
+
+            if (!npcData.roomId) {
+                showAlert('Please select a room', 'danger');
+                return;
+            }
+
+            if (!npcData.spawnRoomId) {
+                showAlert('Please select a spawn room', 'danger');
+                return;
+            }
+
+            if (!id) {
+                // Create mode
+                createNPC(npcData);
+            } else {
+                // Edit mode
+                updateNPC(id, npcData);
+            }
+        });
+
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
+
+        // Initialize
+        if (username) {
+            loadAreas();
+            setCreateMode();
+        }
+    });
+</script>
+</body>
+</html>

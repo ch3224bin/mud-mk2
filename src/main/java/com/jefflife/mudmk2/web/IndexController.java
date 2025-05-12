@@ -77,4 +77,14 @@ public class IndexController {
         }
         return "room-map";
     }
+
+    @GetMapping("/npc-management")
+    public String npcManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "npc-management";
+    }
 }
