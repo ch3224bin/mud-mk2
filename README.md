@@ -161,6 +161,57 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 ### 프로필 관리
 - "PROFILE" 버튼을 클릭하여 사용자 프로필을 확인할 수 있습니다.
 
+## MySQL 설정 (Docker)
+
+이 프로젝트는 Docker Compose를 사용하여 MySQL 데이터베이스를 쉽게 설정할 수 있습니다.
+
+### Docker Compose로 MySQL 실행하기
+
+1. 프로젝트 루트 디렉토리에서 다음 명령어를 실행합니다:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. MySQL 서버가 실행되면 다음 정보로 접속할 수 있습니다:
+   - 호스트: localhost
+   - 포트: 3306
+   - 데이터베이스: mudmk2db
+   - 사용자: muduser
+   - 비밀번호: mudpassword
+
+3. MySQL 데이터는 프로젝트 루트 디렉토리의 `mysql-data` 폴더에 저장됩니다. 이 폴더는 Docker 컨테이너가 처음 실행될 때 자동으로 생성됩니다.
+
+### H2에서 MySQL로 전환하기
+
+기본적으로 이 프로젝트는 H2 인메모리 데이터베이스를 사용합니다. MySQL로 전환하려면 `application.properties` 파일을 다음과 같이 수정하세요:
+
+```properties
+# H2 설정 주석 처리
+#spring.datasource.url=jdbc:h2:mem:testdb
+#spring.datasource.driverClassName=org.h2.Driver
+#spring.datasource.username=sa
+#spring.datasource.password=
+#spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+#spring.h2.console.enabled=true
+
+# MySQL 설정
+spring.datasource.url=jdbc:mysql://localhost:3306/mudmk2db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.username=muduser
+spring.datasource.password=mudpassword
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.hibernate.ddl-auto=update
+```
+
+또한 MySQL JDBC 드라이버 의존성을 `build.gradle` 파일에 추가해야 합니다:
+
+```gradle
+dependencies {
+    // 기존 의존성들...
+    implementation 'mysql:mysql-connector-java:8.0.28'
+}
+```
+
 ## 주의사항
 
 - 실제 운영 환경에서는 클라이언트 ID와 비밀번호를 환경 변수나 외부 설정으로 관리하는 것이 좋습니다.
