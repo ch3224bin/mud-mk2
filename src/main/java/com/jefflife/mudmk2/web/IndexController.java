@@ -20,12 +20,12 @@ public class IndexController {
             // Redirect to chat page if user is logged in
             return "redirect:/chat";
         }
-        return "index";
+        return "web/index";
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "web/login";
     }
 
     @GetMapping("/profile")
@@ -35,7 +35,7 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "profile";
+        return "web/profile";
     }
 
     @GetMapping("/chat")
@@ -45,7 +45,7 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "chat";
+        return "web/chat";
     }
 
     @GetMapping("/area-management")
@@ -55,7 +55,7 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "area-management";
+        return "web/area-management";
     }
 
     @GetMapping("/room-management")
@@ -65,7 +65,7 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "room-management";
+        return "web/room-management";
     }
 
     @GetMapping("/room-map")
@@ -75,7 +75,7 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "room-map";
+        return "web/room-map";
     }
 
     @GetMapping("/npc-management")
@@ -85,6 +85,6 @@ public class IndexController {
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("userPicture", user.getPicture());
         }
-        return "npc-management";
+        return "web/npc-management";
     }
 }
