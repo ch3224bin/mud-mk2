@@ -82,7 +82,7 @@ public class CharacterCreationService {
             }
             default ->
                 // Not in a state that expects input
-                    false;
+                false;
         };
     }
     

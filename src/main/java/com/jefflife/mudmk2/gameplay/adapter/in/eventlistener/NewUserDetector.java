@@ -38,7 +38,7 @@ public class NewUserDetector {
 
     @EventListener
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public void createPlayerWhenFirstJoin(JoinUserEvent event) {
+    public boolean createPlayerWhenFirstJoin(JoinUserEvent event) {
         Authentication authentication = (Authentication) event.user();
         String username = event.user().getName();
         String email = "";
@@ -54,7 +54,10 @@ public class NewUserDetector {
 
             // Start character creation
             characterCreationService.startCharacterCreation(username, user.getId());
+            return true;
         }
+
+        return false;
     }
 
     /**
