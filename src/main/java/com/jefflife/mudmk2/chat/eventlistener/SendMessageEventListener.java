@@ -23,7 +23,7 @@ public class SendMessageEventListener {
                 .sender("System")
                 .content(event.message())
                 .timestamp(LocalDateTime.now())
-                .type(ChatMessage.MessageType.CHAT)
+                .type(ChatMessage.MessageType.FULL_DESCRIPTION)
                 .build();
         messagingTemplate.convertAndSendToUser(event.username(), "/queue/system-messages", responseMessage);
     }

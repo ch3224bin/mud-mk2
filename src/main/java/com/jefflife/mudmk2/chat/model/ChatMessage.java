@@ -21,6 +21,7 @@ public class ChatMessage {
     public enum MessageType {
         CHAT,
         JOIN,
-        LEAVE
+        LEAVE,
+        FULL_DESCRIPTION
     }
 }

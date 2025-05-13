@@ -389,27 +389,7 @@
 
                 <div th:if="${userName}">
                     <div class="chat-container" id="chatContainer">
-                            <pre class="ascii-title">
- __  __ _   _ ____     ____    _    __  __ _____
-|  \/  | | | |  _ \   / ___|  / \  |  \/  | ____|
-| |\/| | | | | | | | | |  _  / _ \ | |\/| |  _|
-| |  | | |_| | |_| | | |_| |/ ___ \| |  | | |___
-|_|  |_|\___/|____/   \____/_/   \_\_|  |_|_____|
 
-Welcome to the MUD Game Terminal. Type 'help' for commands.
-                            </pre>
-                        <div class="message system-message">
-                            <span class="sender">[System]</span>
-                            <span class="content">System initialized. Connection established.</span>
-                        </div>
-                        <div class="message user-message">
-                            <span class="sender">[You]</span>
-                            <span class="content">look</span>
-                        </div>
-                        <div class="message other-message">
-                            <span class="sender">[Game]</span>
-                            <span class="content">You are in a dark room. There are exits to the north and east.</span>
-                        </div>
                     </div>
 
                     <div class="terminal-input">
@@ -430,14 +410,6 @@ Welcome to the MUD Game Terminal. Type 'help' for commands.
                 </div>
 
                 <div th:unless="${userName}" class="login-container">
-                    <h3>Welcome to</h3>
-                    <pre class="ascii-title">
- __  __ _   _ ____     ____    _    __  __ _____
-|  \/  | | | |  _ \   / ___|  / \  |  \/  | ____|
-| |\/| | | | | | | | | |  _  / _ \ | |\/| |  _|
-| |  | | |_| | |_| | | |_| |/ ___ \| |  | | |___
-|_|  |_|\___/|____/   \____/_/   \_\_|  |_|_____|
-                        </pre>
                     <div class="alert-auth">
                         <h5>Authentication Required</h5>
                         <p>Please log in to access the MUD game terminal.</p>
@@ -529,16 +501,25 @@ Welcome to the MUD Game Terminal. Type 'help' for commands.
                 messageElement.className = 'message system-message';
                 senderDisplay = '[System]';
                 message.content = `${message.sender} has left the realm.`;
+            } else if (message.type === 'FULL_DESCRIPTION') {
+                messageElement.className = 'message system-message';
+                senderDisplay = '';
             } else {
                 messageElement.className = 'message other-message';
                 senderDisplay = `[${message.sender}]`;
             }
 
             // Create message with sender and content on the same line
-            messageElement.innerHTML = `
+            if (message.type === 'FULL_DESCRIPTION') {
+                // For FULL_DESCRIPTION, render HTML content directly
+                messageElement.innerHTML = message.content;
+            } else {
+                // For other message types, show sender and content
+                messageElement.innerHTML = `
                     <span class="sender">${senderDisplay}</span>
                     <span class="content">${message.content}</span>
                 `;
+            }
 
             chatContainer.appendChild(messageElement);
             scrollToBottom();

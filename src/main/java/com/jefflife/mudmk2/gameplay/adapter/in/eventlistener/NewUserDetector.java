@@ -37,7 +37,7 @@ public class NewUserDetector {
     }
 
     @EventListener
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(1)
     public boolean createPlayerWhenFirstJoin(JoinUserEvent event) {
         Authentication authentication = (Authentication) event.user();
         String username = event.user().getName();
