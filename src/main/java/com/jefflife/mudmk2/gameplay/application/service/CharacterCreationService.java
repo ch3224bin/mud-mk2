@@ -5,8 +5,11 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.domain.model.character.CharacterCreationState;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.user.domain.User;
+import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -34,18 +37,20 @@ public class CharacterCreationService {
     
     /**
      * Start character creation for a user.
-     * @param username the username
-     * @param userId the user ID
+     * @param username principal name
      */
-    public void startCharacterCreation(String username, Long userId) {
+    public void startCharacterCreation(String username) {
+        User user = UserSessionManager.getConnectedUser(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+
         // Check if the user already has a character
-        if (playerCharacterService.hasCharacter(userId)) {
+        if (playerCharacterService.hasCharacter(username)) {
             sendMessageToUserPort.messageToUser(username, "You already have a character.");
             return;
         }
         
         // Create a new state and store it
-        CharacterCreationState state = new CharacterCreationState(username, userId);
+        CharacterCreationState state = new CharacterCreationState(username, user.getId());
         creationStates.put(username, state);
         
         // Move to the first step (asking for name)

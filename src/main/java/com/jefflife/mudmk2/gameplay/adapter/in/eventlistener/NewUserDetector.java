@@ -49,11 +49,11 @@ public class NewUserDetector {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("User not found: "));
 
-        if (!playerCharacterService.hasCharacter(user.getId())) {
+        if (!playerCharacterService.hasCharacter(username)) {
             logger.info("New user detected: {}", user.getName());
 
             // Start character creation
-            characterCreationService.startCharacterCreation(username, user.getId());
+            characterCreationService.startCharacterCreation(username);
             return true;
         }
 
