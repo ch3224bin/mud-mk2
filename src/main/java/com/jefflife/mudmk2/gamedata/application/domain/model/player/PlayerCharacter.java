@@ -54,4 +54,9 @@ public class PlayerCharacter {
         this.online = online;
         this.lastActiveAt = lastActiveAt;
     }
+
+    public Long getCurrentRoomId() {
+        return this.baseCharacterInfo.getRoomId();
+    }
 }
+

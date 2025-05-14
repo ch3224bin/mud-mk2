@@ -73,4 +73,26 @@ public class Room {
 		this.summary = summary;
 		this.description = description;
 	}
+
+	public String getName() {
+	    return this.summary;
+    }
+
+    public void initializeAssociatedEntities() {
+        // WayOuts 컬렉션 및 관련 객체 명시적 초기화
+        List<WayOut> actualWayOuts = this.getSortedWayOuts();
+        if (actualWayOuts != null) {
+            for (WayOut wayOut : actualWayOuts) {
+                // WayOut 객체의 기본 속성 접근 (필요시)
+                wayOut.getDirection();
+
+                // nextRoom 프록시 초기화
+                Room nextRoom = wayOut.getNextRoom();
+                if (nextRoom != null) {
+                    nextRoom.getId(); // ID 접근으로 프록시 초기화
+                    // 필요에 따라 nextRoom.getName(); 등 추가적인 속성 접근 가능
+                }
+            }
+        }
+    }
 }

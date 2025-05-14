@@ -22,6 +22,7 @@ public class PersistenceManager {
     }
 
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional(readOnly = true)
     public void loadGameState() {
         // 서버 시작시 DB에서 메모리로 로드
         Iterable<Room> rooms = roomRepository.findAll();
