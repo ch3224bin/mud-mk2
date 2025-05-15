@@ -40,7 +40,7 @@ public class ChatMessageEventListener {
 
         try {
             // Parse the message into a command
-            Command command = parserChain.parse(event.sender(), event.content());
+            Command command = parserChain.parse(event.getUsername(), event.content());
             
             // Execute the command if it was parsed successfully
             if (command != null) {

@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
+import com.jefflife.mudmk2.gameplay.application.domain.model.command.InvalidCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,8 @@ public class CommandParserChain {
     public Command parse(String sender, String content) {
         Command command = firstParser.parse(sender, content);
         if (command == null) {
-            logger.warn("No command matched for content: {}", content);
+            logger.info("No command matched for content: {}", content);
+            return new InvalidCommand(sender, content);
         }
         return command;
     }

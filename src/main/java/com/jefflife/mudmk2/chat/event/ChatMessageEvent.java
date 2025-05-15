@@ -21,4 +21,8 @@ public record ChatMessageEvent(
                 chatMessage.getType()
         );
     }
+
+    public String getUsername() {
+        return user.getName();
+    }
 }
