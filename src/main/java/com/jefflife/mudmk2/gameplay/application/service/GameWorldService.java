@@ -35,6 +35,17 @@ public class GameWorldService {
         logger.info("Loaded {} players", this.activePlayers.size());
     }
 
+    /**
+     * 새로 생성된 플레이어 캐릭터를 인메모리 캐시에 추가합니다.
+     * @param playerCharacter 추가할 플레이어 캐릭터
+     */
+    public void addPlayer(final PlayerCharacter playerCharacter) {
+        activePlayers.put(playerCharacter.getId(), playerCharacter);
+        activePlayersByUserId.put(playerCharacter.getUserId(), playerCharacter);
+        logger.debug("Player added to game world: {} (ID: {}, User ID: {})",
+                playerCharacter.getNickname(), playerCharacter.getId(), playerCharacter.getUserId());
+    }
+
     public void movePlayer(Long playerId, Long roomId) {
         final PlayerCharacter player = activePlayers.get(playerId);
         player.setCurrentRoomId(roomId);

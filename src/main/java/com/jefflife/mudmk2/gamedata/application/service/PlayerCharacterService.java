@@ -5,8 +5,10 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterCla
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
 import com.jefflife.mudmk2.user.domain.User;
 import com.jefflife.mudmk2.user.service.UserSessionManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +18,14 @@ import java.time.LocalDateTime;
 @Service
 public class PlayerCharacterService {
     private final PlayerCharacterRepository playerCharacterRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PlayerCharacterService(PlayerCharacterRepository playerCharacterRepository) {
+    public PlayerCharacterService(
+            PlayerCharacterRepository playerCharacterRepository,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.playerCharacterRepository = playerCharacterRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -51,10 +58,10 @@ public class PlayerCharacterService {
     @Transactional
     public PlayerCharacter createCharacter(Long userId, String name, CharacterClass characterClass) {
         // Create base character with stats based on class
-        BaseCharacter baseCharacter = createBaseCharacter(name, characterClass);
+        final BaseCharacter baseCharacter = createBaseCharacter(name, characterClass);
         
         // Create playable character
-        PlayableCharacter playableCharacter = PlayableCharacter.builder()
+        final PlayableCharacter playableCharacter = PlayableCharacter.builder()
                 .level(1)
                 .experience(0)
                 .nextLevelExp(100)
@@ -62,7 +69,7 @@ public class PlayerCharacterService {
                 .build();
         
         // Create player character
-        PlayerCharacter playerCharacter = new PlayerCharacter(
+        final PlayerCharacter playerCharacter = new PlayerCharacter(
                 null, // ID will be generated
                 baseCharacter,
                 playableCharacter,
@@ -73,8 +80,13 @@ public class PlayerCharacterService {
                 LocalDateTime.now() // Last active now
         );
         
-        // Save and return
-        return playerCharacterRepository.save(playerCharacter);
+        // Save character
+        final PlayerCharacter savedCharacter = playerCharacterRepository.save(playerCharacter);
+
+        // Publish event
+        eventPublisher.publishEvent(new PlayerCharacterCreatedEvent(this, savedCharacter));
+
+        return savedCharacter;
     }
     
     /**
@@ -168,3 +180,4 @@ public class PlayerCharacterService {
                 .build();
     }
 }
+
