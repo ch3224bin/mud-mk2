@@ -30,4 +30,8 @@ public class BaseCharacter {
     // 생존 여부
     @Builder.Default
     private boolean alive = true;
+
+    public void setRoomId(final Long roomId) {
+        this.roomId = roomId;
+    }
 }

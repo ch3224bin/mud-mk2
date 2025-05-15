@@ -33,7 +33,7 @@ public enum Direction {
 	}
 	
 	public static Direction valueOfString(String value) {
-		if (dirMap.size() == 0) {
+		if (dirMap.isEmpty()) {
 			for (Direction c : Direction.values()) {
 		        for (String s : c.getSynonyms()) {
 		        	dirMap.put(s, c);
@@ -47,5 +47,9 @@ public enum Direction {
 		return Arrays.asList(Direction.values()).stream()
 				.flatMap(x -> x.synonyms.stream())
 				.toArray(String[]::new);
+	}
+
+	public String getName() {
+		return name;
 	}
 }

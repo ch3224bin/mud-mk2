@@ -43,6 +43,10 @@ public class WayOut implements Comparable<WayOut> {
 		this.isShow = isShow;
 	}
 
+	public boolean isLocked() {
+		return door.isLocked();
+	}
+
 	@Override
 	public int compareTo(WayOut o) {
 		return Integer.compare(this.direction.ordinal(), o.direction.ordinal());

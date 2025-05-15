@@ -53,4 +53,10 @@ public class WayOuts {
 
     wayOuts.add(wayOut);
   }
+
+  public boolean isLocked(final Direction direction) {
+    return getWayOutByDirection(direction)
+            .map(WayOut::isLocked)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방향입니다."));
+  }
 }

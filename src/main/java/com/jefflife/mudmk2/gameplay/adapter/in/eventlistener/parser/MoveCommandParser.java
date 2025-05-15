@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class MoveCommandParser extends AbstractCommandParser {
-    private static final Pattern MOVE_PATTERN = Pattern.compile("(동|서|남|북|위|아래)");
+    private static final Pattern MOVE_PATTERN = Pattern.compile("(동|서|남|북|위|아래|ㄷ|ㅅ|ㄴ|ㅂ)");
     
     @Override
     protected Command parseCommand(String sender, String content) {

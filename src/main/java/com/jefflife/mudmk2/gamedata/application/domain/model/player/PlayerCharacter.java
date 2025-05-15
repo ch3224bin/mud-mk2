@@ -55,6 +55,14 @@ public class PlayerCharacter {
         this.lastActiveAt = lastActiveAt;
     }
 
+    public void initializeAssociatedEntities() {
+
+    }
+
+    public void setCurrentRoomId(final Long roomId) {
+        this.baseCharacterInfo.setRoomId(roomId);
+    }
+
     public Long getCurrentRoomId() {
         return this.baseCharacterInfo.getRoomId();
     }

@@ -1,6 +1,8 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.RoomRepository;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,10 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class PersistenceManager {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PersistenceManager.class);
 
+    private final PlayerCharacterRepository playerCharacterRepository;
     private final RoomRepository roomRepository;
     private final GameWorldService gameWorldService;
 
-    public PersistenceManager(final RoomRepository roomRepository, final GameWorldService gameWorldService) {
+    public PersistenceManager(
+            final PlayerCharacterRepository playerCharacterRepository,
+            final RoomRepository roomRepository,
+            final GameWorldService gameWorldService
+    ) {
+        this.playerCharacterRepository = playerCharacterRepository;
         this.roomRepository = roomRepository;
         this.gameWorldService = gameWorldService;
     }
@@ -27,6 +35,10 @@ public class PersistenceManager {
         // 서버 시작시 DB에서 메모리로 로드
         Iterable<Room> rooms = roomRepository.findAll();
         gameWorldService.loadRooms(rooms);
+
+        Iterable<PlayerCharacter> players = playerCharacterRepository.findAll();
+        gameWorldService.loadPlayers(players);
+
         logger.info("loadGameState finished");
     }
 

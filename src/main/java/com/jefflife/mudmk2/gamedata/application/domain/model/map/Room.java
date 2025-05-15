@@ -95,4 +95,19 @@ public class Room {
             }
         }
     }
+
+	public Optional<Room> getNextRoomByDirection(final Direction direction) {
+		return wayOuts.getWayOutByDirection(direction)
+				.map(WayOut::getNextRoom);
+	}
+
+	public boolean hasWay(final Direction direction) {
+		Optional<WayOut> wayOutByDirection = wayOuts.getWayOutByDirection(direction);
+		return wayOutByDirection.isPresent();
+
+	}
+
+	public boolean isLocked(final Direction direction) {
+		return wayOuts.isLocked(direction);
+	}
 }

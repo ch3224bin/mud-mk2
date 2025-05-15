@@ -37,4 +37,8 @@ public class Door {
 		wo2.installDoor(door);
 		return door;
 	}
+
+	public boolean isLocked() {
+		return isLocked;
+	}
 }
