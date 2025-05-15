@@ -58,6 +58,6 @@ public class PersistenceManager {
     @Transactional
     @Scheduled(fixedDelay = 60_000) // 1분마다 저장
     public void persistGameState() {
-
+        playerCharacterRepository.saveAll(gameWorldService.getActivePlayers());
     }
 }

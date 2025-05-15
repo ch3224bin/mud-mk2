@@ -67,5 +67,9 @@ public class GameWorldService {
                 .map(user -> getPlayerByUserId(user.getId()))
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
     }
+
+    public Iterable<PlayerCharacter> getActivePlayers() {
+        return activePlayers.values();
+    }
 }
 
