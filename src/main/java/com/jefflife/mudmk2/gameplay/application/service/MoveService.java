@@ -30,21 +30,18 @@ public class MoveService implements MoveUseCase {
         final PlayerCharacter player = gameWorldService.getPlayerByUsername(command.username());
         final Room room = gameWorldService.getRoom(player.getCurrentRoomId());
         final Direction direction = Direction.valueOfString(command.direction());
-        if (!room.hasWay(direction)) {
-            sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽으로는 갈 수 없습니다.", direction.getName()));
-            return;
-        }
-        if (room.isLocked(direction)) {
-            sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽은 잠겨있습니다.", direction.getName()));
-            return;
-        }
-        room.getNextRoomByDirection(direction)
-            .ifPresentOrElse(nextRoom -> {
+        final PlayerCharacter.MoveResult moveResult = player.move(room, direction);
+        switch (moveResult) {
+            case SUCCESS:
                 sendMessageToUserPort.messageToUser(command.username(), String.format("당신은 %s쪽으로 이동 합니다.", direction.getName()));
-                gameWorldService.movePlayer(player.getId(), nextRoom.getId());
                 displayRoomInfoUseCase.displayRoomInfo(command.username());
-            }, () ->
-                sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽으로는 갈 수 없습니다.", direction.getName()))
-            );
+                break;
+            case NO_WAY, FAILED:
+                sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽으로는 갈 수 없습니다.", direction.getName()));
+                break;
+            case LOCKED:
+                sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽은 잠겨있습니다.", direction.getName()));
+                break;
+        }
     }
 }

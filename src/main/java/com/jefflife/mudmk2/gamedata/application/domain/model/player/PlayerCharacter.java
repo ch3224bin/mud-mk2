@@ -1,11 +1,14 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -59,12 +62,36 @@ public class PlayerCharacter {
 
     }
 
+    public MoveResult move(final Room currentRoom, final Direction direction) {
+        if (!currentRoom.hasWay(direction)) {
+            return MoveResult.NO_WAY;
+        }
+        if (currentRoom.isLocked(direction)) {
+            return MoveResult.LOCKED;
+        }
+        Optional<Room> nextRoomByDirection = currentRoom.getNextRoomByDirection(direction);
+        if (nextRoomByDirection.isPresent()) {
+            Room nextRoom = nextRoomByDirection.get();
+            this.setCurrentRoomId(nextRoom.getId());
+            return MoveResult.SUCCESS;
+        } else {
+            return MoveResult.FAILED;
+        }
+    }
+
     public void setCurrentRoomId(final Long roomId) {
         this.baseCharacterInfo.setRoomId(roomId);
     }
 
     public Long getCurrentRoomId() {
         return this.baseCharacterInfo.getRoomId();
+    }
+
+    public enum MoveResult {
+        NO_WAY,
+        LOCKED,
+        SUCCESS,
+        FAILED
     }
 }
 

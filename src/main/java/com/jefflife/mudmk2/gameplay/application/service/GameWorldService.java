@@ -46,11 +46,6 @@ public class GameWorldService {
                 playerCharacter.getNickname(), playerCharacter.getId(), playerCharacter.getUserId());
     }
 
-    public void movePlayer(Long playerId, Long roomId) {
-        final PlayerCharacter player = activePlayers.get(playerId);
-        player.setCurrentRoomId(roomId);
-    }
-
     public Room getRoom(Long id) {
         final Room room = rooms.get(id);
         if (room == null) {
