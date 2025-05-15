@@ -18,6 +18,19 @@
 - 방 지도 시각화
 - NPC(Non-Player Character) 관리 (생성, 조회, 수정, 삭제)
 - 명령어 처리 시스템 (Chain of Responsibility 패턴)
+  - 이동 명령어 파싱 및 실행
+  - 대화 명령어 파싱 및 실행
+  - 잘못된 명령어 처리 및 사용자 알림
+- 캐릭터 시스템
+  - 플레이어 캐릭터 생성 및 관리
+  - 캐릭터 클래스별 능력치 차등화
+  - 캐릭터 정보 조회
+- 이벤트 시스템
+  - 캐릭터 생성 이벤트 발행 및 구독
+  - 게임 상태 변화에 따른 이벤트 처리
+- 인메모리 게임 월드 관리
+  - 활성 플레이어 추적 및 관리
+  - 룸 정보 캐싱 및 빠른 접근
 - 한국어 명령어 지원 (이동, 대화 등)
 - 터미널 스타일의 사용자 인터페이스
 
@@ -28,10 +41,23 @@
 - Spring Data JPA
 - Spring WebSocket
 - Thymeleaf
-- H2 Database
+- H2 Database / MySQL
 - Lombok
 - Bootstrap 5
 - SockJS & STOMP
+- Docker & Docker Compose (MySQL 환경 설정)
+
+## 설계 패턴
+
+이 프로젝트에서 사용된 주요 설계 패턴:
+
+- **Chain of Responsibility**: 명령어 파싱 및 실행 체인 구현
+- **Observer 패턴**: Spring의 이벤트 발행/구독 시스템 활용
+- **Repository 패턴**: 데이터 접근 계층 추상화
+- **DTO(Data Transfer Object)**: 계층 간 데이터 전달
+- **DDD(Domain-Driven Design)**: 명확한 도메인 모델과 계층 구분
+- **포트와 어댑터 아키텍처**: 외부 시스템과의 통합 추상화
+- **의존성 주입**: Spring의 DI 컨테이너 활용
 
 ## 설정 방법
 
@@ -92,19 +118,45 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - `com.jefflife.mudmk2.gamedata.application.domain.model.player`: 게임 캐릭터 도메인 모델
   - `BaseCharacter`: 기본 캐릭터 엔티티 (이름, 능력치, 상태 등)
   - `PlayableCharacter`: 플레이 가능한 캐릭터 엔티티 (레벨, 경험치 등)
+  - `PlayerCharacter`: 플레이어 캐릭터 엔티티
   - `NonPlayerCharacter`: NPC 엔티티 (페르소나, 타입, 스폰 위치 등)
   - `NPCType`: NPC 타입 enum
+  - `CharacterClass`: 캐릭터 클래스 enum (전사, 마법사, 도적, 성직자, 레인저)
 
-- `com.jefflife.mudmk2.gamedata.application.service`: 게임 서비스
+- `com.jefflife.mudmk2.gamedata.application.service`: 게임 데이터 서비스
   - `AreaService`: 지역 관리 서비스
   - `RoomService`: 방 관리 서비스 (방 생성, 수정, 삭제, 연결)
   - `NonPlayerCharacterService`: NPC 관리 서비스 (NPC 생성, 수정, 삭제)
+  - `PlayerCharacterService`: 플레이어 캐릭터 관리 서비스
+
+- `com.jefflife.mudmk2.gamedata.application.event`: 게임 이벤트
+  - `PlayerCharacterCreatedEvent`: 플레이어 캐릭터 생성 이벤트
+
+- `com.jefflife.mudmk2.gameplay.application.service`: 게임플레이 서비스
+  - `GameWorldService`: 게임 월드 인메모리 관리 서비스
+  - `PersistenceManager`: 게임 상태 지속성 관리 및 이벤트 처리
+  - `MoveService`: 플레이어 이동 서비스
+  - `InvalidCommandService`: 잘못된 명령어 처리 서비스
+  - `DisplayRoomInfoService`: 방 정보 표시 서비스
 
 - `com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser`: 명령어 파싱 시스템
   - `CommandParser`: 명령어 파서 인터페이스
   - `CommandParserChain`: 명령어 파서 체인 (Chain of Responsibility 패턴)
   - `MoveCommandParser`: 이동 명령어 파서 (동, 서, 남, 북, 위, 아래)
   - `SpeakCommandParser`: 대화 명령어 파서 ("말" 명령어)
+
+- `com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor`: 명령어 실행 시스템
+  - `CommandExecutor`: 명령어 실행자 인터페이스
+  - `CommandExecutorChain`: 명령어 실행자 체인
+  - `MoveCommandExecutor`: 이동 명령어 실행자
+  - `SpeakCommandExecutor`: 대화 명령어 실행자
+  - `InvalidCommandExecutor`: 잘못된 명령어 실행자
+
+- `com.jefflife.mudmk2.gameplay.application.domain.model.command`: 명령어 도메인 모델
+  - `Command`: 명령어 인터페이스
+  - `MoveCommand`: 이동 명령어 모델
+  - `SpeakCommand`: 대화 명령어 모델
+  - `InvalidCommand`: 잘못된 명령어 모델
 
 #### 채팅 관련
 - `com.jefflife.mudmk2.chat.controller`: 채팅 컨트롤러
@@ -130,6 +182,11 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 
 ## 사용 방법
 
+### 캐릭터 생성 및 선택
+- 처음 로그인하면 캐릭터 생성 화면으로 이동합니다.
+- 캐릭터 이름과 클래스(전사, 마법사, 도적, 성직자, 레인저)를 선택하여 생성합니다.
+- 이미 캐릭터가 있다면 자동으로 해당 캐릭터로 로그인합니다.
+
 ### 채팅 시스템
 - 로그인 후 자동으로 채팅 페이지로 이동합니다.
 - 명령어를 입력하고 "Execute" 버튼을 클릭하거나 Enter 키를 누릅니다.
@@ -139,6 +196,7 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 - 이동 명령어: "동", "서", "남", "북", "위", "아래" 입력으로 해당 방향으로 이동합니다.
 - 대화 명령어: "[메시지] 말" 형식으로 입력하여 대화할 수 있습니다. (예: "안녕하세요 말")
 - 명령어는 한국어로 지원됩니다.
+- 잘못된 명령어 입력 시 안내 메시지가 표시됩니다.
 
 ### 지역 관리
 - 채팅 화면에서 "AREA MANAGEMENT" 버튼을 클릭합니다.
@@ -160,6 +218,23 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
 
 ### 프로필 관리
 - "PROFILE" 버튼을 클릭하여 사용자 프로필을 확인할 수 있습니다.
+
+## 시스템 아키텍처 특징
+
+### 이벤트 기반 아키텍처
+- 게임 상태 변화를 이벤트로 발행하여 여러 컴포넌트가 독립적으로 처리 가능
+- 플레이어 캐릭터 생성 시 이벤트를 발행하여 인메모리 캐시 자동 업데이트
+- 느슨한 결합으로 확장성 및 유지보수성 향상
+
+### 명령어 처리 체인
+- Chain of Responsibility 패턴을 활용한 명령어 파싱 및 실행
+- 새로운 명령어 유형 추가가 용이한 확장 가능한 구조
+- 잘못된 명령어도 적절히 처리하여 사용자 경험 개선
+
+### 영속성 관리
+- JPA를 활용한 데이터베이스 상호작용
+- 인메모리 캐싱을 통한 성능 최적화
+- 주기적인 상태 저장으로 데이터 일관성 유지
 
 ## MySQL 설정 (Docker)
 
