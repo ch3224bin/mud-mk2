@@ -5,12 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "로보트 때려" (Hit robot)
  */
 public record AttackCommand(
-    String player,
+    String username,
     String target
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

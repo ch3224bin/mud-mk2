@@ -5,13 +5,8 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "가방 사과 꺼내" (Take apple from bag)
  */
 public record TakeCommand(
-    String player,
+    String username,
     String container,
     String item
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

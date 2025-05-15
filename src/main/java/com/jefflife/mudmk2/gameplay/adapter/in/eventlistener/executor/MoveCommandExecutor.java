@@ -17,7 +17,7 @@ public class MoveCommandExecutor implements CommandExecutor {
     private final MoveUseCase moveUseCase;
 
     @Autowired
-    public MoveCommandExecutor(@Autowired(required = false) MoveUseCase moveUseCase) {
+    public MoveCommandExecutor(final MoveUseCase moveUseCase) {
         this.moveUseCase = moveUseCase;
     }
 

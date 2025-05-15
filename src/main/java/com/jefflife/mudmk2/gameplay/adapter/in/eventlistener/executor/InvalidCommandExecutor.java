@@ -26,7 +26,7 @@ public class InvalidCommandExecutor implements CommandExecutor {
     public void execute(Command command) {
         InvalidCommand invalidCommand = (InvalidCommand) command;
         invalidCommandUseCase.notifyInvalidCommand(
-            invalidCommand.getPlayer(),
+            invalidCommand.username(),
             invalidCommand.originalContent()
         );
     }

@@ -5,12 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "동 열어" (Open east)
  */
 public record OpenCommand(
-    String player,
+    String username,
     String target
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

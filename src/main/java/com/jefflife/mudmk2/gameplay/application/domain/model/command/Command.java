@@ -9,5 +9,5 @@ public interface Command {
      * Returns the player who issued the command.
      * @return the player's identifier
      */
-    String getPlayer();
+    String username();
 }

@@ -5,12 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "동" (East)
  */
 public record MoveCommand(
-    String player,
+    String username,
     String direction
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

@@ -7,12 +7,7 @@ import java.util.List;
  * Example: "나뭇가지 기름 헝겊 조합" (Combine branch, oil, cloth)
  */
 public record CombineCommand(
-    String player,
+    String username,
     List<String> items
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

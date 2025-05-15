@@ -5,12 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "동 잠궈" (Lock east)
  */
 public record LockCommand(
-    String player,
+    String username,
     String target
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

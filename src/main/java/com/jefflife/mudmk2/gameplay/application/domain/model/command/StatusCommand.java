@@ -5,11 +5,6 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "상태창" (Status window)
  */
 public record StatusCommand(
-    String player
+    String username
 ) implements Command {
-    
-    @Override
-    public String getPlayer() {
-        return player;
-    }
 }

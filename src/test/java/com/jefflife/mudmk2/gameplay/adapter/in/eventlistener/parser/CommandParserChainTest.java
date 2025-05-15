@@ -12,20 +12,20 @@ class CommandParserChainTest {
 
     // Simple Command implementation for testing
     private static class TestCommand implements Command {
-        private final String player;
+        private final String username;
         
         public TestCommand(String player) {
-            this.player = player;
+            this.username = player;
         }
         
         @Override
-        public String getPlayer() {
-            return player;
+        public String username() {
+            return username;
         }
         
         @Override
         public String toString() {
-            return "TestCommand{player='" + player + "'}";
+            return "TestCommand{username='" + username + "'}";
         }
     }
     
@@ -85,7 +85,7 @@ class CommandParserChainTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("player1", result.getPlayer());
+        assertEquals("player1", result.username());
     }
 
     @Test
@@ -116,6 +116,6 @@ class CommandParserChainTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("player1", result.getPlayer());
+        assertEquals("player1", result.username());
     }
 }
