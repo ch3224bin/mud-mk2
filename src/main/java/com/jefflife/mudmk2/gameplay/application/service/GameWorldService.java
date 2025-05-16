@@ -1,13 +1,16 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class GameWorldService {
@@ -16,6 +19,7 @@ public class GameWorldService {
     private final Map<Long, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
     private final Map<Long, PlayerCharacter> activePlayersByUserId = new ConcurrentHashMap<>();
     private final Map<Long, Room> rooms = new ConcurrentHashMap<>();
+    private final Map<Long, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
 
     public void loadRooms(final Iterable<Room> rooms) {
         rooms.forEach(room -> {
@@ -43,6 +47,49 @@ public class GameWorldService {
         activePlayersByUserId.put(playerCharacter.getUserId(), playerCharacter);
         logger.debug("Player added to game world: {} (ID: {}, User ID: {})",
                 playerCharacter.getNickname(), playerCharacter.getId(), playerCharacter.getUserId());
+    }
+
+    /**
+     * 게임에 NPC를 로드합니다.
+     * @param npcs 로드할 NPC 목록
+     */
+    public void loadNpcs(final Iterable<NonPlayerCharacter> npcs) {
+        npcs.forEach(npc -> {
+            npc.initializeAssociatedEntities();
+            activeNpcs.put(npc.getId(), npc);
+        });
+        logger.info("Loaded {} NPCs", this.activeNpcs.size());
+    }
+
+    /**
+     * 새로운 NPC를 인메모리 캐시에 추가합니다.
+     * @param npc 추가할 NPC
+     */
+    public void addNpc(final NonPlayerCharacter npc) {
+        activeNpcs.put(npc.getId(), npc);
+        logger.debug("NPC added to game world: {} (ID: {})", npc.getName(), npc.getId());
+    }
+
+    /**
+     * 특정 방에 있는 모든 NPC를 조회합니다.
+     * @param roomId 방 ID
+     * @return 방에 있는 NPC 목록
+     */
+    public List<NonPlayerCharacter> getNpcsInRoom(Long roomId) {
+        return activeNpcs.values().stream()
+                .filter(npc -> npc.getCurrentRoomId().equals(roomId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 특정 방에 있는 모든 플레이어 캐릭터를 조회합니다.
+     * @param roomId 방 ID
+     * @return 방에 있는 플레이어 캐릭터 목록
+     */
+    public List<PlayerCharacter> getPlayersInRoom(Long roomId) {
+        return activePlayers.values().stream()
+                .filter(pc -> pc.getCurrentRoomId().equals(roomId))
+                .collect(Collectors.toList());
     }
 
     public Room getRoom(Long id) {

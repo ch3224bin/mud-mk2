@@ -58,4 +58,16 @@ public class NonPlayerCharacter {
         this.spawnRoomId = spawnRoomId;
         this.essential = essential;
     }
+
+    public void initializeAssociatedEntities() {
+
+    }
+
+    public String getName() {
+        return baseCharacterInfo.getName();
+    }
+
+    public Long getCurrentRoomId() {
+        return baseCharacterInfo.getRoomId();
+    }
 }

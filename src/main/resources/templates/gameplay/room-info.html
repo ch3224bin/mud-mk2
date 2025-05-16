@@ -12,4 +12,26 @@
         </ul>
         <span th:if="${#lists.isEmpty(exits)}" class="no-exits">없음</span>
     </div>
+
+    <!-- NPC 표시 -->
+    <div class="characters-info" th:if="${not #lists.isEmpty(npcsInRoom)}">
+        <div class="npcs-info">
+            <ul class="npcs-list">
+                <li th:each="npc : ${npcsInRoom}" class="character-item">
+                    <span class="npc-name" th:text="${npc.name}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 다른 플레이어 표시 -->
+    <div class="characters-info" th:if="${not #lists.isEmpty(otherPlayersInRoom)}">
+        <div class="players-info">
+            <ul class="players-list">
+                <li th:each="player : ${otherPlayersInRoom}" class="character-item">
+                    <span class="player-name" th:text="${player.nickname}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

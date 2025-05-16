@@ -1,7 +1,9 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.repository.NonPlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
@@ -17,15 +19,18 @@ public class PersistenceManager {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PersistenceManager.class);
 
     private final PlayerCharacterRepository playerCharacterRepository;
+    private final NonPlayerCharacterRepository nonPlayerCharacterRepository;
     private final RoomRepository roomRepository;
     private final GameWorldService gameWorldService;
 
     public PersistenceManager(
             final PlayerCharacterRepository playerCharacterRepository,
+            final NonPlayerCharacterRepository nonPlayerCharacterRepository,
             final RoomRepository roomRepository,
             final GameWorldService gameWorldService
     ) {
         this.playerCharacterRepository = playerCharacterRepository;
+        this.nonPlayerCharacterRepository = nonPlayerCharacterRepository;
         this.roomRepository = roomRepository;
         this.gameWorldService = gameWorldService;
     }
@@ -39,6 +44,9 @@ public class PersistenceManager {
 
         Iterable<PlayerCharacter> players = playerCharacterRepository.findAll();
         gameWorldService.loadPlayers(players);
+
+        Iterable<NonPlayerCharacter> nonPlayerCharacters = nonPlayerCharacterRepository.findAll();
+        gameWorldService.loadNpcs(nonPlayerCharacters);
 
         logger.info("loadGameState finished");
     }
