@@ -370,7 +370,7 @@
 
         /* Room */
         .room-info {
-            padding: 20px;
+            padding: 20px 20px 20px 0px;
             margin-bottom: 15px;
             background-color: transparent;
             font-family: 'IBM Plex Mono', monospace;
@@ -508,12 +508,12 @@
 
                 // Subscribe to public channel
                 stompClient.subscribe('/topic/public', function(message) {
-                    showMessage(JSON.parse(message.body), false);
+                    showMessage(JSON.parse(message.body));
                 });
 
                 // Subscribe to private channel (for personal messages)
                 stompClient.subscribe('/user/queue/system-messages', function(message) {
-                    showMessage(JSON.parse(message.body), false);
+                    showMessage(JSON.parse(message.body));
                 });
 
                 // Send join message
@@ -541,15 +541,12 @@
         scrollToBottom();
 
         // Show message in chat
-        function showMessage(message, isFromUser) {
+        function showMessage(message) {
             const messageElement = document.createElement('div');
             let senderDisplay;
 
             // Determine message type and styling
-            if (isFromUser) {
-                messageElement.className = 'message user-message';
-                senderDisplay = '[You]';
-            } else if (message.sender === 'System') {
+            if (message.sender === 'System') {
                 messageElement.className = 'message system-message';
                 senderDisplay = '[System]';
             } else if (message.type === 'JOIN') {
@@ -602,9 +599,6 @@
 
                 // Send message to server
                 stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-
-                // Show message in our UI
-                showMessage(chatMessage, true);
 
                 // Clear input
                 messageInput.value = '';
