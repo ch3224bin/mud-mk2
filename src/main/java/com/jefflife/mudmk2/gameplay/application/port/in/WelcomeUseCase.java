@@ -7,7 +7,7 @@ public interface WelcomeUseCase {
     /**
      * Sends a welcome message to a user.
      * 
-     * @param username the username of the user to welcome
+     * @param userId the user ID
      */
-    void welcome(String username);
+    void welcome(Long userId);
 }

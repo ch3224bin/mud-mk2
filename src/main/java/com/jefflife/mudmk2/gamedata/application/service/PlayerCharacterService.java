@@ -6,10 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableChar
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
-import com.jefflife.mudmk2.user.domain.User;
-import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +27,11 @@ public class PlayerCharacterService {
 
     /**
      * Check if a player character exists for the given user ID
-     * @param username principal name
+     * @param userId the user ID
      * @return true if a player character exists, false otherwise
      */
-    public boolean hasCharacter(String username) {
-        User user = UserSessionManager.getConnectedUser(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-        return playerCharacterRepository.existsByUserId(user.getId());
+    public boolean hasCharacter(Long userId) {
+        return playerCharacterRepository.existsByUserId(userId);
     }
 
     /**

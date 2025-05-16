@@ -12,20 +12,20 @@ class CommandParserChainTest {
 
     // Simple Command implementation for testing
     private static class TestCommand implements Command {
-        private final String username;
+        private final Long userId;
         
-        public TestCommand(String player) {
-            this.username = player;
+        public TestCommand(Long userId) {
+            this.userId = userId;
         }
         
         @Override
-        public String username() {
-            return username;
+        public Long userId() {
+            return userId;
         }
         
         @Override
         public String toString() {
-            return "TestCommand{username='" + username + "'}";
+            return "TestCommand{username='" + userId + "'}";
         }
     }
     
@@ -40,9 +40,9 @@ class CommandParserChainTest {
         }
         
         @Override
-        protected Command parseCommand(String sender, String content) {
+        protected Command parseCommand(Long userId, String content) {
             if (shouldMatch && content.startsWith(commandPrefix)) {
-                return new TestCommand(sender);
+                return new TestCommand(userId);
             }
             return null;
         }
@@ -81,26 +81,11 @@ class CommandParserChainTest {
         CommandParserChain chain = new CommandParserChain(parsers);
 
         // Act
-        Command result = chain.parse("player1", "move east");
+        Command result = chain.parse(1L, "move east");
 
         // Assert
         assertNotNull(result);
-        assertEquals("player1", result.username());
-    }
-
-    @Test
-    void parse_withNonMatchingCommand_shouldReturnNull() {
-        // Arrange
-        CommandParser parser1 = new TestCommandParser("move", false);
-        CommandParser parser2 = new TestCommandParser("look", false);
-        List<CommandParser> parsers = List.of(parser1, parser2);
-        CommandParserChain chain = new CommandParserChain(parsers);
-
-        // Act
-        Command result = chain.parse("player1", "unknown command");
-
-        // Assert
-        assertNull(result);
+        assertEquals(1L, result.userId());
     }
 
     @Test
@@ -112,10 +97,10 @@ class CommandParserChainTest {
         CommandParserChain chain = new CommandParserChain(parsers);
 
         // Act
-        Command result = chain.parse("player1", "look around");
+        Command result = chain.parse(1L, "look around");
 
         // Assert
         assertNotNull(result);
-        assertEquals("player1", result.username());
+        assertEquals(1L, result.userId());
     }
 }

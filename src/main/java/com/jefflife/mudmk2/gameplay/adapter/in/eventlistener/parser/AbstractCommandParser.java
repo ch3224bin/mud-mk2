@@ -24,14 +24,14 @@ public abstract class AbstractCommandParser implements CommandParser {
     }
 
     @Override
-    public Command parse(String sender, String content) {
-        Command command = parseCommand(sender, content);
+    public Command parse(Long userId, String content) {
+        Command command = parseCommand(userId, content);
         if (command != null) {
             return command;
         }
         
         if (next != null) {
-            return next.parse(sender, content);
+            return next.parse(userId, content);
         }
         
         return null;
@@ -40,9 +40,9 @@ public abstract class AbstractCommandParser implements CommandParser {
     /**
      * Template method that concrete parsers must implement to parse a specific command type.
      *
-     * @param sender the sender of the message
+     * @param userId the ID of the user sending the message
      * @param content the content of the message
      * @return the parsed command, or null if this parser can't handle the message
      */
-    protected abstract Command parseCommand(String sender, String content);
+    protected abstract Command parseCommand(Long userId, String content);
 }

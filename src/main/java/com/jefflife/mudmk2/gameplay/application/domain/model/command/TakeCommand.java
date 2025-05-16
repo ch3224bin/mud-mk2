@@ -5,7 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "가방 사과 꺼내" (Take apple from bag)
  */
 public record TakeCommand(
-    String username,
+    Long userId,
     String container,
     String item
 ) implements Command {

@@ -27,20 +27,20 @@ public class MoveService implements MoveUseCase {
 
     @Override
     public void move(final MoveCommand command) {
-        final PlayerCharacter player = gameWorldService.getPlayerByUsername(command.username());
+        final PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
         final Room room = gameWorldService.getRoom(player.getCurrentRoomId());
         final Direction direction = Direction.valueOfString(command.direction());
         final PlayerCharacter.MoveResult moveResult = player.move(room, direction);
         switch (moveResult) {
             case SUCCESS:
-                sendMessageToUserPort.messageToUser(command.username(), String.format("당신은 %s쪽으로 이동 합니다.", direction.getName()));
-                displayRoomInfoUseCase.displayRoomInfo(command.username());
+                sendMessageToUserPort.messageToUser(command.userId(), String.format("당신은 %s쪽으로 이동 합니다.", direction.getName()));
+                displayRoomInfoUseCase.displayRoomInfo(command.userId());
                 break;
             case NO_WAY, FAILED:
-                sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽으로는 갈 수 없습니다.", direction.getName()));
+                sendMessageToUserPort.messageToUser(command.userId(), String.format("%s쪽으로는 갈 수 없습니다.", direction.getName()));
                 break;
             case LOCKED:
-                sendMessageToUserPort.messageToUser(command.username(), String.format("%s쪽은 잠겨있습니다.", direction.getName()));
+                sendMessageToUserPort.messageToUser(command.userId(), String.format("%s쪽은 잠겨있습니다.", direction.getName()));
                 break;
         }
     }

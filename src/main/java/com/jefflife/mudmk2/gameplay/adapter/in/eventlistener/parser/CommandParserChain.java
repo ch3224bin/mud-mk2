@@ -41,15 +41,15 @@ public class CommandParserChain {
     /**
      * Parses a command from the given message.
      *
-     * @param sender the sender of the message
+     * @param userId the ID of the user sending the message
      * @param content the content of the message
      * @return the parsed command, or null if no parser could handle the message
      */
-    public Command parse(String sender, String content) {
-        Command command = firstParser.parse(sender, content);
+    public Command parse(Long userId, String content) {
+        Command command = firstParser.parse(userId, content);
         if (command == null) {
             logger.info("No command matched for content: {}", content);
-            return new InvalidCommand(sender, content);
+            return new InvalidCommand(userId, content);
         }
         return command;
     }

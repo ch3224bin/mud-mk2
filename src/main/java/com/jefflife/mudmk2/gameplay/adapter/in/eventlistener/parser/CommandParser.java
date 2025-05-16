@@ -27,9 +27,9 @@ public interface CommandParser {
      * Attempts to parse a command from the given message.
      * If this parser can't handle the message, it passes the request to the next parser.
      *
-     * @param sender the sender of the message
+     * @param userId the ID of the user sending the message
      * @param content the content of the message
      * @return the parsed command, or null if no parser in the chain could handle the message
      */
-    Command parse(String sender, String content);
+    Command parse(Long userId, String content);
 }

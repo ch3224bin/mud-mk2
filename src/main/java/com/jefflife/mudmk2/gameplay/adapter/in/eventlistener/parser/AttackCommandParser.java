@@ -16,11 +16,11 @@ public class AttackCommandParser extends AbstractCommandParser {
     private static final Pattern ATTACK_PATTERN = Pattern.compile("(\\S+) 때려");
     
     @Override
-    protected Command parseCommand(String sender, String content) {
+    protected Command parseCommand(Long userId, String content) {
         Matcher matcher = ATTACK_PATTERN.matcher(content);
         if (matcher.matches()) {
             String target = matcher.group(1);
-            AttackCommand command = new AttackCommand(sender, target);
+            AttackCommand command = new AttackCommand(userId, target);
             logger.debug("Parsed AttackCommand: {}", command);
             return command;
         }

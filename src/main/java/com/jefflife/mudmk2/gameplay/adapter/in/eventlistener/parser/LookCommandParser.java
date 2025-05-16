@@ -16,11 +16,11 @@ public class LookCommandParser extends AbstractCommandParser {
     private static final Pattern LOOK_PATTERN = Pattern.compile("(\\S+) 봐");
     
     @Override
-    protected Command parseCommand(String sender, String content) {
+    protected Command parseCommand(Long userId, String content) {
         Matcher matcher = LOOK_PATTERN.matcher(content);
         if (matcher.matches()) {
             String target = matcher.group(1);
-            LookCommand command = new LookCommand(sender, target);
+            LookCommand command = new LookCommand(userId, target);
             logger.debug("Parsed LookCommand: {}", command);
             return command;
         }

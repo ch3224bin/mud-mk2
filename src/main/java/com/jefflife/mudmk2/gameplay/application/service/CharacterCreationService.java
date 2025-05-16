@@ -5,11 +5,8 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.domain.model.character.CharacterCreationState;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
-import com.jefflife.mudmk2.user.domain.User;
-import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -26,7 +23,7 @@ public class CharacterCreationService {
     private final SendMessageToUserPort sendMessageToUserPort;
     
     // Store creation states by username
-    private final Map<String, CharacterCreationState> creationStates = new ConcurrentHashMap<>();
+    private final Map<Long, CharacterCreationState> creationStates = new ConcurrentHashMap<>();
     
     public CharacterCreationService(
             PlayerCharacterService playerCharacterService,
@@ -37,38 +34,35 @@ public class CharacterCreationService {
     
     /**
      * Start character creation for a user.
-     * @param username principal name
+     * @param userId the user ID
      */
-    public void startCharacterCreation(String username) {
-        User user = UserSessionManager.getConnectedUser(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-
+    public void startCharacterCreation(Long userId) {
         // Check if the user already has a character
-        if (playerCharacterService.hasCharacter(username)) {
-            sendMessageToUserPort.messageToUser(username, "You already have a character.");
+        if (playerCharacterService.hasCharacter(userId)) {
+            sendMessageToUserPort.messageToUser(userId, "You already have a character.");
             return;
         }
         
         // Create a new state and store it
-        CharacterCreationState state = new CharacterCreationState(username, user.getId());
-        creationStates.put(username, state);
+        CharacterCreationState state = new CharacterCreationState(userId);
+        creationStates.put(userId, state);
         
         // Move to the first step (asking for name)
         state.nextStep();
         
         // Send welcome message
-        sendMessageToUserPort.messageToUser(username, "Welcome to the game! Let's create your character.");
-        sendMessageToUserPort.messageToUser(username, "What is your character's name?");
+        sendMessageToUserPort.messageToUser(userId, "Welcome to the game! Let's create your character.");
+        sendMessageToUserPort.messageToUser(userId, "What is your character's name?");
     }
     
     /**
      * Process a message from a user who is creating a character.
-     * @param username the username
+     * @param userId the user ID
      * @param message the message
      * @return true if the message was processed as part of character creation, false otherwise
      */
-    public boolean processMessage(String username, String message) {
-        CharacterCreationState state = creationStates.get(username);
+    public boolean processMessage(Long userId, String message) {
+        CharacterCreationState state = creationStates.get(userId);
         
         // If the user is not in character creation, return false
         if (state == null) {
@@ -101,9 +95,9 @@ public class CharacterCreationService {
         state.setCharacterName(name);
         
         // Send confirmation and ask for class
-        sendMessageToUserPort.messageToUser(state.getUsername(), 
+        sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Your character's name is " + name + ". Now, choose your class:");
-        sendMessageToUserPort.messageToUser(state.getUsername(), 
+        sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Available classes: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
     }
     
@@ -125,7 +119,7 @@ public class CharacterCreationService {
             
         } catch (IllegalArgumentException e) {
             // Invalid class, ask again
-            sendMessageToUserPort.messageToUser(state.getUsername(), 
+            sendMessageToUserPort.messageToUser(state.getUserId(),
                     "Invalid class. Please choose from: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
         }
     }
@@ -148,21 +142,21 @@ public class CharacterCreationService {
         );
         
         // Send confirmation
-        sendMessageToUserPort.messageToUser(state.getUsername(), 
+        sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Character created! Welcome, " + character.getNickname() + " the " + character.getCharacterClass() + ".");
-        sendMessageToUserPort.messageToUser(state.getUsername(), 
+        sendMessageToUserPort.messageToUser(state.getUserId(),
                 "You are now in room " + character.getBaseCharacterInfo().getRoomId() + ".");
         
         // Remove the state
-        creationStates.remove(state.getUsername());
+        creationStates.remove(state.getUserId());
     }
     
     /**
      * Check if a user is in character creation.
-     * @param username the username
+     * @param userId the user ID
      * @return true if the user is in character creation, false otherwise
      */
-    public boolean isInCharacterCreation(String username) {
-        return creationStates.containsKey(username);
+    public boolean isInCharacterCreation(Long userId) {
+        return creationStates.containsKey(userId);
     }
 }

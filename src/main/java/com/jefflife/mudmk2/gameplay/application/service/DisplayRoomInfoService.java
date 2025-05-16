@@ -29,11 +29,11 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
     }
 
     @Override
-    public void displayRoomInfo(String principalName) {
-        final PlayerCharacter character = gameWorldService.getPlayerByUsername(principalName);
+    public void displayRoomInfo(Long userId) {
+        final PlayerCharacter character = gameWorldService.getPlayerByUserId(userId);
 
         if (character == null) {
-            logger.info("Player character not found for user {}. Room info will not be displayed.", principalName);
+            logger.info("Player character not found for user {}. Room info will not be displayed.", userId);
             return;
         }
 
@@ -46,8 +46,8 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
 
         String htmlContent = templateEngine.process("gameplay/room-info", context);
 
-        sendMessageToUserPort.messageToUser(principalName, htmlContent);
-        logger.info("Sent room info to user {}", principalName);
+        sendMessageToUserPort.messageToUser(userId, htmlContent);
+        logger.info("Sent room info to user {}", userId);
     }
 }
 

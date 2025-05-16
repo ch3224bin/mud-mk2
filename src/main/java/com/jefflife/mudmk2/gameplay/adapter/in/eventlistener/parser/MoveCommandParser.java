@@ -16,11 +16,11 @@ public class MoveCommandParser extends AbstractCommandParser {
     private static final Pattern MOVE_PATTERN = Pattern.compile("(동|서|남|북|위|아래|ㄷ|ㅅ|ㄴ|ㅂ)");
     
     @Override
-    protected Command parseCommand(String sender, String content) {
+    protected Command parseCommand(Long userId, String content) {
         Matcher matcher = MOVE_PATTERN.matcher(content);
         if (matcher.matches()) {
             String direction = matcher.group(1);
-            MoveCommand command = new MoveCommand(sender, direction);
+            MoveCommand command = new MoveCommand(userId, direction);
             logger.debug("Parsed MoveCommand: {}", command);
             return command;
         }

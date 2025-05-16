@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 public class StatusCommandParser extends AbstractCommandParser {
 
     @Override
-    protected Command parseCommand(String sender, String content) {
+    protected Command parseCommand(Long userId, String content) {
         if (content.equals("상태창")) {
-            StatusCommand command = new StatusCommand(sender);
+            StatusCommand command = new StatusCommand(userId);
             logger.debug("Parsed StatusCommand: {}", command);
             return command;
         }

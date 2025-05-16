@@ -2,7 +2,6 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -60,12 +59,6 @@ public class GameWorldService {
             throw new IllegalArgumentException("Player character not found for user ID: " + userId);
         }
         return playerCharacter;
-    }
-
-    public PlayerCharacter getPlayerByUsername(String username) {
-        return UserSessionManager.getConnectedUser(username)
-                .map(user -> getPlayerByUserId(user.getId()))
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
     }
 
     public Iterable<PlayerCharacter> getActivePlayers() {

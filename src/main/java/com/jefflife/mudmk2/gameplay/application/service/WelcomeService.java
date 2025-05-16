@@ -24,8 +24,8 @@ public class WelcomeService implements WelcomeUseCase {
     }
     
     @Override
-    public void welcome(String username) {
+    public void welcome(Long userId) {
         String welcomeMessage = templateEngine.process("gameplay/welcome", new Context());
-        sendMessageToUserPort.messageToUser(username, welcomeMessage);
+        sendMessageToUserPort.messageToUser(userId, welcomeMessage);
     }
 }

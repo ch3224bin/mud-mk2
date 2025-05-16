@@ -5,7 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "동 잠궈" (Lock east)
  */
 public record LockCommand(
-    String username,
+    Long userId,
     String target
 ) implements Command {
 }

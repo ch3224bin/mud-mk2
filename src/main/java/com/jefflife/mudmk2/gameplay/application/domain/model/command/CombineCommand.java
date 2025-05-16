@@ -7,7 +7,7 @@ import java.util.List;
  * Example: "나뭇가지 기름 헝겊 조합" (Combine branch, oil, cloth)
  */
 public record CombineCommand(
-    String username,
+    Long userId,
     List<String> items
 ) implements Command {
 }

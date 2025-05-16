@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 public class SpeakCommandParser extends AbstractCommandParser {
     
     @Override
-    protected Command parseCommand(String sender, String content) {
+    protected Command parseCommand(Long userId, String content) {
         if (content.endsWith(" 말")) {
             String message = content.substring(0, content.length() - 2);
-            SpeakCommand command = new SpeakCommand(sender, message);
+            SpeakCommand command = new SpeakCommand(userId, message);
             logger.debug("Parsed SpeakCommand: {}", command);
             return command;
         }

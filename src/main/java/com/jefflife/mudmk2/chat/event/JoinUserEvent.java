@@ -8,4 +8,7 @@ public record JoinUserEvent(
         Principal user,
         ChatMessage chatMessage
 ) {
+    public String getUserName() {
+        return user.getName();
+    }
 }

@@ -5,6 +5,6 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "상태창" (Status window)
  */
 public record StatusCommand(
-    String username
+    Long userId
 ) implements Command {
 }

@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.command;
 
 public record InvalidCommand(
-        String username,
+        Long userId,
         String originalContent
 ) implements Command {
 }

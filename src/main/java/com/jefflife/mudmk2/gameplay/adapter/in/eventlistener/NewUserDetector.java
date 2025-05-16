@@ -5,14 +5,13 @@ import com.jefflife.mudmk2.chat.event.JoinUserEvent;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.service.CharacterCreationService;
 import com.jefflife.mudmk2.user.domain.User;
-import com.jefflife.mudmk2.user.domain.UserRepository;
+import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,35 +24,27 @@ public class NewUserDetector {
 
     private final PlayerCharacterService playerCharacterService;
     private final CharacterCreationService characterCreationService;
-    private final UserRepository userRepository;
 
     public NewUserDetector(
-            PlayerCharacterService playerCharacterService,
-            CharacterCreationService characterCreationService,
-            UserRepository userRepository) {
+            final PlayerCharacterService playerCharacterService,
+            final CharacterCreationService characterCreationService
+    ) {
         this.playerCharacterService = playerCharacterService;
         this.characterCreationService = characterCreationService;
-        this.userRepository = userRepository;
     }
 
     @EventListener
     @Order(1)
     public boolean createPlayerWhenFirstJoin(JoinUserEvent event) {
-        Authentication authentication = (Authentication) event.user();
         String username = event.user().getName();
-        String email = "";
-        if (authentication.getPrincipal() instanceof final OAuth2User oauth2User) {
-            email = oauth2User.getAttribute("email");
-        }
+        User user = UserSessionManager.getConnectedUser(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found: "));
-
-        if (!playerCharacterService.hasCharacter(username)) {
-            logger.info("New user detected: {}", user.getName());
+        if (!playerCharacterService.hasCharacter(user.getId())) {
+            logger.info("New user detected: {}", user.getId());
 
             // Start character creation
-            characterCreationService.startCharacterCreation(username);
+            characterCreationService.startCharacterCreation(user.getId());
             return true;
         }
 
@@ -71,10 +62,12 @@ public class NewUserDetector {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public boolean handleChatMessage(ChatMessageEvent event) {
         String username = event.user().getName();
+        User user = UserSessionManager.getConnectedUser(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
         // If the user is already in character creation, process the message
-        if (characterCreationService.isInCharacterCreation(username)) {
-            return characterCreationService.processMessage(username, event.content());
+        if (characterCreationService.isInCharacterCreation(user.getId())) {
+            return characterCreationService.processMessage(user.getId(), event.content());
         }
 
         // User has a character, let the event propagate

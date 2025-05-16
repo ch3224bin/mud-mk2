@@ -22,6 +22,7 @@ public class UserSessionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(UserSessionManager.class);
     private static final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
+    private static final Map<Long, String> userIdToPrincipalName = new ConcurrentHashMap<>();
     private final UserRepository userRepository;
 
     public UserSessionManager(UserRepository userRepository) {
@@ -40,6 +41,7 @@ public class UserSessionManager {
 
             if (user != null) {
                 connectedUsers.put(mapKey, user);
+                userIdToPrincipalName.put(user.getId(), mapKey);
                 logger.info("User connected: {} (Principal name: {}). SessionId: {}. Total connected users: {}", user.getId(), mapKey, sessionId, connectedUsers.size());
             } else {
                 logger.warn("User object could not be retrieved for principal name: {}. SessionId: {}. User not added to session map.", mapKey, sessionId);
@@ -59,6 +61,7 @@ public class UserSessionManager {
             String mapKey = principal.getName();
             if (connectedUsers.containsKey(mapKey)) {
                 User removedUser = connectedUsers.remove(mapKey);
+                userIdToPrincipalName.remove(removedUser.getId());
                 logger.info("User disconnected: {} (Principal name: {}). SessionId: {}. Total connected users: {}", removedUser.getId(), mapKey, sessionId, connectedUsers.size());
             } else {
                 logger.warn("User (Principal name: {}) was not in the connected users map upon disconnect. SessionId: {}", mapKey, sessionId);
@@ -99,5 +102,9 @@ public class UserSessionManager {
 
     public static Map<String, User> getAllConnectedUsers() {
         return Map.copyOf(connectedUsers);
+    }
+
+    public static Optional<String> getPrincipalName(Long userId) {
+        return Optional.ofNullable(userIdToPrincipalName.get(userId));
     }
 }

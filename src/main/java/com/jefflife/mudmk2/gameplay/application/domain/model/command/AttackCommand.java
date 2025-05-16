@@ -5,7 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "로보트 때려" (Hit robot)
  */
 public record AttackCommand(
-    String username,
+    Long userId,
     String target
 ) implements Command {
 }

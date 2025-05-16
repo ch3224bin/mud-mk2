@@ -5,7 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "안녕하세요 말" (Say hello)
  */
 public record SpeakCommand(
-    String username,
+    Long userId,
     String message
 ) implements Command {
 }

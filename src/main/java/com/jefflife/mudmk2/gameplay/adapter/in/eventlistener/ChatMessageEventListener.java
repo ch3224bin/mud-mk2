@@ -4,11 +4,16 @@ import com.jefflife.mudmk2.chat.event.ChatMessageEvent;
 import com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor.CommandExecutorChain;
 import com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser.CommandParserChain;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
+import com.jefflife.mudmk2.user.domain.User;
+import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Listens for chat message events and processes them as game commands.
@@ -40,7 +45,9 @@ public class ChatMessageEventListener {
 
         try {
             // Parse the message into a command
-            Command command = parserChain.parse(event.getUsername(), event.content());
+            User user = UserSessionManager.getConnectedUser(event.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException(event.getUsername()));
+            Command command = parserChain.parse(user.getId(), event.content());
             
             // Execute the command if it was parsed successfully
             if (command != null) {

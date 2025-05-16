@@ -8,14 +8,12 @@ import lombok.Getter;
  */
 @Getter
 public class CharacterCreationState {
-    private final String username;
     private final Long userId;
     private CreationStep currentStep;
     private String characterName;
     private CharacterClass characterClass;
 
-    public CharacterCreationState(String username, Long userId) {
-        this.username = username;
+    public CharacterCreationState(Long userId) {
         this.userId = userId;
         this.currentStep = CreationStep.INITIAL;
     }

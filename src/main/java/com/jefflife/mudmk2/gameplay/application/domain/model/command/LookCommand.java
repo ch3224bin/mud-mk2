@@ -5,7 +5,7 @@ package com.jefflife.mudmk2.gameplay.application.domain.model.command;
  * Example: "동 봐" (Look east)
  */
 public record LookCommand(
-    String username,
+    Long userId,
     String target
 ) implements Command {
 }
