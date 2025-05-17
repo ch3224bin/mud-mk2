@@ -534,6 +534,17 @@
         const destinationRoomSelect = document.getElementById('destinationRoomSelect');
         const alertContainer = document.getElementById('alertContainer');
 
+        // Helper function to escape HTML special characters
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         // Load all areas for the dropdown
         function loadAreas() {
             fetch(AREAS_API_URL)
@@ -678,7 +689,8 @@
 
             let html = '<option value="">Select Room</option>';
             rooms.forEach(room => {
-                html += `<option value="${room.id}">${room.name}</option>`;
+                const safeName = escapeHtml(room.name);
+                html += `<option value="${room.id}">${safeName}</option>`;
             });
 
             sourceRoomSelect.innerHTML = html;
@@ -794,6 +806,11 @@
 
             let html = '';
             rooms.forEach(room => {
+                // Escape any HTML in room data
+                const safeName = escapeHtml(room.name);
+                const safeSummary = escapeHtml(room.summary);
+                const safeDescription = escapeHtml(room.description);
+
                 // Create connection badges
                 let connectionsHtml = '';
                 if (room.wayOuts && room.wayOuts.length > 0) {
@@ -802,11 +819,11 @@
                         const directionClass = wayOut.direction.toLowerCase();
                         const directionName = getDirectionName(wayOut.direction);
                         const targetRoom = rooms.find(r => r.id === wayOut.nextRoomId);
-                        const targetRoomName = targetRoom ? targetRoom.name : 'Unknown Room';
+                        const targetRoomName = targetRoom ? escapeHtml(targetRoom.name) : 'Unknown Room';
 
                         connectionsHtml += `
                         <div class="connection-badge ${directionClass}">
-                            <i class="fas fa-arrow-right"></i> ${directionName}: ${targetRoomName}
+                            <i class="fas fa-arrow-${getDirectionArrow(wayOut.direction)}"></i> ${directionName}: ${targetRoomName}
                         </div>`;
                     });
                     connectionsHtml += '</div>';
@@ -815,115 +832,92 @@
                 html += `
                 <div class="room-item">
                     <div class="room-item-info">
-                        <div class="room-item-name">${room.name}</div>
-                        <div class="room-item-description">${room.summary}</div>
+                        <div class="room-item-name">${safeName}</div>
+                        <div class="room-item-description">${safeSummary}</div>
                         ${connectionsHtml}
                     </div>
                     <div class="room-item-actions">
-                        <button class="btn btn-sm btn-primary" onclick="editRoom('${room.id}', '${room.name}', '${room.summary}', '${room.description}')">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteRoom('${room.id}')">Delete</button>
+                        <button class="btn btn-sm btn-primary edit-btn" data-id="${room.id}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${room.id}">Delete</button>
                     </div>
                 </div>`;
             });
 
             roomListContainer.innerHTML = html;
+
+            // 편집과 삭제 버튼에 이벤트 리스너 추가
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const room = rooms.find(r => r.id == id);
+
+                    if (room) {
+                        setEditMode(room.id, room.name, room.summary, room.description);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const room = rooms.find(r => r.id == id);
+
+                    if (room && confirm(`정말 "${escapeHtml(room.name)}" 방을 삭제하시겠습니까?`)) {
+                        deleteRoom(id);
+                    }
+                });
+            });
         }
 
-        // Room form submit handler
-        roomForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Event listeners
+        areaSelect.addEventListener('change', function() {
+            const selectedAreaId = this.value;
+            loadRooms(selectedAreaId);
+        });
 
+        roomForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const id = roomId.value;
             const name = roomName.value.trim();
             const summary = roomSummary.value.trim();
             const description = roomDescription.value.trim();
-            const selectedAreaId = areaSelect.value;
-            const id = roomId.value;
+            const areaIdValue = areaSelect.value;
 
-            if (!name) {
-                showAlert('Please enter a room name', 'danger');
+            if (!name || !summary || !description || !areaIdValue) {
+                showAlert('All fields are required', 'danger');
                 return;
             }
 
-            if (!summary) {
-                showAlert('Please enter a room summary', 'danger');
-                return;
-            }
-
-            if (!description) {
-                showAlert('Please enter a room description', 'danger');
-                return;
-            }
-
-            if (!selectedAreaId) {
-                showAlert('Please select an area', 'danger');
-                return;
-            }
-
-            if (!id) {
-                // Create mode
-                createRoom(name, summary, description, selectedAreaId);
-            } else {
-                // Edit mode
+            if (id) {
                 updateRoom(id, name, summary, description);
+            } else {
+                createRoom(name, summary, description, areaIdValue);
             }
         });
 
-        // Link room form submit handler
-        document.getElementById('linkRoomForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
+
+        document.getElementById('linkRoomForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
             const sourceRoomId = sourceRoomSelect.value;
             const destinationRoomId = destinationRoomSelect.value;
             const sourceDir = document.getElementById('sourceDirSelect').value;
             const destinationDir = document.getElementById('destinationDirSelect').value;
 
-            if (!sourceRoomId) {
-                showAlert('Please select a source room', 'danger');
-                return;
-            }
-
-            if (!destinationRoomId) {
-                showAlert('Please select a destination room', 'danger');
-                return;
-            }
-
-            if (!sourceDir) {
-                showAlert('Please select a source direction', 'danger');
-                return;
-            }
-
-            if (!destinationDir) {
-                showAlert('Please select a destination direction', 'danger');
-                return;
-            }
-
-            if (sourceRoomId === destinationRoomId) {
-                showAlert('Source and destination rooms cannot be the same', 'danger');
+            if (!sourceRoomId || !destinationRoomId || !sourceDir || !destinationDir) {
+                showAlert('All fields are required for linking rooms', 'danger');
                 return;
             }
 
             linkRooms(sourceRoomId, destinationRoomId, sourceDir, destinationDir);
         });
 
-        // Cancel button click handler
-        cancelButton.addEventListener('click', function() {
-            setCreateMode();
-        });
-
-        // Define global functions for edit and delete
-        window.editRoom = editRoom;
-        window.deleteRoom = deleteRoom;
-
-        // Load areas on page load
+        // Initial load
         loadAreas();
-
-        // Event listener for area selection
-        areaSelect.addEventListener('change', function() {
-            const selectedAreaId = areaSelect.value;
-            loadRooms(selectedAreaId);
-        });
-
-        // Other functions like populateRoomDropdowns, editRoom, etc.
     });
 </script>
 </body>
