@@ -1,0 +1,5 @@
+<div class="weather-message">
+    <span class="weather-icon" th:classappend="'weather-icon-' + ${weatherType.toLowerCase()}"></span>
+    <span class="weather-label">날씨가 변했습니다: </span>
+    <span class="weather-value" th:text="${weatherType}">맑음</span>
+</div>

@@ -456,6 +456,233 @@
             font-weight: normal;
             margin-left: 4px;
         }
+
+        /** 날씨 **/
+        .weather-message-container {
+            width: 100%;
+            margin: 10px 0;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .weather-banner {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .weather-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .weather-icon::before {
+            font-size: 22px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .weather-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .weather-label {
+            color: #9ca3af;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .weather-value {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        /* 날씨별 스타일 */
+        .weather-message {
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 4px 0;
+            color: #fbbf24;
+            font-style: italic;
+        }
+
+        .weather-icon {
+            display: inline-block;
+            margin-right: 5px;
+            position: relative;
+        }
+
+        .weather-icon::before {
+            font-size: 16px;
+            vertical-align: middle;
+        }
+
+        .weather-label {
+            color: #9ca3af;
+        }
+
+        .weather-value {
+            font-weight: 600;
+            text-shadow: 0 0 3px currentColor;
+        }
+
+        /* 날씨별 스타일 */
+        .weather-icon-sunny::before {
+            content: "☀️";
+            color: #ffc107;
+        }
+
+        .weather-icon-cloudy::before {
+            content: "☁️";
+            color: #b0bec5;
+        }
+
+        .weather-icon-rainy::before {
+            content: "🌧️";
+            color: #4fc3f7;
+        }
+
+        .weather-icon-snowy::before {
+            content: "❄️";
+            color: #e1f5fe;
+        }
+
+        .weather-icon-stormy::before {
+            content: "⚡";
+            color: #ce93d8;
+        }
+
+        .weather-icon-foggy::before {
+            content: "🌫️";
+            color: #cfd8dc;
+        }
+
+        /* 날씨별 텍스트 색상 */
+        .weather-value:has(+ .weather-icon-sunny) {
+            color: #ffc107;
+        }
+
+        .weather-value:has(+ .weather-icon-cloudy) {
+            color: #b0bec5;
+        }
+
+        .weather-value:has(+ .weather-icon-rainy) {
+            color: #4fc3f7;
+        }
+
+        .weather-value:has(+ .weather-icon-snowy) {
+            color: #e1f5fe;
+        }
+
+        .weather-value:has(+ .weather-icon-stormy) {
+            color: #ce93d8;
+        }
+
+        .weather-value:has(+ .weather-icon-foggy) {
+            color: #cfd8dc;
+        }
+
+        /* 게임 시간 */
+        .game-time-message {
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 4px 0;
+            color: #fbbf24;
+            font-style: italic;
+        }
+
+        .time-icon {
+            display: inline-block;
+            margin-right: 5px;
+            position: relative;
+        }
+
+        .time-icon::before {
+            font-size: 16px;
+            vertical-align: middle;
+        }
+
+        .time-label {
+            color: #9ca3af;
+        }
+
+        .time-value {
+            font-weight: 600;
+            text-shadow: 0 0 3px currentColor;
+        }
+
+        .period-value {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-left: 4px;
+        }
+
+        /* 시간대별 스타일 */
+        .time-icon-새벽::before {
+            content: "🌅";
+            color: #9fa8da;
+        }
+
+        .time-icon-아침::before {
+            content: "🌞";
+            color: #ffb74d;
+        }
+
+        .time-icon-낮::before {
+            content: "☀️";
+            color: #ffd54f;
+        }
+
+        .time-icon-저녁::before {
+            content: "🌇";
+            color: #ffa000;
+        }
+
+        .time-icon-밤::before {
+            content: "🌙";
+            color: #7986cb;
+        }
+
+        .time-icon-심야::before {
+            content: "✨";
+            color: #5c6bc0;
+        }
+
+        /* 시간대별 텍스트 색상 */
+        .time-value.새벽, .period-value.새벽 {
+            color: #9fa8da;
+        }
+
+        .time-value.아침, .period-value.아침 {
+            color: #ffb74d;
+        }
+
+        .time-value.낮, .period-value.낮 {
+            color: #ffd54f;
+        }
+
+        .time-value.저녁, .period-value.저녁 {
+            color: #ffa000;
+        }
+
+        .time-value.밤, .period-value.밤 {
+            color: #7986cb;
+        }
+
+        .time-value.심야, .period-value.심야 {
+            color: #5c6bc0;
+        }
     </style>
 </head>
 <body>
