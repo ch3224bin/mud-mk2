@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - 인스턴스 시나리오 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .scenario-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .scenario-form {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .form-select {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00aa00 0%, #00ff00 100%);
+            color: #000;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #00cc00 0%, #00ff88 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid #9ca3af;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(156, 163, 175, 0.1);
+            color: #e4e4e7;
+            border-color: #e4e4e7;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .scenario-list {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .scenario-list-header {
+            color: #00ff00;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .scenario-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .scenario-item:last-child {
+            border-bottom: none;
+        }
+
+        .scenario-item-info {
+            flex: 1;
+        }
+
+        .scenario-item-title {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .scenario-item-description {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .scenario-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: right;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-profile {
+            background: transparent;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .btn-profile:hover {
+            background: #60a5fa;
+            color: #000;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-area {
+            background: transparent;
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .btn-area:hover {
+            background: #f59e0b;
+            color: #000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .alert-danger {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .scenario-container {
+                padding: 16px;
+            }
+
+            .scenario-form, .scenario-list {
+                padding: 16px;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>인스턴스 시나리오 관리</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="scenario-container">
+                        <div id="alertContainer" class="alert"></div>
+
+                        <!-- Create/Edit Scenario Form -->
+                        <div class="scenario-form">
+                            <h4 class="mb-4" id="formTitle">인스턴스 시나리오 생성</h4>
+                            <form id="scenarioForm">
+                                <input type="hidden" id="scenarioId" value="">
+                                <div class="mb-3">
+                                    <label for="scenarioTitle" class="form-label">시나리오 제목</label>
+                                    <input type="text" class="form-control" id="scenarioTitle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="scenarioDescription" class="form-label">시나리오 설명</label>
+                                    <textarea class="form-control" id="scenarioDescription" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="areaSelect" class="form-label">연결된 Area</label>
+                                    <select class="form-select" id="areaSelect" required>
+                                        <option value="">Area 선택</option>
+                                        <!-- Areas will be loaded here -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="roomSelect" class="form-label">입구 방</label>
+                                    <select class="form-select" id="roomSelect" required>
+                                        <option value="">방 선택</option>
+                                        <!-- Rooms will be loaded here -->
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary" id="saveButton">시나리오 생성</button>
+                                    <button type="button" class="btn btn-secondary" id="cancelButton" style="display: none;">취소</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Scenario List -->
+                        <div class="scenario-list">
+                            <h4 class="scenario-list-header">인스턴스 시나리오 목록</h4>
+                            <div id="scenarioListContainer">
+                                <!-- Scenario items will be loaded here -->
+                                <div class="text-center py-4 text-muted">시나리오 로딩 중...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/area-management" class="btn btn-system btn-area me-2">AREA MANAGEMENT</a>
+                        <a href="/room-management" class="btn btn-system btn-room me-2">ROOM MANAGEMENT</a>
+                        <a href="/npc-management" class="btn btn-system btn-room me-2">NPC MANAGEMENT</a>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/profile" class="btn btn-system btn-profile me-2">PROFILE</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the Instance Scenario Management system.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get username from Thymeleaf
+        const username = /*[[${userName}]]*/ 'default-user';
+
+        // Base API URLs
+        const SCENARIOS_API_URL = '/api/v1/instance-scenarios';
+        const AREAS_API_URL = '/api/v1/areas';
+        const ROOMS_API_URL = '/api/v1/rooms';
+
+        // DOM Elements
+        const scenarioForm = document.getElementById('scenarioForm');
+        const formTitle = document.getElementById('formTitle');
+        const scenarioId = document.getElementById('scenarioId');
+        const scenarioTitle = document.getElementById('scenarioTitle');
+        const scenarioDescription = document.getElementById('scenarioDescription');
+        const areaSelect = document.getElementById('areaSelect');
+        const roomSelect = document.getElementById('roomSelect');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const scenarioListContainer = document.getElementById('scenarioListContainer');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Helper function to escape HTML special characters
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Load all areas for the dropdown
+        function loadAreas() {
+            fetch(AREAS_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load areas');
+                    }
+                    return response.json();
+                })
+                .then(areas => {
+                    populateAreaDropdown(areas);
+                })
+                .catch(error => {
+                    showAlert('Area 로딩 오류: ' + error.message, 'danger');
+                });
+        }
+
+        // Populate area dropdown
+        function populateAreaDropdown(areas) {
+            if (!areas || areas.length === 0) {
+                areaSelect.innerHTML = '<option value="">등록된 Area가 없습니다</option>';
+                return;
+            }
+
+            let html = '<option value="">Area 선택</option>';
+            areas.forEach(area => {
+                const areaType = area.type === 'INSTANCE_MAP' ? '인스턴스 맵' : area.type;
+                const safeName = escapeHtml(area.name);
+                html += `<option value="${area.id}" data-type="${area.type}">${safeName} (${areaType})</option>`;
+            });
+
+            areaSelect.innerHTML = html;
+        }
+
+        // Load rooms for selected area
+        function loadRooms(selectedAreaId) {
+            roomSelect.innerHTML = '<option value="">로딩 중...</option>';
+
+            if (!selectedAreaId) {
+                roomSelect.innerHTML = '<option value="">Area를 먼저 선택해 주세요</option>';
+                return;
+            }
+
+            fetch(`${ROOMS_API_URL}?areaId=${selectedAreaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load rooms');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateRoomDropdown(data.content);
+                })
+                .catch(error => {
+                    showAlert('방 정보 로딩 오류: ' + error.message, 'danger');
+                    roomSelect.innerHTML = '<option value="">로딩 실패</option>';
+                });
+        }
+
+        // Populate room dropdown
+        function populateRoomDropdown(rooms) {
+            if (!rooms || rooms.length === 0) {
+                roomSelect.innerHTML = '<option value="">선택된 Area에 등록된 방이 없습니다</option>';
+                return;
+            }
+
+            let html = '<option value="">입구로 사용할 방 선택</option>';
+            rooms.forEach(room => {
+                const safeName = escapeHtml(room.name);
+                html += `<option value="${room.id}">${safeName}</option>`;
+            });
+
+            roomSelect.innerHTML = html;
+        }
+
+        // Load all scenarios
+        function loadScenarios() {
+            scenarioListContainer.innerHTML = '<div class="text-center py-4 text-muted">시나리오 로딩 중...</div>';
+
+            fetch(SCENARIOS_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load scenarios');
+                    }
+                    return response.json();
+                })
+                .then(scenarios => {
+                    displayScenarios(scenarios);
+                })
+                .catch(error => {
+                    showAlert('시나리오 로딩 오류: ' + error.message, 'danger');
+                    scenarioListContainer.innerHTML = '<div class="text-center py-4 text-muted">시나리오 로딩 실패</div>';
+                });
+        }
+
+        // Display scenarios in the list
+        function displayScenarios(scenarios) {
+            if (!scenarios || scenarios.length === 0) {
+                scenarioListContainer.innerHTML = '<div class="text-center py-4 text-muted">등록된 시나리오가 없습니다. 위 폼에서 시나리오를 생성해 주세요.</div>';
+                return;
+            }
+
+            let html = '';
+            scenarios.forEach(scenario => {
+                // Escape any HTML in scenario data
+                const safeTitle = escapeHtml(scenario.title);
+                const safeDescription = escapeHtml(scenario.description);
+
+                html += `
+                <div class="scenario-item">
+                    <div class="scenario-item-info">
+                        <div class="scenario-item-title">${safeTitle}</div>
+                        <div class="scenario-item-description">
+                            ${safeDescription}<br>
+                            <small>Area ID: ${scenario.areaId}, 입구 방 ID: ${scenario.entranceRoomId}</small>
+                        </div>
+                    </div>
+                    <div class="scenario-item-actions">
+                        <button class="btn btn-sm btn-primary edit-btn" data-id="${scenario.id}">수정</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${scenario.id}">삭제</button>
+                    </div>
+                </div>`;
+            });
+
+            scenarioListContainer.innerHTML = html;
+
+            // 편집과 삭제 버튼에 이벤트 리스너 추가
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    loadScenarioForEdit(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    if (confirm(`정말로 이 시나리오를 삭제하시겠습니까?`)) {
+                        deleteScenario(id);
+                    }
+                });
+            });
+        }
+
+        // Load scenario for editing
+        function loadScenarioForEdit(id) {
+            fetch(`${SCENARIOS_API_URL}/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load scenario');
+                    }
+                    return response.json();
+                })
+                .then(scenario => {
+                    setEditMode(scenario);
+                })
+                .catch(error => {
+                    showAlert('시나리오 정보 로딩 오류: ' + error.message, 'danger');
+                });
+        }
+
+        // Set form to edit mode
+        function setEditMode(scenario) {
+            formTitle.textContent = '인스턴스 시나리오 수정';
+            saveButton.textContent = '시나리오 업데이트';
+            scenarioId.value = scenario.id;
+            scenarioTitle.value = scenario.title;
+            scenarioDescription.value = scenario.description;
+
+            // Set area and load related rooms
+            areaSelect.value = scenario.areaId;
+            loadRooms(scenario.areaId);
+
+            // We need to wait for rooms to load before setting the room select value
+            const roomSelectInterval = setInterval(() => {
+                if (roomSelect.options.length > 1) {
+                    roomSelect.value = scenario.entranceRoomId;
+                    clearInterval(roomSelectInterval);
+                }
+            }, 100);
+
+            cancelButton.style.display = 'block';
+
+            // Scroll to form
+            scenarioForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Set form to create mode
+        function setCreateMode() {
+            formTitle.textContent = '인스턴스 시나리오 생성';
+            saveButton.textContent = '시나리오 생성';
+            scenarioId.value = '';
+            scenarioTitle.value = '';
+            scenarioDescription.value = '';
+            areaSelect.selectedIndex = 0;
+            roomSelect.innerHTML = '<option value="">Area를 먼저 선택해 주세요</option>';
+            cancelButton.style.display = 'none';
+        }
+
+        // Create a new scenario
+        function createScenario(title, description, areaId, entranceRoomId) {
+            fetch(SCENARIOS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    areaId: areaId,
+                    entranceRoomId: entranceRoomId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create scenario');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`"${title}" 시나리오가 생성되었습니다!`, 'success');
+                setCreateMode();
+                loadScenarios();
+            })
+            .catch(error => {
+                showAlert('시나리오 생성 오류: ' + error.message, 'danger');
+            });
+        }
+
+        // Update an existing scenario
+        function updateScenario(id, title, description, areaId, entranceRoomId) {
+            fetch(`${SCENARIOS_API_URL}/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    areaId: areaId,
+                    entranceRoomId: entranceRoomId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update scenario');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`"${title}" 시나리오가 업데이트 되었습니다!`, 'success');
+                setCreateMode();
+                loadScenarios();
+            })
+            .catch(error => {
+                showAlert('시나리오 업데이트 오류: ' + error.message, 'danger');
+            });
+        }
+
+        // Delete a scenario
+        function deleteScenario(id) {
+            fetch(`${SCENARIOS_API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete scenario');
+                }
+                showAlert('시나리오가 삭제되었습니다!', 'success');
+                loadScenarios();
+            })
+            .catch(error => {
+                showAlert('시나리오 삭제 오류: ' + error.message, 'danger');
+            });
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            alertContainer.textContent = message;
+            alertContainer.className = `alert alert-${type}`;
+            alertContainer.style.display = 'block';
+
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // Event Listeners
+        areaSelect.addEventListener('change', function() {
+            const selectedAreaId = this.value;
+            loadRooms(selectedAreaId);
+        });
+
+        scenarioForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = scenarioTitle.value.trim();
+            const description = scenarioDescription.value.trim();
+            const areaId = parseInt(areaSelect.value);
+            const entranceRoomId = parseInt(roomSelect.value);
+            const id = scenarioId.value;
+
+            if (!title || !description || !areaId || isNaN(areaId) || !entranceRoomId || isNaN(entranceRoomId)) {
+                showAlert('모든 필드를 입력해 주세요', 'danger');
+                return;
+            }
+
+            // Check if the selected area is of type INSTANCE_MAP
+            const selectedOption = areaSelect.options[areaSelect.selectedIndex];
+            const areaType = selectedOption.getAttribute('data-type');
+
+            if (areaType !== 'INSTANCE_MAP') {
+                showAlert('인스턴스 맵(INSTANCE_MAP) 타입의 Area만 선택할 수 있습니다', 'danger');
+                return;
+            }
+
+            if (!id) {
+                // Create mode
+                createScenario(title, description, areaId, entranceRoomId);
+            } else {
+                // Edit mode
+                updateScenario(id, title, description, areaId, entranceRoomId);
+            }
+        });
+
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
+
+        // Initialize
+        if (username) {
+            loadAreas();
+            loadScenarios();
+        }
+    });
+</script>
+</body>
+</html>
