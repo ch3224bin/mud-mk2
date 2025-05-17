@@ -15,10 +15,13 @@ public class Room {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@Column(name = "name", nullable = false)
+	private String name;
+
 	@Column(name = "summary", nullable = false)
 	private String summary;
 
-	@Column(name = "description", nullable = false)
+	@Column(name = "description", nullable = false, length = 2000)
 	private String description;
 
 	@Column(name = "area_id", nullable = false)
@@ -28,9 +31,10 @@ public class Room {
 	private WayOuts wayOuts = new WayOuts();
 
 	@Builder
-	public Room(final long id, final long areaId, final String summary, final String description, final WayOuts wayOuts) {
+	public Room(final long id, final long areaId, final String name, final String summary, final String description, final WayOuts wayOuts) {
 		this.id = id;
 		this.areaId = areaId;
+		this.name = name;
 		this.summary = summary;
 		this.description = description;
 		this.wayOuts = wayOuts;
@@ -69,14 +73,19 @@ public class Room {
 		Door.setup(wayOut, anotherWayOut);
 	}
 
-	public void update(String summary, String description) {
+	public void update(String name, String summary, String description) {
+		this.name = name;
 		this.summary = summary;
 		this.description = description;
 	}
 
 	public String getName() {
-	    return this.summary;
+	    return this.name;
     }
+
+	public String getSummary() {
+		return this.summary;
+	}
 
     public void initializeAssociatedEntities() {
         // WayOuts 컬렉션 및 관련 객체 명시적 초기화

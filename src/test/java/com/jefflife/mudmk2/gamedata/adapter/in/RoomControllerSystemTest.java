@@ -41,9 +41,10 @@ public class RoomControllerSystemTest {
     void createRoom_shouldCreateRoomAndReturnCreatedResponse() throws Exception {
         // Given
         long areaId = 1L;
+        String name = "Test Room";
         String summary = "Test Room";
         String description = "This is a test room description";
-        String requestJson = createRoomJson(areaId, summary, description);
+        String requestJson = createRoomJson(areaId, name, summary, description);
 
         // When
         MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -69,23 +70,26 @@ public class RoomControllerSystemTest {
     void updateRoom_shouldUpdateRoomAndReturnOkResponse() throws Exception {
         // Given
         long areaId = 1L;
+        String originalName = "Original Room";
         String originalSummary = "Original Room";
         String originalDescription = "This is the original room description";
 
         // Create a room
-        RoomResponse createdRoom = createRoom(areaId, originalSummary, originalDescription);
+        RoomResponse createdRoom = createRoom(areaId, originalName, originalSummary, originalDescription);
         long roomId = createdRoom.id();
 
         // Now update the room
+        String updatedName = "Updated Room";
         String updatedSummary = "Updated Room";
         String updatedDescription = "This is the updated room description";
 
         // When
-        RoomResponse updateResponse = updateRoom(roomId, updatedSummary, updatedDescription);
+        RoomResponse updateResponse = updateRoom(roomId, updatedName, updatedSummary, updatedDescription);
 
         // Then
         assertThat(updateResponse.id()).isEqualTo(roomId);
         assertThat(updateResponse.areaId()).isEqualTo(areaId);
+        assertThat(updateResponse.name()).isEqualTo(updatedName);
         assertThat(updateResponse.summary()).isEqualTo(updatedSummary);
         assertThat(updateResponse.description()).isEqualTo(updatedDescription);
     }
@@ -95,11 +99,12 @@ public class RoomControllerSystemTest {
     void getRoom_shouldReturnRoomAndOkResponse() throws Exception {
         // Given
         long areaId = 1L;
+        String name = "Test Room for Get";
         String summary = "Test Room for Get";
         String description = "This is a test room for the get method";
 
         // Create a room
-        RoomResponse createdRoom = createRoom(areaId, summary, description);
+        RoomResponse createdRoom = createRoom(areaId, name, summary, description);
         long roomId = createdRoom.id();
 
         // When
@@ -117,13 +122,15 @@ public class RoomControllerSystemTest {
         long areaId = 1L;
 
         // Create two rooms with unique identifiers
+        String name1 = "Test Room for Pagination 1 " + System.currentTimeMillis();
         String summary1 = "Test Room for Pagination 1 " + System.currentTimeMillis();
         String description1 = "This is test room 1 for pagination test";
-        RoomResponse room1 = createRoom(areaId, summary1, description1);
+        RoomResponse room1 = createRoom(areaId, name1, summary1, description1);
 
+        String name2 = "Test Room for Pagination 2 " + System.currentTimeMillis();
         String summary2 = "Test Room for Pagination 2 " + System.currentTimeMillis();
         String description2 = "This is test room 2 for pagination test";
-        RoomResponse room2 = createRoom(areaId, summary2, description2);
+        RoomResponse room2 = createRoom(areaId, name2, summary2, description2);
 
         // When
         // Request with a large page size to ensure we get all rooms
@@ -171,11 +178,12 @@ public class RoomControllerSystemTest {
     void deleteRoom_shouldDeleteRoomAndReturnNoContent() throws Exception {
         // Given
         long areaId = 1L;
+        String name = "Test Room for Delete";
         String summary = "Test Room for Delete";
         String description = "This is a test room for the delete method";
 
         // Create a room
-        RoomResponse createdRoom = createRoom(areaId, summary, description);
+        RoomResponse createdRoom = createRoom(areaId, name, summary, description);
         long roomId = createdRoom.id();
 
         // When
@@ -200,14 +208,16 @@ public class RoomControllerSystemTest {
         long areaId = 1L;
 
         // Create two rooms
+        String name1 = "East Room";
         String summary1 = "East Room";
         String description1 = "This is the east room";
-        RoomResponse room1 = createRoom(areaId, summary1, description1);
+        RoomResponse room1 = createRoom(areaId, name1, summary1, description1);
         long room1Id = room1.id();
 
+        String name2 = "West Room";
         String summary2 = "West Room";
         String description2 = "This is the west room";
-        RoomResponse room2 = createRoom(areaId, summary2, description2);
+        RoomResponse room2 = createRoom(areaId, name2, summary2, description2);
         long room2Id = room2.id();
 
         // When
@@ -258,8 +268,8 @@ public class RoomControllerSystemTest {
         assertThat(hasWestExit).withFailMessage("Room2 should have an exit to Room1 in the WEST direction").isTrue();
     }
 
-    private String createRoomJson(long areaId, String summary, String description) throws Exception {
-        CreateRoomRequest request = new CreateRoomRequest(areaId, summary, description);
+    private String createRoomJson(long areaId, String name, String summary, String description) throws Exception {
+        CreateRoomRequest request = new CreateRoomRequest(areaId, name, summary, description);
         return objectMapper.writeValueAsString(request);
     }
 
@@ -270,8 +280,8 @@ public class RoomControllerSystemTest {
         assertThat(room.description()).isEqualTo(expectedDescription);
     }
 
-    private String updateRoomJson(String summary, String description) throws Exception {
-        UpdateRoomRequest request = new UpdateRoomRequest(summary, description);
+    private String updateRoomJson(String name, String summary, String description) throws Exception {
+        UpdateRoomRequest request = new UpdateRoomRequest(name, summary, description);
         return objectMapper.writeValueAsString(request);
     }
 
@@ -289,8 +299,8 @@ public class RoomControllerSystemTest {
     /**
      * Helper method to create a room and return the response
      */
-    private RoomResponse createRoom(long areaId, String summary, String description) throws Exception {
-        String requestJson = createRoomJson(areaId, summary, description);
+    private RoomResponse createRoom(long areaId, String name, String summary, String description) throws Exception {
+        String requestJson = createRoomJson(areaId, name, summary, description);
 
         MvcResult result = mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -318,8 +328,8 @@ public class RoomControllerSystemTest {
     /**
      * Helper method to update a room and return the response
      */
-    private RoomResponse updateRoom(long roomId, String summary, String description) throws Exception {
-        String requestJson = updateRoomJson(summary, description);
+    private RoomResponse updateRoom(long roomId, String name, String summary, String description) throws Exception {
+        String requestJson = updateRoomJson(name, summary, description);
 
         MvcResult result = mockMvc.perform(patch(BASE_URL + "/" + roomId)
                         .contentType(MediaType.APPLICATION_JSON)

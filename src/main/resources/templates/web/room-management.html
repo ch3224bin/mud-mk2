@@ -409,6 +409,10 @@
                                     <input type="text" class="form-control" id="roomName" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="roomSummary" class="form-label">Room Summary</label>
+                                    <input type="text" class="form-control" id="roomSummary" required>
+                                </div>
+                                <div class="mb-3">
                                     <label for="roomDescription" class="form-label">Room Description</label>
                                     <textarea class="form-control" id="roomDescription" rows="3" required></textarea>
                                 </div>
@@ -510,6 +514,10 @@
         // Get username from Thymeleaf
         const username = /*[[${userName}]]*/ 'default-user';
 
+        // Base API URLs
+        const AREAS_API_URL = '/api/v1/areas';
+        const ROOMS_API_URL = '/api/v1/rooms';
+
         // DOM Elements
         const areaSelect = document.getElementById('areaSelect');
         const roomForm = document.getElementById('roomForm');
@@ -517,22 +525,14 @@
         const roomId = document.getElementById('roomId');
         const areaId = document.getElementById('areaId');
         const roomName = document.getElementById('roomName');
+        const roomSummary = document.getElementById('roomSummary');
         const roomDescription = document.getElementById('roomDescription');
         const saveButton = document.getElementById('saveButton');
         const cancelButton = document.getElementById('cancelButton');
         const roomListContainer = document.getElementById('roomListContainer');
-        const alertContainer = document.getElementById('alertContainer');
-
-        // Link Room Form Elements
-        const linkRoomForm = document.getElementById('linkRoomForm');
         const sourceRoomSelect = document.getElementById('sourceRoomSelect');
         const destinationRoomSelect = document.getElementById('destinationRoomSelect');
-        const sourceDirSelect = document.getElementById('sourceDirSelect');
-        const destinationDirSelect = document.getElementById('destinationDirSelect');
-
-        // Base API URLs
-        const AREAS_API_URL = '/api/v1/areas';
-        const ROOMS_API_URL = '/api/v1/rooms';
+        const alertContainer = document.getElementById('alertContainer');
 
         // Load all areas for the dropdown
         function loadAreas() {
@@ -592,106 +592,15 @@
                 });
         }
 
-        // Display rooms in the list
-        function displayRooms(rooms) {
-            if (!rooms || rooms.length === 0) {
-                roomListContainer.innerHTML = '<div class="text-center py-4 text-muted">No rooms found in this area. Create your first room above.</div>';
-                return;
-            }
-
-            let html = '';
-            rooms.forEach(room => {
-                // Create connection badges
-                let connectionsHtml = '';
-                if (room.wayOuts && room.wayOuts.length > 0) {
-                    connectionsHtml = '<div class="room-connections">';
-                    room.wayOuts.forEach(wayOut => {
-                        const directionClass = wayOut.direction.toLowerCase();
-                        const directionName = getDirectionName(wayOut.direction);
-                        const targetRoom = rooms.find(r => r.id === wayOut.nextRoomId);
-                        const targetRoomName = targetRoom ? targetRoom.summary : 'Unknown Room';
-
-                        connectionsHtml += `
-                        <div class="connection-badge ${directionClass}">
-                            <i class="fas fa-arrow-${getDirectionArrow(wayOut.direction)}"></i>
-                            ${directionName} → ${targetRoomName}
-                        </div>`;
-                    });
-                    connectionsHtml += '</div>';
-                }
-
-                html += `
-                <div class="room-item">
-                    <div class="room-item-info">
-                        <div class="room-item-name">${room.summary}</div>
-                        <div class="room-item-description">${room.description}</div>
-                        ${connectionsHtml}
-                    </div>
-                    <div class="room-item-actions">
-                        <button class="btn btn-secondary btn-sm edit-btn" data-id="${room.id}" data-name="${room.summary}" data-description="${room.description}">Edit</button>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${room.id}" data-name="${room.summary}">Delete</button>
-                    </div>
-                </div>
-                `;
-            });
-
-            roomListContainer.innerHTML = html;
-
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const name = this.getAttribute('data-name');
-                    const description = this.getAttribute('data-description');
-
-                    // Set form to edit mode
-                    setEditMode(id, name, description);
-                });
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const name = this.getAttribute('data-name');
-
-                    if (confirm(`Are you sure you want to delete the room "${name}"?`)) {
-                        deleteRoom(id);
-                    }
-                });
-            });
-        }
-
-        // Set form to create mode
-        function setCreateMode() {
-            formTitle.textContent = 'Create New Room';
-            saveButton.textContent = 'Create Room';
-            roomId.value = '';
-            roomName.value = '';
-            roomDescription.value = '';
-            cancelButton.style.display = 'none';
-        }
-
-        // Set form to edit mode
-        function setEditMode(id, name, description) {
-            formTitle.textContent = 'Edit Room';
-            saveButton.textContent = 'Update Room';
-            roomId.value = id;
-            roomName.value = name;
-            roomDescription.value = description;
-            cancelButton.style.display = 'block';
-
-            // Scroll to form
-            roomForm.scrollIntoView({ behavior: 'smooth' });
-        }
-
         // Create a new room
-        function createRoom(summary, description, areaId) {
+        function createRoom(name, summary, description, areaId) {
             fetch(ROOMS_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    name: name,
                     summary: summary,
                     description: description,
                     areaId: areaId
@@ -704,7 +613,7 @@
                 return response.json();
             })
             .then(data => {
-                showAlert(`Room "${summary}" created successfully!`, 'success');
+                showAlert(`Room "${name}" created successfully!`, 'success');
                 setCreateMode();
                 loadRooms(areaId);
             })
@@ -714,13 +623,14 @@
         }
 
         // Update an existing room
-        function updateRoom(id, summary, description) {
+        function updateRoom(id, name, summary, description) {
             fetch(`${ROOMS_API_URL}/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    name: name,
                     summary: summary,
                     description: description
                 })
@@ -768,7 +678,7 @@
 
             let html = '<option value="">Select Room</option>';
             rooms.forEach(room => {
-                html += `<option value="${room.id}">${room.summary}</option>`;
+                html += `<option value="${room.id}">${room.name}</option>`;
             });
 
             sourceRoomSelect.innerHTML = html;
@@ -811,6 +721,11 @@
             });
         }
 
+        // Edit room function - called from edit buttons
+        function editRoom(id, name, summary, description) {
+            setEditMode(id, name, summary, description);
+        }
+
         // Show alert message
         function showAlert(message, type) {
             alertContainer.textContent = message;
@@ -823,32 +738,114 @@
             }, 5000);
         }
 
-        // Event Listeners
-        areaSelect.addEventListener('change', function() {
-            const selectedAreaId = this.value;
-            areaId.value = selectedAreaId;
-
-            if (selectedAreaId) {
-                loadRooms(selectedAreaId);
-                roomForm.style.display = 'block';
-                linkRoomForm.style.display = 'block';
-            } else {
-                roomListContainer.innerHTML = '<div class="text-center py-4 text-muted">Please select an area to view rooms</div>';
-                roomForm.style.display = 'none';
-                linkRoomForm.style.display = 'none';
+        // Helper function to get direction name
+        function getDirectionName(direction) {
+            switch(direction) {
+                case 'EAST': return '동(East)';
+                case 'WEST': return '서(West)';
+                case 'SOUTH': return '남(South)';
+                case 'NORTH': return '북(North)';
+                default: return direction;
             }
-        });
+        }
 
+        // Helper function to get direction arrow
+        function getDirectionArrow(direction) {
+            switch(direction) {
+                case 'EAST': return 'right';
+                case 'WEST': return 'left';
+                case 'SOUTH': return 'down';
+                case 'NORTH': return 'up';
+                default: return 'right';
+            }
+        }
+
+        // Set form to create mode
+        function setCreateMode() {
+            formTitle.textContent = 'Create New Room';
+            saveButton.textContent = 'Create Room';
+            roomId.value = '';
+            roomName.value = '';
+            roomSummary.value = '';
+            roomDescription.value = '';
+            cancelButton.style.display = 'none';
+        }
+
+        // Set form to edit mode
+        function setEditMode(id, name, summary, description) {
+            formTitle.textContent = 'Edit Room';
+            saveButton.textContent = 'Update Room';
+            roomId.value = id;
+            roomName.value = name;
+            roomSummary.value = summary;
+            roomDescription.value = description;
+            cancelButton.style.display = 'block';
+
+            // Scroll to form
+            roomForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Display rooms in the list
+        function displayRooms(rooms) {
+            if (!rooms || rooms.length === 0) {
+                roomListContainer.innerHTML = '<div class="text-center py-4 text-muted">No rooms found in this area. Create your first room above.</div>';
+                return;
+            }
+
+            let html = '';
+            rooms.forEach(room => {
+                // Create connection badges
+                let connectionsHtml = '';
+                if (room.wayOuts && room.wayOuts.length > 0) {
+                    connectionsHtml = '<div class="room-connections">';
+                    room.wayOuts.forEach(wayOut => {
+                        const directionClass = wayOut.direction.toLowerCase();
+                        const directionName = getDirectionName(wayOut.direction);
+                        const targetRoom = rooms.find(r => r.id === wayOut.nextRoomId);
+                        const targetRoomName = targetRoom ? targetRoom.name : 'Unknown Room';
+
+                        connectionsHtml += `
+                        <div class="connection-badge ${directionClass}">
+                            <i class="fas fa-arrow-right"></i> ${directionName}: ${targetRoomName}
+                        </div>`;
+                    });
+                    connectionsHtml += '</div>';
+                }
+
+                html += `
+                <div class="room-item">
+                    <div class="room-item-info">
+                        <div class="room-item-name">${room.name}</div>
+                        <div class="room-item-description">${room.summary}</div>
+                        ${connectionsHtml}
+                    </div>
+                    <div class="room-item-actions">
+                        <button class="btn btn-sm btn-primary" onclick="editRoom('${room.id}', '${room.name}', '${room.summary}', '${room.description}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRoom('${room.id}')">Delete</button>
+                    </div>
+                </div>`;
+            });
+
+            roomListContainer.innerHTML = html;
+        }
+
+        // Room form submit handler
         roomForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
             const name = roomName.value.trim();
+            const summary = roomSummary.value.trim();
             const description = roomDescription.value.trim();
             const selectedAreaId = areaSelect.value;
             const id = roomId.value;
 
             if (!name) {
                 showAlert('Please enter a room name', 'danger');
+                return;
+            }
+
+            if (!summary) {
+                showAlert('Please enter a room summary', 'danger');
                 return;
             }
 
@@ -864,25 +861,21 @@
 
             if (!id) {
                 // Create mode
-                createRoom(name, description, selectedAreaId);
+                createRoom(name, summary, description, selectedAreaId);
             } else {
                 // Edit mode
-                updateRoom(id, name, description);
+                updateRoom(id, name, summary, description);
             }
         });
 
-        cancelButton.addEventListener('click', function() {
-            setCreateMode();
-        });
-
-        // Link Room Form Event Listener
-        linkRoomForm.addEventListener('submit', function(e) {
+        // Link room form submit handler
+        document.getElementById('linkRoomForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const sourceRoomId = sourceRoomSelect.value;
             const destinationRoomId = destinationRoomSelect.value;
-            const sourceDir = sourceDirSelect.value;
-            const destinationDir = destinationDirSelect.value;
+            const sourceDir = document.getElementById('sourceDirSelect').value;
+            const destinationDir = document.getElementById('destinationDirSelect').value;
 
             if (!sourceRoomId) {
                 showAlert('Please select a source room', 'danger');
@@ -912,35 +905,27 @@
             linkRooms(sourceRoomId, destinationRoomId, sourceDir, destinationDir);
         });
 
-        // Helper function to get direction name
-        function getDirectionName(direction) {
-            switch(direction) {
-                case 'EAST': return '동(East)';
-                case 'WEST': return '서(West)';
-                case 'SOUTH': return '남(South)';
-                case 'NORTH': return '북(North)';
-                default: return direction;
-            }
-        }
+        // Cancel button click handler
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
 
-        // Helper function to get direction arrow
-        function getDirectionArrow(direction) {
-            switch(direction) {
-                case 'EAST': return 'right';
-                case 'WEST': return 'left';
-                case 'SOUTH': return 'down';
-                case 'NORTH': return 'up';
-                default: return 'right';
-            }
-        }
+        // Define global functions for edit and delete
+        window.editRoom = editRoom;
+        window.deleteRoom = deleteRoom;
 
-        // Initialize
-        if (username) {
-            loadAreas();
-            roomForm.style.display = 'none'; // Hide form until area is selected
-            linkRoomForm.style.display = 'none'; // Hide link form until area is selected
-        }
+        // Load areas on page load
+        loadAreas();
+
+        // Event listener for area selection
+        areaSelect.addEventListener('change', function() {
+            const selectedAreaId = areaSelect.value;
+            loadRooms(selectedAreaId);
+        });
+
+        // Other functions like populateRoomDropdowns, editRoom, etc.
     });
 </script>
 </body>
 </html>
+

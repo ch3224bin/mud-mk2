@@ -42,7 +42,7 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 	public RoomResponse updateRoom(final long id, final UpdateRoomRequest updateRoomRequest) {
 		final Room room = roomRepository.findById(id)
 				.orElseThrow(IllegalArgumentException::new);
-		room.update(updateRoomRequest.summary(), updateRoomRequest.description());
+		room.update(updateRoomRequest.name(), updateRoomRequest.summary(), updateRoomRequest.description());
 		roomRepository.save(room);
 		return RoomResponse.of(room);
 	}

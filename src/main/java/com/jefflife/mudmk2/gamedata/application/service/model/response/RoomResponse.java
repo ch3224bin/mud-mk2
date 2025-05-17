@@ -7,6 +7,7 @@ import java.util.List;
 public record RoomResponse(
         long id,
         long areaId,
+        String name,
         String summary,
         String description,
         List<WayOutResponse> wayOuts,
@@ -17,6 +18,7 @@ public record RoomResponse(
         return new RoomResponse(
                 room.getId(),
                 room.getAreaId(),
+                room.getName(),
                 room.getSummary(),
                 room.getDescription(),
                 WayOutResponse.of(room.getWayOuts()),
