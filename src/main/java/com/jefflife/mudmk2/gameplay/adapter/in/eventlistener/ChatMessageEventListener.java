@@ -9,11 +9,8 @@ import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Listens for chat message events and processes them as game commands.
@@ -36,7 +33,6 @@ public class ChatMessageEventListener {
      *
      * @param event the chat message event to handle
      */
-    @Async("taskExecutor")
     @EventListener
     public void handleChatMessage(ChatMessageEvent event) {
         // Log the received event

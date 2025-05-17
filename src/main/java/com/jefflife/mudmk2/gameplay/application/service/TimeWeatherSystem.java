@@ -8,6 +8,7 @@ import com.jefflife.mudmk2.gameplay.application.tick.TickListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -34,6 +35,7 @@ public class TimeWeatherSystem implements TickListener {
         this.sendWeatherMessagePort = sendWeatherMessagePort;
     }
 
+    @Async("taskExecutor")
     @Override
     public void onTick(long tickCount) {
         // 게임 시간 업데이트
