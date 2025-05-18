@@ -3,7 +3,7 @@
         <h2 class="room-name" th:text="${roomName}">Room Name</h2>
     </div>
     <div class="room-content">
-        <p class="room-description" th:text="${roomDescription}">Room description goes here.</p>
+        <p class="room-description" th:utext="${roomDescription}">Room description goes here.</p>
     </div>
     <div class="exits-info">
         <span class="exits-label">출구:</span>
