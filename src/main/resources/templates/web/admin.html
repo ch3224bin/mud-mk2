@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .admin-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .admin-title {
+            color: #00ff00;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .admin-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 5px 15px rgba(0, 255, 0, 0.1);
+        }
+
+        .admin-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #00ff00;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .admin-card-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #00ff00;
+            margin-bottom: 16px;
+        }
+
+        .admin-card-description {
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+        .btn-admin {
+            background: linear-gradient(45deg, #00aa00 0%, #00ff00 100%);
+            color: #000;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .btn-admin:hover {
+            background: linear-gradient(45deg, #00cc00 0%, #00ff88 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-area {
+            background: linear-gradient(45deg, #d97706 0%, #f59e0b 100%);
+        }
+
+        .btn-area:hover {
+            background: linear-gradient(45deg, #f59e0b 0%, #fbbf24 100%);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-room {
+            background: linear-gradient(45deg, #0369a1 0%, #0ea5e9 100%);
+        }
+
+        .btn-room:hover {
+            background: linear-gradient(45deg, #0ea5e9 0%, #38bdf8 100%);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-npc {
+            background: linear-gradient(45deg, #7e22ce 0%, #a855f7 100%);
+        }
+
+        .btn-npc:hover {
+            background: linear-gradient(45deg, #a855f7 0%, #d8b4fe 100%);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-scenario {
+            background: linear-gradient(45deg, #b91c1c 0%, #ef4444 100%);
+        }
+
+        .btn-scenario:hover {
+            background: linear-gradient(45deg, #ef4444 0%, #f87171 100%);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+            padding-top: 24px;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-profile {
+            background: transparent;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .btn-profile:hover {
+            background: #60a5fa;
+            color: #000;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 16px;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>ADMIN PANEL</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="admin-container">
+                        <h3 class="admin-title">< SYSTEM MANAGEMENT ></h3>
+
+                        <div class="admin-grid">
+                            <div class="admin-card">
+                                <div class="admin-icon">
+                                    <i class="fas fa-map"></i>
+                                </div>
+                                <h4 class="admin-card-title">AREA MANAGEMENT</h4>
+                                <p class="admin-card-description">
+                                    Create and manage game areas, the foundation of your world's structure.
+                                </p>
+                                <a href="/area-management" class="btn btn-admin btn-area">MANAGE AREAS</a>
+                            </div>
+
+                            <div class="admin-card">
+                                <div class="admin-icon">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <h4 class="admin-card-title">ROOM MANAGEMENT</h4>
+                                <p class="admin-card-description">
+                                    Design and organize rooms within areas, connecting them to build your world.
+                                </p>
+                                <a href="/room-management" class="btn btn-admin btn-room">MANAGE ROOMS</a>
+                            </div>
+
+                            <div class="admin-card">
+                                <div class="admin-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <h4 class="admin-card-title">ROOM MAP</h4>
+                                <p class="admin-card-description">
+                                    Visualize the layout of your world with an interactive map of all rooms.
+                                </p>
+                                <a href="/room-map" class="btn btn-admin">VIEW MAP</a>
+                            </div>
+
+                            <div class="admin-card">
+                                <div class="admin-icon">
+                                    <i class="fas fa-user-ninja"></i>
+                                </div>
+                                <h4 class="admin-card-title">NPC MANAGEMENT</h4>
+                                <p class="admin-card-description">
+                                    Create and manage non-player characters to populate your world.
+                                </p>
+                                <a href="/npc-management" class="btn btn-admin btn-npc">MANAGE NPCs</a>
+                            </div>
+
+                            <div class="admin-card">
+                                <div class="admin-icon">
+                                    <i class="fas fa-scroll"></i>
+                                </div>
+                                <h4 class="admin-card-title">INSTANCE SCENARIOS</h4>
+                                <p class="admin-card-description">
+                                    Design and manage special instances and scenarios for player adventures.
+                                </p>
+                                <a href="/instance-scenario-management" class="btn btn-admin btn-scenario">MANAGE SCENARIOS</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the Admin Panel.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
