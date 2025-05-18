@@ -46,4 +46,10 @@ public class MonsterType {
     
     private int maxSpawnCount;
     private int currentSpawnCount;
+
+    // 공격성
+    private int aggressiveness = 50; // 0-100
+
+    // 리스폰 시간 (ticks)
+    private int respawnTime = 300;
 }
