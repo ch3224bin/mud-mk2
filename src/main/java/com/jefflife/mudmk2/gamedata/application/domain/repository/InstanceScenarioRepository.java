@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.application.port.out;
+package com.jefflife.mudmk2.gamedata.application.domain.repository;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.instance.InstanceScenario;
 import org.springframework.data.jpa.repository.JpaRepository;

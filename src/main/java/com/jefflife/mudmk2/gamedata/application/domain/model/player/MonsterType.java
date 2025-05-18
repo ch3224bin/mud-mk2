@@ -1,12 +1,15 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
+@Builder @AllArgsConstructor
 public class MonsterType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,15 +44,29 @@ public class MonsterType {
     private int expPerLevel;
 
     // 스폰 정보
+    @Builder.Default
     @Embedded
     private MonsterSpawnRooms monsterSpawnRooms = new MonsterSpawnRooms();
-    
-    private int maxSpawnCount;
-    private int currentSpawnCount;
 
     // 공격성
     private int aggressiveness = 50; // 0-100
 
     // 리스폰 시간 (ticks)
     private int respawnTime = 300;
+
+    public void addSpawnRoom(final MonsterSpawnRoom spawnRoom) {
+        if (monsterSpawnRooms == null) {
+            monsterSpawnRooms = new MonsterSpawnRooms();
+        }
+        monsterSpawnRooms.addSpawnRoom(spawnRoom);
+    }
+
+    public void clearAndAddAll(final List<MonsterSpawnRoom> newSpawnRooms) {
+        if (monsterSpawnRooms == null) {
+            monsterSpawnRooms = new MonsterSpawnRooms();
+        } else {
+            monsterSpawnRooms.clearAndAddAll(newSpawnRooms);
+        }
+    }
 }
+

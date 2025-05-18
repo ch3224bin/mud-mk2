@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -13,5 +14,24 @@ import java.util.List;
 @Embeddable
 public class MonsterSpawnRooms {
     @OneToMany(mappedBy = "monsterType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MonsterSpawnRoom> spawnRooms;
+    private List<MonsterSpawnRoom> spawnRooms = new ArrayList<>();
+
+    public void addSpawnRoom(MonsterSpawnRoom spawnRoom) {
+        if (spawnRooms == null) {
+            spawnRooms = new ArrayList<>();
+        }
+        spawnRooms.add(spawnRoom);
+    }
+
+    public void clearAndAddAll(List<MonsterSpawnRoom> newSpawnRooms) {
+        if (spawnRooms == null) {
+            spawnRooms = new ArrayList<>();
+        } else {
+            spawnRooms.clear();
+        }
+
+        if (newSpawnRooms != null) {
+            spawnRooms.addAll(newSpawnRooms);
+        }
+    }
 }

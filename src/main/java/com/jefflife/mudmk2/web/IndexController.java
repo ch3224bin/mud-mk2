@@ -97,4 +97,14 @@ public class IndexController {
         }
         return "web/npc-management";
     }
+
+    @GetMapping("/monster-type-management")
+    public String monsterTypeManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/monster-type-management";
+    }
 }

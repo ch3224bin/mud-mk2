@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,4 +17,11 @@ public class MonsterSpawnRoom {
     @JoinColumn(name = "monster_type_id")
     private MonsterType monsterType;
     private int spawnCount;
+
+    @Builder
+    public MonsterSpawnRoom(Long roomId, MonsterType monsterType, int spawnCount) {
+        this.roomId = roomId;
+        this.monsterType = monsterType;
+        this.spawnCount = spawnCount;
+    }
 }
