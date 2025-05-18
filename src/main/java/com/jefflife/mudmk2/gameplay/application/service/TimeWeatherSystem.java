@@ -17,7 +17,7 @@ import java.util.Random;
 @Component
 public class TimeWeatherSystem implements TickListener {
 
-    private static final int TICKS_PER_GAME_HOUR = 60; // 60틱 = 1시간
+    private static final int TICKS_PER_GAME_HOUR = 600; // 60틱 = 1시간
 
     private final SendGameTimeMessagePort sendGameTimeMessagePort;
     private final SendWeatherMessagePort sendWeatherMessagePort;

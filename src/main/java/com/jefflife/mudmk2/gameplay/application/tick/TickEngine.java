@@ -17,7 +17,7 @@ public class TickEngine {
         this.listeners = listeners;
     }
 
-    @Scheduled(fixedDelayString = "${game.tick.interval:1000}") // 1초마다 tick
+    @Scheduled(fixedDelayString = "${game.tick.interval:100}") // 0.1초마다 tick
     public void tick() {
         tickCount++;
         log.debug("Game tick: {}", tickCount);
