@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gameplay.application.service;
+package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
@@ -7,6 +7,7 @@ import com.jefflife.mudmk2.gameplay.application.domain.model.command.MoveCommand
 import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.in.MoveUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.springframework.stereotype.Service;
 
 @Service

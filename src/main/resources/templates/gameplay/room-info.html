@@ -18,7 +18,7 @@
         <div class="npcs-info">
             <ul class="npcs-list">
                 <li th:each="npc : ${npcsInRoom}" class="character-item">
-                    <span class="npc-name" th:text="${npc.name}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
+                    <span class="npc-name" th:text="${npc}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
                 </li>
             </ul>
         </div>
@@ -29,7 +29,7 @@
         <div class="players-info">
             <ul class="players-list">
                 <li th:each="player : ${otherPlayersInRoom}" class="character-item">
-                    <span class="player-name" th:text="${player.nickname}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
+                    <span class="player-name" th:text="${player}"></span><span class="character-status" th:text="'님이 서있습니다.'"></span>
                 </li>
             </ul>
         </div>

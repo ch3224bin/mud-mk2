@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gameplay.application.service;
+package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gameplay.application.port.in.InvalidCommandUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
