@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -27,19 +24,25 @@ public class MonsterType {
     private int baseIntelligence;
     private int basePow;
     private int baseCha;
-    
-    // 레벨별 스탯 증가치
-    private float hpPerLevel;
-    private float strPerLevel;
-    // ... 기타 스탯
-    
+
     // 기본 경험치 보상
     private long baseExperience;
     
+    // 레벨별 스탯 증가치
+    private int hpPerLevel;
+    private int strPerLevel;
+    private int dexPerLevel;
+    private int conPerLevel;
+    private int intelligencePerLevel;
+    private int powPerLevel;
+    private int chaPerLevel;
+
+    // 레벨당 경험치 증가치
+    private int expPerLevel;
+
     // 스폰 정보
-    @ElementCollection
-    @CollectionTable(name = "monster_spawn_rooms")
-    private Set<Long> spawnRoomIds = new HashSet<>();
+    @Embedded
+    private MonsterSpawnRooms monsterSpawnRooms = new MonsterSpawnRooms();
     
     private int maxSpawnCount;
     private int currentSpawnCount;

@@ -1,14 +1,12 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.map;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Builder @AllArgsConstructor
 public class WayOut implements Comparable<WayOut> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,18 +28,9 @@ public class WayOut implements Comparable<WayOut> {
 	@JoinColumn(name = "door_id", nullable = false)
 	private Door door;
 
+	@Builder.Default
 	@Column(name = "is_show", nullable = false, columnDefinition = "boolean default true")
 	private boolean isShow = true;
-
-	@Builder
-	public WayOut(long id, Room room, Room nextRoom, Direction direction, Door door, boolean isShow) {
-		this.id = id;
-		this.room = room;
-		this.nextRoom = nextRoom;
-		this.direction = direction;
-		this.door = door;
-		this.isShow = isShow;
-	}
 
 	public boolean isLocked() {
 		return door.isLocked();
