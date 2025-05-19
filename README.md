@@ -17,6 +17,15 @@
 - 방 연결 및 문(Door) 관리
 - 방 지도 시각화
 - NPC(Non-Player Character) 관리 (생성, 조회, 수정, 삭제)
+- 몬스터 타입 관리 (생성, 조회, 수정, 삭제)
+  - 기본 스탯 설정 (HP, MP, STR, DEX 등)
+  - 레벨당 스탯 증가량 설정
+  - 스폰 룸 및 스폰 정보 관리
+  - 공격성 및 리스폰 시간 설정
+- 인스턴스 시나리오 관리 (생성, 조회, 수정, 삭제)
+  - 시나리오 상태관리
+  - 퀘스트 정보 설정
+  - 구역 연결 설정
 - 명령어 처리 시스템 (Chain of Responsibility 패턴)
   - 이동 명령어 파싱 및 실행
   - 대화 명령어 파싱 및 실행
@@ -25,6 +34,9 @@
   - 플레이어 캐릭터 생성 및 관리
   - 캐릭터 클래스별 능력치 차등화
   - 캐릭터 정보 조회
+- 게임 환경 시스템
+  - 게임 내 시간 관리
+  - 날씨 시스템
 - 이벤트 시스템
   - 캐릭터 생성 이벤트 발행 및 구독
   - 게임 상태 변화에 따른 이벤트 처리
@@ -80,6 +92,54 @@ spring.security.oauth2.client.registration.google.client-id=YOUR_GOOGLE_CLIENT_I
 spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIENT_SECRET
 ```
 
+### 3. 데이터베이스 설정
+
+Docker Compose를 사용하여 MySQL 데이터베이스를 실행할 수 있습니다:
+
+```bash
+docker-compose up -d
+```
+
+또는 H2 인메모리 데이터베이스를 사용할 수 있도록 `application.properties`를 설정할 수 있습니다:
+
+```properties
+spring.h2.console.enabled=true
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+```
+
+## 관리자 화면
+
+### 기능 개요
+MUD 게임에서는 관리자 화면을 통해 게임 세계를 구성하는 여러 요소들을 쉽게 관리할 수 있습니다:
+
+1. **영역 관리 (Area Management)**
+   - 게임 세계의 다양한 영역을 생성, 조회, 수정 및 삭제
+   - 각 영역에 대한 자세한 설명 제공
+
+2. **방 관리 (Room Management)**
+   - 각 영역 내에 방을 생성하고 관리
+   - 방끼리의 연결을 통한 이동 경로 설정
+   - 방 정보 상세 설정 (설명, 특성 등)
+
+3. **방 지도 (Room Map)**
+   - 시각적인 방 지도 제공
+   - 전체 게임 세계의 연결 상태 확인
+
+4. **NPC 관리 (NPC Management)**
+   - 비플레이어 캐릭터 생성 및 관리
+   - NPC 위치, 대화, 행동 설정
+
+5. **몬스터 타입 관리 (Monster Type Management)**
+   - 다양한 몬스터 타입 생성 및 관리
+   - 몬스터 기본 스탯 및 레벨별 성장 설정
+   - 스폰 정보 및 공격성 설정
+   
+6. **인스턴스 시나리오 (Instance Scenarios)**
+   - 특별 인스턴스 및 시나리오 관리
+   - 퀘스트 정보 및 구역 연결 설정
+
 ## 프로젝트 구조
 
 ### 주요 패키지 및 클래스
@@ -100,195 +160,27 @@ spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIE
   - `Role`: 사용자 권한 enum
   - `UserRepository`: 사용자 저장소
 
-#### 게임 관련
-- `com.jefflife.mudmk2.gamedata.adapter.in`: 게임 컨트롤러
-  - `AreaController`: 지역 관리 API 컨트롤러
-  - `RoomController`: 방 관리 API 컨트롤러
-  - `NonPlayerCharacterController`: NPC 관리 API 컨트롤러
+#### 게임 데이터 관련
+- `com.jefflife.mudmk2.gamedata.application`: 게임 데이터 비즈니스 로직
+  - `domain.model`: 게임 도메인 모델 (Area, Room, NPC, MonsterType 등)
+  - `port.in`: 입력 포트 인터페이스 (UseCase)
+  - `port.out`: 출력 포트 인터페이스 (Repository)
+  - `service`: 비즈니스 서비스 구현체
 
-- `com.jefflife.mudmk2.gamedata.application.domain.model.map`: 게임 맵 도메인 모델
-  - `Area`: 지역 엔티티
-  - `AreaType`: 지역 타입 enum (INSTANCE_MAP, OPEN_MAP)
-  - `Room`: 방 엔티티
-  - `Door`: 문 엔티티 (잠금/해제 기능)
-  - `WayOut`: 출구 엔티티 (방 간 연결)
-  - `WayOuts`: 출구 컬렉션 (방의 모든 출구 관리)
-  - `Direction`: 방향 enum (동, 서, 남, 북)
+- `com.jefflife.mudmk2.gamedata.adapter`: 포트 어댑터
+  - `in`: 입력 어댑터 (Controller)
+  - `out`: 출력 어댑터 (Repository 구현체)
 
-- `com.jefflife.mudmk2.gamedata.application.domain.model.player`: 게임 캐릭터 도메인 모델
-  - `BaseCharacter`: 기본 캐릭터 엔티티 (이름, 능력치, 상태 등)
-  - `PlayableCharacter`: 플레이 가능한 캐릭터 엔티티 (레벨, 경험치 등)
-  - `PlayerCharacter`: 플레이어 캐릭터 엔티티
-  - `NonPlayerCharacter`: NPC 엔티티 (페르소나, 타입, 스폰 위치 등)
-  - `NPCType`: NPC 타입 enum
-  - `CharacterClass`: 캐릭터 클래스 enum (전사, 마법사, 도적, 성직자, 레인저)
+#### 게임 시스템 관련
+- `com.jefflife.mudmk2.gameplay`: 게임 플레이 관련 컴포넌트
+  - `application`: 게임 플레이 비즈니스 로직
+  - `time`: 게임 내 시간 관리
+  - `weather`: 날씨 시스템
 
-- `com.jefflife.mudmk2.gamedata.application.service`: 게임 데이터 서비스
-  - `AreaService`: 지역 관리 서비스
-  - `RoomService`: 방 관리 서비스 (방 생성, 수정, 삭제, 연결)
-  - `NonPlayerCharacterService`: NPC 관리 서비스 (NPC 생성, 수정, 삭제)
-  - `PlayerCharacterService`: 플레이어 캐릭터 관리 서비스
+## 기여 방법
 
-- `com.jefflife.mudmk2.gamedata.application.event`: 게임 이벤트
-  - `PlayerCharacterCreatedEvent`: 플레이어 캐릭터 생성 이벤트
-
-- `com.jefflife.mudmk2.gameplay.application.service`: 게임플레이 서비스
-  - `GameWorldService`: 게임 월드 인메모리 관리 서비스
-  - `PersistenceManager`: 게임 상태 지속성 관리 및 이벤트 처리
-  - `MoveService`: 플레이어 이동 서비스
-  - `InvalidCommandService`: 잘못된 명령어 처리 서비스
-  - `DisplayRoomInfoService`: 방 정보 표시 서비스
-
-- `com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser`: 명령어 파싱 시스템
-  - `CommandParser`: 명령어 파서 인터페이스
-  - `CommandParserChain`: 명령어 파서 체인 (Chain of Responsibility 패턴)
-  - `MoveCommandParser`: 이동 명령어 파서 (동, 서, 남, 북, 위, 아래)
-  - `SpeakCommandParser`: 대화 명령어 파서 ("말" 명령어)
-
-- `com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor`: 명령어 실행 시스템
-  - `CommandExecutor`: 명령어 실행자 인터페이스
-  - `CommandExecutorChain`: 명령어 실행자 체인
-  - `MoveCommandExecutor`: 이동 명령어 실행자
-  - `SpeakCommandExecutor`: 대화 명령어 실행자
-  - `InvalidCommandExecutor`: 잘못된 명령어 실행자
-
-- `com.jefflife.mudmk2.gameplay.application.domain.model.command`: 명령어 도메인 모델
-  - `Command`: 명령어 인터페이스
-  - `MoveCommand`: 이동 명령어 모델
-  - `SpeakCommand`: 대화 명령어 모델
-  - `InvalidCommand`: 잘못된 명령어 모델
-
-#### 채팅 관련
-- `com.jefflife.mudmk2.chat.controller`: 채팅 컨트롤러
-  - `ChatController`: WebSocket 채팅 컨트롤러
-
-- `com.jefflife.mudmk2.chat.model`: 채팅 모델
-  - `ChatMessage`: 채팅 메시지 모델
-
-#### 웹 인터페이스
-- `com.jefflife.mudmk2.web`: 웹 컨트롤러
-  - `IndexController`: 메인 페이지 컨트롤러 (로그인, 채팅, 프로필, 지역 관리 페이지)
-
-## 실행 방법
-
-1. 프로젝트를 클론합니다.
-2. Google OAuth 클라이언트 ID와 비밀번호를 `application.properties`에 설정합니다.
-3. 프로젝트를 빌드하고 실행합니다:
-   ```bash
-   ./gradlew bootRun
-   ```
-4. 웹 브라우저에서 `http://localhost:8080`에 접속합니다.
-5. Google 계정으로 로그인합니다.
-
-## 사용 방법
-
-### 캐릭터 생성 및 선택
-- 처음 로그인하면 캐릭터 생성 화면으로 이동합니다.
-- 캐릭터 이름과 클래스(전사, 마법사, 도적, 성직자, 레인저)를 선택하여 생성합니다.
-- 이미 캐릭터가 있다면 자동으로 해당 캐릭터로 로그인합니다.
-
-### 채팅 시스템
-- 로그인 후 자동으로 채팅 페이지로 이동합니다.
-- 명령어를 입력하고 "Execute" 버튼을 클릭하거나 Enter 키를 누릅니다.
-- 다른 사용자와 실시간으로 채팅할 수 있습니다.
-
-### 명령어 사용
-- 이동 명령어: "동", "서", "남", "북", "위", "아래" 입력으로 해당 방향으로 이동합니다.
-- 대화 명령어: "[메시지] 말" 형식으로 입력하여 대화할 수 있습니다. (예: "안녕하세요 말")
-- 명령어는 한국어로 지원됩니다.
-- 잘못된 명령어 입력 시 안내 메시지가 표시됩니다.
-
-### 지역 관리
-- 채팅 화면에서 "AREA MANAGEMENT" 버튼을 클릭합니다.
-- 지역 생성 폼에서 이름과 타입을 입력하여 새 지역을 생성합니다.
-- 기존 지역을 수정하거나 삭제할 수 있습니다.
-
-### 방 관리
-- 채팅 화면에서 "ROOM MANAGEMENT" 버튼을 클릭합니다.
-- 방 생성 폼에서 지역, 요약, 설명을 입력하여 새 방을 생성합니다.
-- 기존 방을 수정하거나 삭제할 수 있습니다.
-- 방 연결 기능을 통해 두 방 사이에 출구를 생성하고 문을 설치할 수 있습니다.
-- 방 지도 기능을 통해 방들의 연결 관계를 시각적으로 확인할 수 있습니다.
-
-### NPC 관리
-- 채팅 화면에서 "NPC MANAGEMENT" 버튼을 클릭합니다.
-- NPC 생성 폼에서 이름, 배경, 능력치, 페르소나, 타입 등을 입력하여 새 NPC를 생성합니다.
-- 기존 NPC를 수정하거나 삭제할 수 있습니다.
-- NPC는 게임 내에서 대화하거나 상호작용할 수 있는 캐릭터입니다.
-
-### 프로필 관리
-- "PROFILE" 버튼을 클릭하여 사용자 프로필을 확인할 수 있습니다.
-
-## 시스템 아키텍처 특징
-
-### 이벤트 기반 아키텍처
-- 게임 상태 변화를 이벤트로 발행하여 여러 컴포넌트가 독립적으로 처리 가능
-- 플레이어 캐릭터 생성 시 이벤트를 발행하여 인메모리 캐시 자동 업데이트
-- 느슨한 결합으로 확장성 및 유지보수성 향상
-
-### 명령어 처리 체인
-- Chain of Responsibility 패턴을 활용한 명령어 파싱 및 실행
-- 새로운 명령어 유형 추가가 용이한 확장 가능한 구조
-- 잘못된 명령어도 적절히 처리하여 사용자 경험 개선
-
-### 영속성 관리
-- JPA를 활용한 데이터베이스 상호작용
-- 인메모리 캐싱을 통한 성능 최적화
-- 주기적인 상태 저장으로 데이터 일관성 유지
-
-## MySQL 설정 (Docker)
-
-이 프로젝트는 Docker Compose를 사용하여 MySQL 데이터베이스를 쉽게 설정할 수 있습니다.
-
-### Docker Compose로 MySQL 실행하기
-
-1. 프로젝트 루트 디렉토리에서 다음 명령어를 실행합니다:
-   ```bash
-   docker-compose up -d
-   ```
-
-2. MySQL 서버가 실행되면 다음 정보로 접속할 수 있습니다:
-   - 호스트: localhost
-   - 포트: 3306
-   - 데이터베이스: mudmk2db
-   - 사용자: muduser
-   - 비밀번호: mudpassword
-
-3. MySQL 데이터는 프로젝트 루트 디렉토리의 `mysql-data` 폴더에 저장됩니다. 이 폴더는 Docker 컨테이너가 처음 실행될 때 자동으로 생성됩니다.
-
-### H2에서 MySQL로 전환하기
-
-기본적으로 이 프로젝트는 H2 인메모리 데이터베이스를 사용합니다. MySQL로 전환하려면 `application.properties` 파일을 다음과 같이 수정하세요:
-
-```properties
-# H2 설정 주석 처리
-#spring.datasource.url=jdbc:h2:mem:testdb
-#spring.datasource.driverClassName=org.h2.Driver
-#spring.datasource.username=sa
-#spring.datasource.password=
-#spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-#spring.h2.console.enabled=true
-
-# MySQL 설정
-spring.datasource.url=jdbc:mysql://localhost:3306/mudmk2db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
-spring.datasource.username=muduser
-spring.datasource.password=mudpassword
-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
-spring.jpa.hibernate.ddl-auto=update
-```
-
-또한 MySQL JDBC 드라이버 의존성을 `build.gradle` 파일에 추가해야 합니다:
-
-```gradle
-dependencies {
-    // 기존 의존성들...
-    implementation 'mysql:mysql-connector-java:8.0.28'
-}
-```
-
-## 주의사항
-
-- 실제 운영 환경에서는 클라이언트 ID와 비밀번호를 환경 변수나 외부 설정으로 관리하는 것이 좋습니다.
-- 데이터베이스 설정을 실제 운영 환경에 맞게 변경해야 합니다.
-- 이 프로젝트는 개발 및 학습 목적으로 만들어졌습니다.
+1. 이 저장소를 포크합니다.
+2. 새 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
+3. 변경사항을 커밋합니다 (`git commit -m 'Add some amazing feature'`)
+4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
+5. Pull Request를 제출합니다.
