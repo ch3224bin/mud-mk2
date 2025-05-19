@@ -24,6 +24,7 @@ public class RoomInfoMessageSender implements SendRoomInfoMessagePort {
         context.setVariable("exits", roomInfoVariables.exits());
         context.setVariable("npcsInRoom", roomInfoVariables.npcsInRoom());
         context.setVariable("otherPlayersInRoom", roomInfoVariables.otherPlayersInRoom());
+        context.setVariable("monstersInRoom", roomInfoVariables.monstersInRoom());
 
         String htmlContent = templateEngine.process("gameplay/room-info", context);
         chatEventPublisher.messageToUser(roomInfoVariables.userId(), htmlContent);

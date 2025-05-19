@@ -34,4 +34,15 @@
             </ul>
         </div>
     </div>
+
+    <!-- 몬스터 표시 -->
+    <div class="monsters-info" th:if="${not #lists.isEmpty(monstersInRoom)}">
+        <div class="monsters-list">
+            <ul>
+                <li th:each="monster : ${monstersInRoom}" class="monster-item">
+                    <span class="monster-name" th:text="${monster}"></span><span class="monster-status" th:text="'가 있습니다.'"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
@@ -51,13 +52,20 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
                 .map(PlayerCharacter::getNickname)
                 .toList();
 
+        // 현재 방에 있는 몬스터 목록 가져오기
+        List<String> monstersInRoom = gameWorldService.getMonstersInRoom(currentRoom.getId())
+                .stream()
+                .map(monster -> monster.getName() + " (레벨 " + monster.getLevel() + ")")
+                .toList();
+
         sendRoomInfoMessagePort.sendMessage(new RoomInfoVariables(
                 userId,
                 currentRoom.getName(),
                 currentRoom.getDescription(),
                 currentRoom.getExitString(),
                 npcsInRoom,
-                otherPlayersInRoom
+                otherPlayersInRoom,
+                monstersInRoom // 몬스터 정보 추가
         ));
         logger.info("Sent room info to user {}", userId);
     }
