@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MUD Terminal - Character Class Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1c24 0%, #2d2f3b 100%);
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .terminal-card {
+            background: rgba(20, 21, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 16px 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #9ca3af;
+        }
+
+        .user-info .fw-bold {
+            color: #00ff00;
+            margin-left: 8px;
+        }
+
+        .character-class-container {
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 0, 0.02) 0%, transparent 70%);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+
+        .admin-title {
+            color: #00ff00;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .class-form {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.6);
+            color: #e4e4e7;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 10px 16px;
+        }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00aa00 0%, #00ff00 100%);
+            color: #000;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #00cc00 0%, #00ff88 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid #9ca3af;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(156, 163, 175, 0.1);
+            color: #e4e4e7;
+            border-color: #e4e4e7;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .class-list {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .class-list-header {
+            color: #00ff00;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .class-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .class-item:last-child {
+            border-bottom: none;
+        }
+
+        .class-item-info {
+            flex: 1;
+        }
+
+        .class-item-name-code {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .class-item-name {
+            color: #00ff00;
+            font-weight: 600;
+        }
+
+        .class-item-code {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .class-item-description {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .class-item-stats {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .stat-badge.hp {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .stat-badge.mp {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .stat-badge.str {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .stat-badge.dex {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .stat-badge.con {
+            border-color: #ec4899;
+            color: #ec4899;
+        }
+
+        .stat-badge.int {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .stat-badge.pow {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .stat-badge.cha {
+            border-color: #f472b6;
+            color: #f472b6;
+        }
+
+        .class-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+        }
+
+        .system-controls {
+            margin: 24px;
+            text-align: right;
+        }
+
+        .system-controls .fw-bold {
+            color: #00ff00;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .btn-system {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-chat {
+            background: transparent;
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+
+        .btn-chat:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-admin {
+            background: transparent;
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .btn-admin:hover {
+            background: #f59e0b;
+            color: #000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .alert {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert-success {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .alert-danger {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .character-class-container {
+                padding: 16px;
+            }
+
+            .class-form, .class-list {
+                padding: 16px;
+            }
+
+            .system-controls {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+            <div class="terminal-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>CHARACTER CLASS MANAGEMENT</h2>
+                        <div th:if="${userName}" class="user-info">
+                            <span>USER:</span>
+                            <span th:text="${userName}" class="fw-bold"></span>
+                            <img th:if="${userPicture}" th:src="${userPicture}" alt="Profile"
+                                 style="width: 36px; height: 36px; border-radius: 50%;
+                                            margin-left: 12px; border: 2px solid #00ff00;">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${userName}">
+                    <div class="character-class-container">
+                        <div id="alertContainer" class="alert"></div>
+
+                        <!-- Create/Edit Character Class Form -->
+                        <div class="class-form">
+                            <h4 class="mb-4" id="formTitle">Create New Character Class</h4>
+                            <form id="classForm">
+                                <input type="hidden" id="classId" value="">
+
+                                <!-- Basic Information -->
+                                <h5 class="mb-3">Basic Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="className" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="className" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="classCode" class="form-label">Code</label>
+                                        <input type="text" class="form-control" id="classCode" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="classDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="classDescription" rows="3"></textarea>
+                                </div>
+
+                                <!-- Base Stats -->
+                                <h5 class="mb-3 mt-4">Base Stats</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="baseHp" class="form-label">Base HP</label>
+                                        <input type="number" class="form-control" id="baseHp" min="1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="baseMp" class="form-label">Base MP</label>
+                                        <input type="number" class="form-control" id="baseMp" min="0" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="baseStr" class="form-label">Base STR</label>
+                                        <input type="number" class="form-control" id="baseStr" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="baseDex" class="form-label">Base DEX</label>
+                                        <input type="number" class="form-control" id="baseDex" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="baseCon" class="form-label">Base CON</label>
+                                        <input type="number" class="form-control" id="baseCon" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="baseIntelligence" class="form-label">Base INT</label>
+                                        <input type="number" class="form-control" id="baseIntelligence" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="basePow" class="form-label">Base POW</label>
+                                        <input type="number" class="form-control" id="basePow" min="1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="baseCha" class="form-label">Base CHA</label>
+                                        <input type="number" class="form-control" id="baseCha" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary" id="saveButton">Create Character Class</button>
+                                    <button type="button" class="btn btn-secondary" id="cancelButton" style="display: none;">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="initializeButton">Initialize Default Classes</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Character Class List -->
+                        <div class="class-list">
+                            <h4 class="class-list-header">Character Classes</h4>
+                            <div id="classListContainer">
+                                <!-- Class items will be loaded here -->
+                                <div class="text-center py-4 text-muted">Loading character classes...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-controls">
+                        <div class="fw-bold">SYSTEM NAVIGATION:</div>
+                        <a href="/admin" class="btn btn-system btn-admin me-2">ADMIN PANEL</a>
+                        <a href="/chat" class="btn btn-system btn-chat me-2">CHAT</a>
+                        <a href="/logout" class="btn btn-system btn-logout">LOGOUT</a>
+                    </div>
+                </div>
+
+                <div th:unless="${userName}" class="login-container">
+                    <h3>Authentication Required</h3>
+                    <div class="alert-auth">
+                        <h5>Access Denied</h5>
+                        <p>Please log in to access the Character Class Management system.</p>
+                    </div>
+                    <a href="/oauth2/authorization/google" class="btn btn-google">
+                        <i class="fab fa-google me-2"></i>Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get username from Thymeleaf
+        const username = /*[[${userName}]]*/ 'default-user';
+
+        // DOM Elements
+        const classForm = document.getElementById('classForm');
+        const formTitle = document.getElementById('formTitle');
+        const classId = document.getElementById('classId');
+        const className = document.getElementById('className');
+        const classCode = document.getElementById('classCode');
+        const classDescription = document.getElementById('classDescription');
+        const baseHp = document.getElementById('baseHp');
+        const baseMp = document.getElementById('baseMp');
+        const baseStr = document.getElementById('baseStr');
+        const baseDex = document.getElementById('baseDex');
+        const baseCon = document.getElementById('baseCon');
+        const baseIntelligence = document.getElementById('baseIntelligence');
+        const basePow = document.getElementById('basePow');
+        const baseCha = document.getElementById('baseCha');
+        const saveButton = document.getElementById('saveButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const initializeButton = document.getElementById('initializeButton');
+        const classListContainer = document.getElementById('classListContainer');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // API URL constants
+        const CHARACTER_CLASSES_API_URL = '/api/character-classes';
+
+        // Load all character classes
+        function loadCharacterClasses() {
+            fetch(CHARACTER_CLASSES_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load character classes');
+                    }
+                    return response.json();
+                })
+                .then(classes => {
+                    displayCharacterClasses(classes);
+                })
+                .catch(error => {
+                    showAlert('Error loading character classes: ' + error.message, 'danger');
+                });
+        }
+
+        // Display character classes in the list
+        function displayCharacterClasses(classes) {
+            if (!classes || classes.length === 0) {
+                classListContainer.innerHTML = '<div class="text-center py-4 text-muted">No character classes found. Create your first class above or initialize defaults.</div>';
+                return;
+            }
+
+            let html = '';
+            classes.forEach(characterClass => {
+                // Create stat badges
+                let statsHtml = '<div class="class-item-stats">';
+
+                statsHtml += `<div class="stat-badge hp">HP: ${characterClass.baseHp}</div>`;
+                statsHtml += `<div class="stat-badge mp">MP: ${characterClass.baseMp}</div>`;
+                statsHtml += `<div class="stat-badge str">STR: ${characterClass.baseStr}</div>`;
+                statsHtml += `<div class="stat-badge dex">DEX: ${characterClass.baseDex}</div>`;
+                statsHtml += `<div class="stat-badge con">CON: ${characterClass.baseCon}</div>`;
+                statsHtml += `<div class="stat-badge int">INT: ${characterClass.baseIntelligence}</div>`;
+                statsHtml += `<div class="stat-badge pow">POW: ${characterClass.basePow}</div>`;
+                statsHtml += `<div class="stat-badge cha">CHA: ${characterClass.baseCha}</div>`;
+
+                statsHtml += '</div>';
+
+                html += `
+                <div class="class-item">
+                    <div class="class-item-info">
+                        <div class="class-item-name-code">
+                            <div class="class-item-name">${characterClass.name}</div>
+                            <div class="class-item-code">${characterClass.code}</div>
+                        </div>
+                        <div class="class-item-description">${characterClass.description || 'No description'}</div>
+                        ${statsHtml}
+                    </div>
+                    <div class="class-item-actions">
+                        <button class="btn btn-secondary btn-sm edit-btn" data-id="${characterClass.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${characterClass.id}" data-name="${characterClass.name}">Delete</button>
+                    </div>
+                </div>
+                `;
+            });
+
+            classListContainer.innerHTML = html;
+
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    loadCharacterClassForEdit(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+
+                    if (confirm(`Are you sure you want to delete the character class "${name}"?`)) {
+                        deleteCharacterClass(id);
+                    }
+                });
+            });
+        }
+
+        // Load character class for editing
+        function loadCharacterClassForEdit(id) {
+            fetch(`${CHARACTER_CLASSES_API_URL}/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load character class details');
+                    }
+                    return response.json();
+                })
+                .then(characterClass => {
+                    setEditMode(characterClass);
+                })
+                .catch(error => {
+                    showAlert('Error loading character class details: ' + error.message, 'danger');
+                });
+        }
+
+        // Set form to create mode
+        function setCreateMode() {
+            formTitle.textContent = 'Create New Character Class';
+            saveButton.textContent = 'Create Character Class';
+            classId.value = '';
+            className.value = '';
+            classCode.value = '';
+            classDescription.value = '';
+            baseHp.value = '100';
+            baseMp.value = '50';
+            baseStr.value = '10';
+            baseDex.value = '10';
+            baseCon.value = '10';
+            baseIntelligence.value = '10';
+            basePow.value = '10';
+            baseCha.value = '10';
+            cancelButton.style.display = 'none';
+        }
+
+        // Set form to edit mode
+        function setEditMode(characterClass) {
+            formTitle.textContent = 'Edit Character Class';
+            saveButton.textContent = 'Update Character Class';
+            classId.value = characterClass.id;
+            className.value = characterClass.name;
+            classCode.value = characterClass.code;
+            classDescription.value = characterClass.description || '';
+            baseHp.value = characterClass.baseHp;
+            baseMp.value = characterClass.baseMp;
+            baseStr.value = characterClass.baseStr;
+            baseDex.value = characterClass.baseDex;
+            baseCon.value = characterClass.baseCon;
+            baseIntelligence.value = characterClass.baseIntelligence;
+            basePow.value = characterClass.basePow;
+            baseCha.value = characterClass.baseCha;
+            cancelButton.style.display = 'block';
+
+            // Scroll to form
+            classForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Create a new character class
+        function createCharacterClass(classData) {
+            fetch(CHARACTER_CLASSES_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(classData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create character class');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`Character class "${classData.name}" created successfully!`, 'success');
+                setCreateMode();
+                loadCharacterClasses();
+            })
+            .catch(error => {
+                showAlert('Error creating character class: ' + error.message, 'danger');
+            });
+        }
+
+        // Update an existing character class
+        function updateCharacterClass(id, classData) {
+            fetch(`${CHARACTER_CLASSES_API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(classData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update character class');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`Character class "${classData.name}" updated successfully!`, 'success');
+                setCreateMode();
+                loadCharacterClasses();
+            })
+            .catch(error => {
+                showAlert('Error updating character class: ' + error.message, 'danger');
+            });
+        }
+
+        // Delete a character class
+        function deleteCharacterClass(id) {
+            fetch(`${CHARACTER_CLASSES_API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete character class');
+                }
+                showAlert('Character class deleted successfully!', 'success');
+                loadCharacterClasses();
+            })
+            .catch(error => {
+                showAlert('Error deleting character class: ' + error.message, 'danger');
+            });
+        }
+
+        // Initialize default character classes
+        function initializeDefaultClasses() {
+            fetch(`${CHARACTER_CLASSES_API_URL}/initialize`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to initialize default character classes');
+                }
+                showAlert('Default character classes initialized successfully!', 'success');
+                loadCharacterClasses();
+            })
+            .catch(error => {
+                showAlert('Error initializing default character classes: ' + error.message, 'danger');
+            });
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            alertContainer.textContent = message;
+            alertContainer.className = `alert alert-${type}`;
+            alertContainer.style.display = 'block';
+
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // Event Listeners
+        classForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = classId.value;
+            const classData = {
+                name: className.value.trim(),
+                code: classCode.value.trim(),
+                description: classDescription.value.trim(),
+                baseHp: parseInt(baseHp.value),
+                baseMp: parseInt(baseMp.value),
+                baseStr: parseInt(baseStr.value),
+                baseDex: parseInt(baseDex.value),
+                baseCon: parseInt(baseCon.value),
+                baseIntelligence: parseInt(baseIntelligence.value),
+                basePow: parseInt(basePow.value),
+                baseCha: parseInt(baseCha.value)
+            };
+
+            if (!classData.name) {
+                showAlert('Please enter a class name', 'danger');
+                return;
+            }
+
+            if (!classData.code) {
+                showAlert('Please enter a class code', 'danger');
+                return;
+            }
+
+            if (!id) {
+                // Create mode
+                createCharacterClass(classData);
+            } else {
+                // Edit mode
+                updateCharacterClass(id, classData);
+            }
+        });
+
+        cancelButton.addEventListener('click', function() {
+            setCreateMode();
+        });
+
+        initializeButton.addEventListener('click', function() {
+            if (confirm('Are you sure you want to initialize default character classes? This will not affect existing classes.')) {
+                initializeDefaultClasses();
+            }
+        });
+
+        // Initialize
+        if (username) {
+            setCreateMode();
+            loadCharacterClasses();
+        }
+    });
+</script>
+</body>
+</html>
