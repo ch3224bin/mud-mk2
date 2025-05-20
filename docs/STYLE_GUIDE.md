@@ -208,16 +208,6 @@ select.form-control {
     color: #9ca3af;
     font-size: 14px;
 }
-
-.npc-name {
-    color: #ff9900;
-    font-weight: 500;
-}
-
-.player-name {
-    color: #60a5fa;
-    font-weight: 500;
-}
 ```
 
 ### 5.4 몬스터 정보
@@ -230,16 +220,6 @@ select.form-control {
 .monsters-header {
     margin-bottom: 5px;
 }
-
-.monsters-label {
-    color: #ff5252;
-    font-weight: bold;
-}
-
-.monster-name {
-    color: #ff5252;
-    font-weight: 600;
-}
 ```
 
 ### 5.5 출구 정보
@@ -251,14 +231,15 @@ select.form-control {
 }
 
 .exits-label {
-    color: #fbbf24;
-    font-weight: 600;
+    /* text-warning 클래스 사용 */
     margin-right: 10px;
 }
 
-.exit-direction {
-    color: #00ff00;
-    font-weight: 600;
+.exits-list {
+    list-style-type: none;
+    padding: 0;
+    display: inline-block;
+    margin: 0;
 }
 ```
 
@@ -456,13 +437,170 @@ transition: all 0.3s ease;
 }
 ```
 
+## 11. 추상화된 CSS 클래스 시스템
+
+### 11.1 색상 클래스
+```css
+/* 컬러 시스템 - 공통 색상 클래스 */
+.text-primary {
+    color: #00ff00 !important; /* 기본 터미널 색상 */
+}
+
+.text-secondary {
+    color: #9ca3af !important; /* 부가 정보, 라벨 색상 */
+}
+
+.text-highlight {
+    color: #00ffff !important; /* 강조 색상 */
+    font-weight: bold;
+}
+
+.text-danger {
+    color: #ff4444 !important; /* 경고, 위험 색상 */
+    font-weight: bold;
+}
+
+.text-warning {
+    color: #fbbf24 !important; /* 주의, 알림 색상 */
+}
+
+.text-info {
+    color: #60a5fa !important; /* 정보 색상 */
+}
+
+.text-success {
+    color: #00ff88 !important; /* 성공, 긍정 색상 */
+}
+
+.text-item {
+    color: #ffa500 !important; /* 아이템 관련 색상 */
+}
+
+.text-npc {
+    color: #ff9900 !important; /* NPC 관련 색상 */
+    font-weight: 500;
+}
+
+.text-player {
+    color: #60a5fa !important; /* 플레이어 관련 색상 */
+    font-weight: 500;
+}
+
+.text-monster {
+    color: #ff5252 !important; /* 몬스터 관련 색상 */
+    font-weight: 600;
+}
+
+.text-exit {
+    color: #00ff00 !important; /* 출구 관련 색상 */
+    font-weight: 600;
+}
+```
+
+### 11.2 타이포그래피 클래스
+```css
+.font-terminal {
+    font-family: 'IBM Plex Mono', monospace !important;
+}
+
+.font-normal {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.font-bold {
+    font-weight: 600 !important;
+}
+
+.font-italic {
+    font-style: italic !important;
+}
+```
+
+### 11.3 마진 유틸리티 클래스
+```css
+/* 마진 유틸리티 클래스 */
+.mt-1 {
+    margin-top: 4px !important;
+}
+
+.mb-1 {
+    margin-bottom: 4px !important;
+}
+
+.my-1 {
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+}
+
+.mt-2 {
+    margin-top: 8px !important;
+}
+
+.mb-2 {
+    margin-bottom: 8px !important;
+}
+
+.my-2 {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+.mt-3 {
+    margin-top: 16px !important;
+}
+
+.mb-3 {
+    margin-bottom: 16px !important;
+}
+
+.my-3 {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+}
+```
+
+### 11.4 레이아웃 유틸리티 클래스
+```css
+/* 정렬 유틸리티 */
+.list-unstyled {
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
+```
+
+### 11.5 효과 유틸리티 클래스
+```css
+/* 테두리와 그림자 효과 */
+.text-shadow-sm {
+    text-shadow: 0 0 3px currentColor !important;
+}
+
+.text-shadow-md {
+    text-shadow: 0 0 5px currentColor !important;
+}
+
+.text-shadow-lg {
+    text-shadow: 0 0 8px currentColor !important;
+}
+```
+
 ## 스타일 적용 지침
 
 1. 모든 새 페이지는 터미널 스타일 디자인 언어를 따릅니다.
-2. 기본 폰트와 색상 체계를 준수하여 일관된 사용자 경험을 제공합니다.
-3. 관리자 페이지는 그리드 레이아웃을 사용하고, 게임 페이지는 카드 레이아웃을 사용합니다.
-4. 모바일 디바이스에서도 최적의 경험을 제공할 수 있도록 반응형으로 디자인합니다.
-5. 게임 요소(방, NPC, 몬스터 등)는 정해진 색상 체계를 따라 일관되게 표시합니다.
+2. 특정 컴포넌트의 스타일보다는 추상화된 유틸리티 클래스 사용을 우선시합니다.
+   예: `<span class="monster-name">` 대신 `<span class="text-monster">`
+3. 레이아웃을 위해서는 마진 유틸리티 클래스 사용을 권장합니다.
+   예: `margin-top: 10px` 대신 `class="mt-3"`
+4. 타이포그래피는 지정된 폰트 클래스를 사용합니다.
+   예: `font-family: 'IBM Plex Mono'` 대신 `class="font-terminal"`
+5. 모든 게임 요소(방, NPC, 몬스터 등)는 정해진 색상 클래스를 따라 일관되게 표시합니다.
 6. 모든 상호작용 요소는 명확한 호버 효과와 트랜지션을 가져야 합니다.
+7. 스타일 적용 시 논리적인 순서로 클래스를 적용합니다:
+   - 컴포넌트 클래스 (예: room-name)
+   - 색상 클래스 (예: text-success)
+   - 타이포그래피 (예: font-bold)
+   - 마진 및 패딩 (예: mt-3)
+   - 효과 (예: text-shadow-lg)
 
 이 스타일 가이드는 MUD-MK2 프로젝트의 웹 인터페이스가 일관된 디자인과 사용자 경험을 제공할 수 있도록 돕기 위한 참고 자료입니다. 새로운 기능이나 페이지를 추가할 때 이 가이드라인을 따라 개발하여 시각적 일관성을 유지하세요.

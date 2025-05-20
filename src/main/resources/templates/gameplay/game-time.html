@@ -1,6 +1,7 @@
-<div class="game-time-message">
+<div class="game-time-message font-terminal font-italic text-warning">
     <span class="time-icon" th:classappend="'time-icon-' + ${dayPeriod.toLowerCase()}"></span>
-    <span class="time-label">현재 시각: </span>
-    <span class="time-value" th:text="${gameHour} + '시'">12시</span>
-    <span class="period-value" th:text="'(' + ${dayPeriod} + ')'">낮</span>
+    <span class="time-label text-secondary">현재 시각: </span>
+    <span class="time-value text-shadow-sm" th:text="${gameHour} + '시'">12시</span>
+    <span class="period-value text-shadow-sm" th:text="'(' + ${dayPeriod} + ')'">낮</span>
 </div>
+

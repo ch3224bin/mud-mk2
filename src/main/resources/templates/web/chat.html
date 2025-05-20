@@ -301,97 +301,136 @@
             margin-top: 10px;
         }
 
-        /* Blinking cursor */
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        /* 컬러 시스템 - 공통 색상 클래스 */
+        .text-primary {
+            color: #00ff00 !important; /* 기본 터미널 색상 */
         }
 
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 18px;
-            background: #00ff00;
-            margin-left: 4px;
-            animation: blink 1s infinite;
-            vertical-align: text-bottom;
-            box-shadow: 0 0 5px #00ff00;
+        .text-secondary {
+            color: #9ca3af !important; /* 부가 정보, 라벨 색상 */
         }
 
-        /* ASCII Art Title styling */
-        .ascii-title {
-            color: #00ff00;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            margin-bottom: 20px;
+        .text-highlight {
+            color: #00ffff !important; /* 강조 색상 */
+            font-weight: bold;
         }
 
-        /* Login view styling */
-        .login-container {
-            text-align: center;
-            padding: 60px 24px;
+        .text-danger {
+            color: #ff4444 !important; /* 경고, 위험 색상 */
+            font-weight: bold;
         }
 
-        .login-container h3 {
-            color: #e4e4e7;
-            font-size: 1.8rem;
-            margin-bottom: 24px;
+        .text-warning {
+            color: #fbbf24 !important; /* 주의, 알림 색상 */
         }
 
-        .alert-auth {
-            background: rgba(96, 165, 250, 0.1);
-            border: 1px solid rgba(96, 165, 250, 0.3);
-            color: #93c5fd;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 32px;
+        .text-info {
+            color: #60a5fa !important; /* 정보 색상 */
         }
 
-        .alert-auth h5 {
-            color: #60a5fa;
-            margin-bottom: 12px;
+        .text-success {
+            color: #00ff88 !important; /* 성공, 긍정 색상 */
         }
 
-        .btn-google {
-            background: linear-gradient(45deg, #db4437 0%, #f66d6d 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .text-item {
+            color: #ffa500 !important; /* 아이템 관련 색상 */
         }
 
-        .btn-google:hover {
-            background: linear-gradient(45deg, #f66d6d 0%, #db4437 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(219, 68, 55, 0.4);
+        .text-npc {
+            color: #ff9900 !important; /* NPC 관련 색상 */
+            font-weight: 500;
         }
 
-        /* Remove Bootstrap input-group dependency */
-        .terminal-input * {
-            box-sizing: border-box;
+        .text-player {
+            color: #60a5fa !important; /* 플레이어 관련 색상 */
+            font-weight: 500;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .chat-container {
-                height: calc(100vh - 320px);
-                min-height: 400px;
-                padding: 16px;
-            }
+        .text-monster {
+            color: #ff5252 !important; /* 몬스터 관련 색상 */
+            font-weight: 600;
+        }
 
-            .terminal-input, .system-controls {
-                margin: 0 16px 16px;
-            }
+        .text-exit {
+            color: #00ff00 !important; /* 출구 관련 색상 */
+            font-weight: 600;
+        }
 
-            .btn-execute {
-                padding: 12px 16px;
-                font-size: 0.9rem;
-            }
+        /* 타이포그래피 스타일 */
+        .font-terminal {
+            font-family: 'IBM Plex Mono', monospace !important;
+        }
 
-            .terminal-input .prompt {
-                padding: 12px 12px;
-            }
+        .font-normal {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .font-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-italic {
+            font-style: italic !important;
+        }
+
+        /* 마진 유틸리티 클래스 */
+        .mt-1 {
+            margin-top: 4px !important;
+        }
+
+        .mb-1 {
+            margin-bottom: 4px !important;
+        }
+
+        .my-1 {
+            margin-top: 4px !important;
+            margin-bottom: 4px !important;
+        }
+
+        .mt-2 {
+            margin-top: 8px !important;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px !important;
+        }
+
+        .my-2 {
+            margin-top: 8px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .mt-3 {
+            margin-top: 16px !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 16px !important;
+        }
+
+        .my-3 {
+            margin-top: 16px !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* 정렬 유틸리티 */
+        .list-unstyled {
+            list-style-type: none !important;
+            padding-left: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* 테두리와 그림자 효과 */
+        .text-shadow-sm {
+            text-shadow: 0 0 3px currentColor !important;
+        }
+
+        .text-shadow-md {
+            text-shadow: 0 0 5px currentColor !important;
+        }
+
+        .text-shadow-lg {
+            text-shadow: 0 0 8px currentColor !important;
         }
 
         /* Room */
@@ -489,21 +528,6 @@
             margin-bottom: 10px;
         }
 
-        .monsters-header {
-            margin-bottom: 5px;
-        }
-
-        .monsters-label {
-            color: #ff5252;
-            font-weight: bold;
-        }
-
-        .monsters-list ul {
-            list-style-type: none;
-            padding: 0;
-            margin-bottom: 5px;
-        }
-
         .monster-item {
             margin-bottom: 3px;
         }
@@ -514,63 +538,96 @@
         }
 
         .monster-status {
-            color: #ff9e80;
-        }
-
-        /** 날씨 **/
-        .weather-message-container {
-            width: 100%;
-            margin: 10px 0;
-            font-family: 'IBM Plex Mono', monospace;
-        }
-
-        .weather-banner {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .weather-icon {
-            width: 28px;
-            height: 28px;
-            margin-right: 10px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-
-        .weather-icon::before {
-            font-size: 22px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .weather-content {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .weather-label {
             color: #9ca3af;
-            font-weight: normal;
-            font-style: italic;
         }
 
-        .weather-value {
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 5px currentColor;
+        /* Blinking cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
-        /* 날씨별 스타일 */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: #00ff00;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        /* Login view styling */
+        .login-container {
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .login-container h3 {
+            color: #e4e4e7;
+            font-size: 1.8rem;
+            margin-bottom: 24px;
+        }
+
+        .alert-auth {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            color: #93c5fd;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .alert-auth h5 {
+            color: #60a5fa;
+            margin-bottom: 12px;
+        }
+
+        .btn-google {
+            background: linear-gradient(45deg, #db4437 0%, #f66d6d 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-google:hover {
+            background: linear-gradient(45deg, #f66d6d 0%, #db4437 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(219, 68, 55, 0.4);
+        }
+
+        /* Remove Bootstrap input-group dependency */
+        .terminal-input * {
+            box-sizing: border-box;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 320px);
+                min-height: 400px;
+                padding: 16px;
+            }
+
+            .terminal-input, .system-controls {
+                margin: 0 16px 16px;
+            }
+
+            .btn-execute {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .terminal-input .prompt {
+                padding: 12px 12px;
+            }
+        }
+
+        /* 날씨 */
         .weather-message {
             font-family: 'IBM Plex Mono', monospace;
             margin: 4px 0;
@@ -626,31 +683,6 @@
 
         .weather-icon-안개::before {
             content: "🌫️";
-            color: #cfd8dc;
-        }
-
-        /* 날씨별 텍스트 색상 */
-        .weather-value:has(+ .weather-icon-맑음) {
-            color: #ffc107;
-        }
-
-        .weather-value:has(+ .weather-icon-흐림) {
-            color: #b0bec5;
-        }
-
-        .weather-value:has(+ .weather-icon-비) {
-            color: #4fc3f7;
-        }
-
-        .weather-value:has(+ .weather-icon-눈) {
-            color: #e1f5fe;
-        }
-
-        .weather-value:has(+ .weather-icon-폭풍) {
-            color: #ce93d8;
-        }
-
-        .weather-value:has(+ .weather-icon-안개) {
             color: #cfd8dc;
         }
 
@@ -716,31 +748,6 @@
 
         .time-icon-심야::before {
             content: "✨";
-            color: #5c6bc0;
-        }
-
-        /* 시간대별 텍스트 색상 */
-        .time-value.새벽, .period-value.새벽 {
-            color: #9fa8da;
-        }
-
-        .time-value.아침, .period-value.아침 {
-            color: #ffb74d;
-        }
-
-        .time-value.낮, .period-value.낮 {
-            color: #ffd54f;
-        }
-
-        .time-value.저녁, .period-value.저녁 {
-            color: #ffa000;
-        }
-
-        .time-value.밤, .period-value.밤 {
-            color: #7986cb;
-        }
-
-        .time-value.심야, .period-value.심야 {
             color: #5c6bc0;
         }
     </style>
