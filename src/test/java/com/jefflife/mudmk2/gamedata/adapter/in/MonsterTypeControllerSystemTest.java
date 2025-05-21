@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gamedata.adapter.in;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
+import com.jefflife.mudmk2.gamedata.application.service.model.request.MonsterSpawnRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,31 @@ public class MonsterTypeControllerSystemTest {
     void createMonsterType_shouldCreateMonsterTypeAndReturnCreatedResponse() throws Exception {
         // Given
         String monsterTypeName = "Test Monster";
-        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(monsterTypeName, 100, 10, 5);
+        String description = "Test Monster Description";
+        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(
+                monsterTypeName,
+                description,
+                100, // baseHp
+                50,  // baseMp
+                10,  // baseStr
+                8,   // baseDex
+                5,   // baseCon
+                7,   // baseIntelligence
+                6,   // basePow
+                5,   // baseCha
+                100, // baseExperience
+                10,  // hpPerLevel
+                2,   // strPerLevel
+                2,   // dexPerLevel
+                1,   // conPerLevel
+                1,   // intelligencePerLevel
+                1,   // powPerLevel
+                1,   // chaPerLevel
+                50,  // expPerLevel
+                List.of(), // spawnRooms
+                1,   // aggressiveness
+                60   // respawnTime
+        );
         String requestJson = objectMapper.writeValueAsString(createRequest);
 
         // When
@@ -74,7 +99,30 @@ public class MonsterTypeControllerSystemTest {
     void updateMonsterType_whenNotFound_shouldReturnNotFound() throws Exception {
         // Given
         long nonExistentId = -999L;
-        UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest("Non Existent", 1, 1, 1);
+        UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest(
+                "Non Existent",     // name
+                "Description",      // description
+                100,                // baseHp
+                50,                 // baseMp
+                10,                 // baseStr
+                8,                  // baseDex
+                5,                  // baseCon
+                7,                  // baseIntelligence
+                6,                  // basePow
+                5,                  // baseCha
+                100,                // baseExperience
+                10,                 // hpPerLevel
+                2,                  // strPerLevel
+                2,                  // dexPerLevel
+                1,                  // conPerLevel
+                1,                  // intelligencePerLevel
+                1,                  // powPerLevel
+                1,                  // chaPerLevel
+                50,                 // expPerLevel
+                List.of(),          // spawnRooms
+                1,                  // aggressiveness
+                60                  // respawnTime
+        );
         String requestJson = objectMapper.writeValueAsString(updateRequest);
 
         // When & Then
@@ -122,7 +170,30 @@ public class MonsterTypeControllerSystemTest {
 
         // When
         String updatedMonsterTypeName = "Updated Monster Name";
-        UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest(updatedMonsterTypeName, 220, 22, 11);
+        UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest(
+                updatedMonsterTypeName, // name
+                "Updated Description",  // description
+                220,                    // baseHp
+                60,                     // baseMp
+                22,                     // baseStr
+                10,                     // baseDex
+                11,                     // baseCon
+                9,                      // baseIntelligence
+                8,                      // basePow
+                7,                      // baseCha
+                120,                    // baseExperience
+                12,                     // hpPerLevel
+                3,                      // strPerLevel
+                3,                      // dexPerLevel
+                2,                      // conPerLevel
+                2,                      // intelligencePerLevel
+                2,                      // powPerLevel
+                2,                      // chaPerLevel
+                60,                     // expPerLevel
+                List.of(),              // spawnRooms
+                2,                      // aggressiveness
+                70                      // respawnTime
+        );
         MonsterTypeResponse updatedMonsterType = updateMonsterType(createdMonsterType.id(), updateRequest);
 
         // Then
@@ -160,8 +231,44 @@ public class MonsterTypeControllerSystemTest {
                 .andExpect(status().isNotFound());
     }
 
-    private MonsterTypeResponse createTestMonsterType(String name, int maxHp, int attack, int defense) throws Exception {
-        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(name, maxHp, attack, defense);
+    private MonsterTypeResponse createTestMonsterType(String name, String description, int baseHp, int baseMp, int baseStr, int baseDex, int baseCon, int baseIntelligence, int basePow, int baseCha, long baseExperience, int hpPerLevel, int strPerLevel, int dexPerLevel, int conPerLevel, int intelligencePerLevel, int powPerLevel, int chaPerLevel, int expPerLevel, List<MonsterSpawnRoomRequest> spawnRooms, int aggressiveness, int respawnTime) throws Exception {
+        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(name, description, baseHp, baseMp, baseStr, baseDex, baseCon, baseIntelligence, basePow, baseCha, baseExperience, hpPerLevel, strPerLevel, dexPerLevel, conPerLevel, intelligencePerLevel, powPerLevel, chaPerLevel, expPerLevel, spawnRooms, aggressiveness, respawnTime);
+        String requestJson = objectMapper.writeValueAsString(createRequest);
+
+        MvcResult result = mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        return objectMapper.readValue(result.getResponse().getContentAsString(), MonsterTypeResponse.class);
+    }
+
+    private MonsterTypeResponse createTestMonsterType(String name, int baseHp, int baseStr, int baseCon) throws Exception {
+        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(
+                name,                // name
+                "Description for " + name, // description
+                baseHp,             // baseHp
+                50,                 // baseMp
+                baseStr,            // baseStr
+                8,                  // baseDex
+                baseCon,            // baseCon
+                7,                  // baseIntelligence
+                6,                  // basePow
+                5,                  // baseCha
+                100,                // baseExperience
+                10,                 // hpPerLevel
+                2,                  // strPerLevel
+                2,                  // dexPerLevel
+                1,                  // conPerLevel
+                1,                  // intelligencePerLevel
+                1,                  // powPerLevel
+                1,                  // chaPerLevel
+                50,                 // expPerLevel
+                List.of(),          // spawnRooms
+                1,                  // aggressiveness
+                60                  // respawnTime
+        );
         String requestJson = objectMapper.writeValueAsString(createRequest);
 
         MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -209,12 +316,12 @@ public class MonsterTypeControllerSystemTest {
                 .andExpect(status().isNoContent());
     }
 
-    private void assertMonsterTypeEquals(MonsterTypeResponse monsterType, String expectedName, int expectedMaxHp, int expectedAttack, int expectedDefense) {
+    private void assertMonsterTypeEquals(MonsterTypeResponse monsterType, String expectedName, int expectedBaseHp, int expectedBaseStr, int expectedBaseCon) {
         assertThat(monsterType).isNotNull();
         assertThat(monsterType.name()).isEqualTo(expectedName);
-        assertThat(monsterType.maxHp()).isEqualTo(expectedMaxHp);
-        assertThat(monsterType.attack()).isEqualTo(expectedAttack);
-        assertThat(monsterType.defense()).isEqualTo(expectedDefense);
+        assertThat(monsterType.baseHp()).isEqualTo(expectedBaseHp);
+        assertThat(monsterType.baseStr()).isEqualTo(expectedBaseStr);
+        assertThat(monsterType.baseCon()).isEqualTo(expectedBaseCon);
     }
 
     private void assertMonsterTypeInList(List<MonsterTypeResponse> monsterTypes, MonsterTypeResponse expectedMonsterType) {
@@ -222,10 +329,10 @@ public class MonsterTypeControllerSystemTest {
         for (MonsterTypeResponse monsterType : monsterTypes) {
             if (monsterType.id().equals(expectedMonsterType.id())) {
                 found = true;
-                assertMonsterTypeEquals(monsterType, expectedMonsterType.name(), expectedMonsterType.maxHp(), expectedMonsterType.attack(), expectedMonsterType.defense());
+                assertMonsterTypeEquals(monsterType, expectedMonsterType.name(), expectedMonsterType.baseHp(), expectedMonsterType.baseStr(), expectedMonsterType.baseCon());
                 break;
             }
         }
-        assertThat(found).isTrue().withFailMessage("MonsterType with id %s not found in the list.", expectedMonsterType.id());
+        assertThat(found).isTrue();
     }
 }

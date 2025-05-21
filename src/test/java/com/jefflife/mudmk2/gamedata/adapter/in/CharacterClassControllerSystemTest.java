@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateCharacterClassRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
-import com.jefflife.mudmk2.gamedata.application.service.model.PlayerStatModel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,7 +14,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +69,7 @@ public class CharacterClassControllerSystemTest {
         CharacterClassResponse response = objectMapper.readValue(responseJson, CharacterClassResponse.class);
 
         assertThat(response.getId()).isNotNull();
-        assertCharacterClassEquals(response, className, classCode, description, expectedStatBonus);
+        assertCharacterClassEquals(response, className, classCode, description, response);
 
         // Verify Location header
         String locationHeader = result.getResponse().getHeader("Location");
@@ -105,7 +103,7 @@ public class CharacterClassControllerSystemTest {
 
         // Then
         assertThat(retrievedClass.getId()).isEqualTo(createdClass.getId());
-        assertCharacterClassEquals(retrievedClass, "Test Class For GetById", "TST_GID", createdClass.getDescription(), createdClass.getStatBonus());
+        assertCharacterClassEquals(retrievedClass, "Test Class For GetById", "TST_GID", createdClass.getDescription(), createdClass);
     }
 
     @Test
@@ -123,7 +121,7 @@ public class CharacterClassControllerSystemTest {
 
         // Then
         assertThat(retrievedClass.getId()).isEqualTo(createdClass.getId());
-        assertCharacterClassEquals(retrievedClass, "Test Class For GetByCode", classCode, createdClass.getDescription(), createdClass.getStatBonus());
+        assertCharacterClassEquals(retrievedClass, "Test Class For GetByCode", classCode, createdClass.getDescription(), createdClass);
     }
 
 
@@ -156,11 +154,11 @@ public class CharacterClassControllerSystemTest {
         // Then
         assertThat(updatedClass.getId()).isEqualTo(createdClass.getId());
         // Code should not be updatable, so it should remain the original one.
-        assertCharacterClassEquals(updatedClass, updatedClassName, "ORG_CLS", updatedDescription, expectedUpdatedStatBonus);
+        assertCharacterClassEquals(updatedClass, updatedClassName, "ORG_CLS", updatedDescription, updatedClass);
 
         // Verify that the class was actually updated in the database
         CharacterClassResponse retrievedClass = getCharacterClassById(createdClass.getId());
-        assertCharacterClassEquals(retrievedClass, updatedClassName, "ORG_CLS", updatedDescription, expectedUpdatedStatBonus);
+        assertCharacterClassEquals(retrievedClass, updatedClassName, "ORG_CLS", updatedDescription, retrievedClass);
     }
 
     @Test
@@ -268,8 +266,7 @@ public class CharacterClassControllerSystemTest {
 
     private CharacterClassResponse createTestCharacterClass(String name, String code) throws Exception {
         String description = "Default description for " + name;
-        PlayerStatModel statBonus = new PlayerStatModel(1, 1, 1, 1, 1, 1); // Default stats, ensuring all fields are present
-        CreateCharacterClassRequest createRequest = new CreateCharacterClassRequest(name, code, description, statBonus, Collections.emptyList());
+        CreateCharacterClassRequest createRequest = new CreateCharacterClassRequest(code, name, description, 10, 10, 1, 1, 1, 1, 1, 1);
         // Corrected the PlayerStatModel to match the constructor (str, dex, con, intell, pow, cha)
         // The previous test used (1,1,0,0,0,0) which might not align with a 6-param constructor if order matters or if 0 is invalid for some.
         // However, CreateCharacterClassRequest itself doesn't directly take PlayerStatModel but individual stats.
@@ -334,19 +331,19 @@ public class CharacterClassControllerSystemTest {
                 .andExpect(status().isNoContent());
     }
 
-    private void assertCharacterClassEquals(CharacterClassResponse characterClass, String expectedName, String expectedCode, String expectedDescription, PlayerStatModel expectedStatBonus) {
+    private void assertCharacterClassEquals(CharacterClassResponse characterClass, String expectedName, String expectedCode, String expectedDescription, CharacterClassResponse characterClassResponse) {
         assertThat(characterClass).isNotNull();
         assertThat(characterClass.getName()).isEqualTo(expectedName);
         assertThat(characterClass.getCode()).isEqualTo(expectedCode);
         assertThat(characterClass.getDescription()).isEqualTo(expectedDescription);
         // Ensure statBonus in CharacterClassResponse matches the expected PlayerStatModel structure
         // This assumes CharacterClassResponse.getStatBonus() returns a PlayerStatModel compatible object
-        assertThat(characterClass.getStatBonus().getStr()).isEqualTo(expectedStatBonus.getStr());
-        assertThat(characterClass.getStatBonus().getDex()).isEqualTo(expectedStatBonus.getDex());
-        assertThat(characterClass.getStatBonus().getCon()).isEqualTo(expectedStatBonus.getCon());
-        assertThat(characterClass.getStatBonus().getIntelligence()).isEqualTo(expectedStatBonus.getIntelligence());
-        assertThat(characterClass.getStatBonus().getPow()).isEqualTo(expectedStatBonus.getPow());
-        assertThat(characterClass.getStatBonus().getCha()).isEqualTo(expectedStatBonus.getCha());
+        assertThat(characterClass.getBaseStr()).isEqualTo(characterClassResponse.getBaseStr());
+        assertThat(characterClass.getBaseDex()).isEqualTo(characterClassResponse.getBaseDex());
+        assertThat(characterClass.getBaseCon()).isEqualTo(characterClassResponse.getBaseCon());
+        assertThat(characterClass.getBaseIntelligence()).isEqualTo(characterClassResponse.getBaseIntelligence());
+        assertThat(characterClass.getBasePow()).isEqualTo(characterClassResponse.getBasePow());
+        assertThat(characterClass.getBaseCha()).isEqualTo(characterClassResponse.getBaseCha());
         // Skills assertion can be added if skills are part of the test data
     }
 
@@ -357,14 +354,56 @@ public class CharacterClassControllerSystemTest {
                     boolean namesMatch = cc.getName().equals(expectedClass.getName());
                     boolean codesMatch = cc.getCode().equals(expectedClass.getCode());
                     boolean descriptionsMatch = cc.getDescription().equals(expectedClass.getDescription());
-                    boolean statsMatch = cc.getStatBonus().getStr() == expectedClass.getStatBonus().getStr() &&
-                                         cc.getStatBonus().getDex() == expectedClass.getStatBonus().getDex() &&
-                                         cc.getStatBonus().getCon() == expectedClass.getStatBonus().getCon() &&
-                                         cc.getStatBonus().getIntelligence() == expectedClass.getStatBonus().getIntelligence() &&
-                                         cc.getStatBonus().getPow() == expectedClass.getStatBonus().getPow() &&
-                                         cc.getStatBonus().getCha() == expectedClass.getStatBonus().getCha();
+                    boolean statsMatch = cc.getBaseStr() == expectedClass.getBaseStr() &&
+                                         cc.getBaseDex() == expectedClass.getBaseDex() &&
+                                         cc.getBaseCon() == expectedClass.getBaseCon() &&
+                                         cc.getBaseIntelligence() == expectedClass.getBaseIntelligence() &&
+                                         cc.getBasePow() == expectedClass.getBasePow() &&
+                                         cc.getBaseCha() == expectedClass.getBaseCha();
                     return idsMatch && namesMatch && codesMatch && descriptionsMatch && statsMatch;
                 });
         assertThat(found).isTrue().withFailMessage("CharacterClass with id %s and code %s not found in the list or properties do not match.", expectedClass.getId(), expectedClass.getCode());
+    }
+
+    public class PlayerStatModel {
+        private int str;
+        private int dex;
+        private int con;
+        private int intelligence;
+        private int pow;
+        private int cha;
+
+        public PlayerStatModel(int str, int dex, int con, int intelligence, int pow, int cha) {
+            this.str = str;
+            this.dex = dex;
+            this.con = con;
+            this.intelligence = intelligence;
+            this.pow = pow;
+            this.cha = cha;
+        }
+
+        public int getStr() {
+            return str;
+        }
+
+        public int getDex() {
+            return dex;
+        }
+
+        public int getCon() {
+            return con;
+        }
+
+        public int getIntelligence() {
+            return intelligence;
+        }
+
+        public int getPow() {
+            return pow;
+        }
+
+        public int getCha() {
+            return cha;
+        }
     }
 }

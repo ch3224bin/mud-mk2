@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gamedata.adapter.in;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.InstanceScenarioResponse; // This might need adjustment based on actual response objects
+import com.jefflife.mudmk2.gamedata.application.service.model.response.InstanceScenarioResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,14 +51,14 @@ public class InstanceScenarioControllerSystemTest {
         String responseJson = result.getResponse().getContentAsString();
         InstanceScenarioResponse response = objectMapper.readValue(responseJson, InstanceScenarioResponse.class);
 
-        assertThat(response.getId()).isNotNull(); // or isGreaterThan(0L)
-        assertThat(response.getTitle()).isEqualTo(title);
-        assertThat(response.getDescription()).isEqualTo(description);
-        assertThat(response.getAreaId()).isEqualTo(areaId);
-        assertThat(response.getEntranceRoomId()).isEqualTo(entranceRoomId);
+        assertThat(response.id()).isGreaterThan(0L);
+        assertThat(response.title()).isEqualTo(title);
+        assertThat(response.description()).isEqualTo(description);
+        assertThat(response.areaId()).isEqualTo(areaId);
+        assertThat(response.entranceRoomId()).isEqualTo(entranceRoomId);
 
         String locationHeader = result.getResponse().getHeader("Location");
-        assertThat(locationHeader).isEqualTo(BASE_URL + "/" + response.getId());
+        assertThat(locationHeader).isEqualTo(BASE_URL + "/" + response.id());
     }
 
     private String createInstanceScenarioJson(String title, String description, long areaId, long entranceRoomId) {
@@ -76,22 +78,22 @@ public class InstanceScenarioControllerSystemTest {
     }
 
     private void assertInstanceScenarioEquals(InstanceScenarioResponse actual, InstanceScenarioResponse expected) {
-        assertThat(actual.getTitle()).isEqualTo(expected.getTitle());
-        assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
-        assertThat(actual.getAreaId()).isEqualTo(expected.getAreaId());
-        assertThat(actual.getEntranceRoomId()).isEqualTo(expected.getEntranceRoomId());
+        assertThat(actual.title()).isEqualTo(expected.title());
+        assertThat(actual.description()).isEqualTo(expected.description());
+        assertThat(actual.areaId()).isEqualTo(expected.areaId());
+        assertThat(actual.entranceRoomId()).isEqualTo(expected.entranceRoomId());
     }
 
     private void assertInstanceScenarioInList(List<InstanceScenarioResponse> scenarios, InstanceScenarioResponse expectedScenario) {
         boolean found = false;
         for (InstanceScenarioResponse scenario : scenarios) {
-            if (scenario.getId().equals(expectedScenario.getId())) { // Use .equals() for Long comparison
+            if (scenario.id() == expectedScenario.id()) { // Use .equals() for Long comparison
                 assertInstanceScenarioEquals(scenario, expectedScenario);
                 found = true;
                 break;
             }
         }
-        assertThat(found).isTrueWithMessage("Scenario with ID " + expectedScenario.getId() + " not found in the list.");
+        assertThat(found).isTrue();
     }
 
     @Test
@@ -108,7 +110,7 @@ public class InstanceScenarioControllerSystemTest {
 
         // Then
         String responseJson = result.getResponse().getContentAsString();
-        List<InstanceScenarioResponse> actualScenarios = objectMapper.readValue(responseJson, new TypeReference<List<InstanceScenarioResponse>>() {});
+        List<InstanceScenarioResponse> actualScenarios = objectMapper.readValue(responseJson, new TypeReference<>() {});
 
         assertThat(actualScenarios).isNotNull();
         assertThat(actualScenarios.size()).isGreaterThanOrEqualTo(2);
@@ -127,7 +129,7 @@ public class InstanceScenarioControllerSystemTest {
         InstanceScenarioResponse createdScenario = createTestInstanceScenario(title, description, areaId, entranceRoomId);
 
         // When
-        MvcResult result = mockMvc.perform(get(BASE_URL + "/" + createdScenario.getId())
+        MvcResult result = mockMvc.perform(get(BASE_URL + "/" + createdScenario.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -136,7 +138,7 @@ public class InstanceScenarioControllerSystemTest {
         String responseJson = result.getResponse().getContentAsString();
         InstanceScenarioResponse retrievedScenario = objectMapper.readValue(responseJson, InstanceScenarioResponse.class);
 
-        assertThat(retrievedScenario.getId()).isEqualTo(createdScenario.getId());
+        assertThat(retrievedScenario.id()).isEqualTo(createdScenario.id());
         assertInstanceScenarioEquals(retrievedScenario, createdScenario);
     }
 
@@ -150,7 +152,7 @@ public class InstanceScenarioControllerSystemTest {
         InstanceScenarioResponse createdScenario = createTestInstanceScenario(title, description, areaId, entranceRoomId);
 
         // When
-        MvcResult result = mockMvc.perform(get(BASE_URL + "/title/" + createdScenario.getTitle())
+        MvcResult result = mockMvc.perform(get(BASE_URL + "/title/" + createdScenario.title())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -159,7 +161,7 @@ public class InstanceScenarioControllerSystemTest {
         String responseJson = result.getResponse().getContentAsString();
         InstanceScenarioResponse retrievedScenario = objectMapper.readValue(responseJson, InstanceScenarioResponse.class);
 
-        assertThat(retrievedScenario.getId()).isEqualTo(createdScenario.getId());
+        assertThat(retrievedScenario.id()).isEqualTo(createdScenario.id());
         assertInstanceScenarioEquals(retrievedScenario, createdScenario);
     }
 
@@ -180,7 +182,7 @@ public class InstanceScenarioControllerSystemTest {
         String updateRequestJson = updateInstanceScenarioJson(updatedTitle, updatedDescription, updatedAreaId, updatedEntranceRoomId);
 
         // When
-        MvcResult result = mockMvc.perform(patch(BASE_URL + "/" + originalScenario.getId())
+        MvcResult result = mockMvc.perform(patch(BASE_URL + "/" + originalScenario.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequestJson))
                 .andExpect(status().isOk())
@@ -190,13 +192,13 @@ public class InstanceScenarioControllerSystemTest {
         String responseJson = result.getResponse().getContentAsString();
         InstanceScenarioResponse updatedScenarioResponse = objectMapper.readValue(responseJson, InstanceScenarioResponse.class);
 
-        InstanceScenarioResponse expectedUpdatedScenario = new InstanceScenarioResponse(originalScenario.getId(), updatedTitle, updatedDescription, updatedAreaId, updatedEntranceRoomId);
+        InstanceScenarioResponse expectedUpdatedScenario = new InstanceScenarioResponse(originalScenario.id(), updatedTitle, updatedDescription, updatedAreaId, updatedEntranceRoomId);
 
-        assertThat(updatedScenarioResponse.getId()).isEqualTo(originalScenario.getId());
+        assertThat(updatedScenarioResponse.id()).isEqualTo(originalScenario.id());
         assertInstanceScenarioEquals(updatedScenarioResponse, expectedUpdatedScenario);
 
         // Verify persistence
-        MvcResult refetchResult = mockMvc.perform(get(BASE_URL + "/" + originalScenario.getId())
+        MvcResult refetchResult = mockMvc.perform(get(BASE_URL + "/" + originalScenario.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
