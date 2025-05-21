@@ -23,7 +23,10 @@ public class InstanceScenarioController {
 
     @PostMapping
     public ResponseEntity<InstanceScenarioResponse> createInstanceScenario(@RequestBody CreateInstanceScenarioRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(createUseCase.createInstanceScenario(request));
+        InstanceScenarioResponse response = createUseCase.createInstanceScenario(request);
+        return ResponseEntity
+                .created(java.net.URI.create("/api/v1/instance-scenarios/" + response.id()))
+                .body(response);
     }
 
     @GetMapping
