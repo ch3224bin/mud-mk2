@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Embeddable
@@ -42,5 +43,15 @@ public class PartyMembers {
     public boolean isMember(final Long memberId) {
         return members.stream()
                 .anyMatch(member -> Objects.equals(member.getCharacterId(), memberId));
+    }
+
+    /**
+     * 파티 멤버들의 ID 목록을 반환합니다.
+     * @return 파티 멤버 ID 목록
+     */
+    public List<Long> getMemberIds() {
+        return members.stream()
+                .map(PartyMember::getCharacterId)
+                .collect(Collectors.toList());
     }
 }

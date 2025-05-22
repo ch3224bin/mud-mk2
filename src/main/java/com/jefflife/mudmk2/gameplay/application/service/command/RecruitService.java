@@ -1,34 +1,116 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
 import com.jefflife.mudmk2.gameplay.application.port.in.RecruitUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RecruitService implements RecruitUseCase {
+    private static final Logger logger = LoggerFactory.getLogger(RecruitService.class);
+
     private final GameWorldService gameWorldService;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public RecruitService(final GameWorldService gameWorldService, final SendMessageToUserPort sendMessageToUserPort) {
+    public RecruitService(
+            final GameWorldService gameWorldService,
+            final SendMessageToUserPort sendMessageToUserPort
+    ) {
         this.gameWorldService = gameWorldService;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
     public void recruit(final RecruitCommand recruitCommand) {
-        // NPC 대상임
-        // target이 같은 방에 있는지 찾고
-        // target을 확인하면 합류 발사
-        // target은 다른 그룹에 속해 있으면 안된다
-        // 합류 후 NPC는 리더를 따라 다녀야함
-        // leader player move event를 party 에서 받아서 party member들에게 전달
-        // NPC는 리더의 뒤를 무조건 따라가야함 (여러 요인들로 인해 조건을 주면 못따라감)
-        // PC의 경우는 별도의 룰을 주어야하는데 나중에 구현
-
+        // 1. 플레이어 정보 가져오기
         PlayerCharacter player = gameWorldService.getPlayerByUserId(recruitCommand.userId());
+        Long playerId = player.getId();
+        Long playerRoomId = player.getCurrentRoomId();
 
+        // 2. 초대할 NPC 찾기
+        NonPlayerCharacter targetNpc = gameWorldService.getNpcByName(recruitCommand.npcName());
+        if (targetNpc == null) {
+            sendMessageToUserPort.messageToUser(
+                    recruitCommand.userId(),
+                    "대상을 찾을 수 없습니다: " + recruitCommand.npcName()
+            );
+            return;
+        }
+
+        // 3. NPC가 같은 방에 있는지 확인
+        if (!targetNpc.getCurrentRoomId().equals(playerRoomId)) {
+            sendMessageToUserPort.messageToUser(
+                    recruitCommand.userId(),
+                    targetNpc.getName() + "는 당신과 같은 방에 있지 않습니다."
+            );
+            return;
+        }
+
+        // 4. NPC가 이미 다른 파티에 속해 있는지 확인 (NPC ID를 사용)
+        Long npcId = targetNpc.getId();
+        if (gameWorldService.isInParty(npcId)) {
+            sendMessageToUserPort.messageToUser(
+                    recruitCommand.userId(),
+                    targetNpc.getName() + "는 이미 다른 파티에 속해 있습니다."
+            );
+            return;
+        }
+
+        // worldService에 등록된 party는 주기적으로 PersistenceManager를 통해 저장됨
+        // 서버가 시작될때 PersistenceManager에서 worldService에 DB에 저장되어 있던 party를 등록시킴
+        // 5. 플레이어의 파티가 있는지 확인, 없으면 생성
+        Party party = gameWorldService.getPartyByPlayerId(playerId)
+                .orElseGet(() -> createParty(playerId));
+
+        if (!party.isLeader(playerId)) {
+            sendMessageToUserPort.messageToUser(
+                    recruitCommand.userId(),
+                    "파티 리더만 NPC를 초대할 수 있습니다."
+            );
+            return;
+        }
+
+        // 6. NPC를 파티에 추가
+        Party.AddPartyMemberResult result = party.addMember(npcId);
+        switch (result) {
+            case PARTY_FULL -> {
+                sendMessageToUserPort.messageToUser(
+                        recruitCommand.userId(),
+                        "파티가 가득 찼습니다."
+                );
+            }
+            case ALREADY_IN_SAME_PARTY -> {
+                sendMessageToUserPort.messageToUser(
+                        recruitCommand.userId(),
+                        targetNpc.getName() + "는 이미 당신의 파티에 있습니다."
+                );
+            }
+            case ALREADY_IN_OTHER_PARTY -> {
+                sendMessageToUserPort.messageToUser(
+                        recruitCommand.userId(),
+                        targetNpc.getName() + "는 이미 다른 파티에 속해 있습니다."
+                );
+            }
+            case SUCCESS -> {
+                sendMessageToUserPort.messageToUser(
+                        recruitCommand.userId(),
+                        targetNpc.getName() + "가 당신의 파티에 합류했습니다."
+                );
+                logger.info("NPC {} joined player {}'s party", npcId, playerId);
+            }
+        }
+    }
+
+    private Party createParty(Long playerId) {
+        Party newParty = Party.createParty(playerId);
+        gameWorldService.addParty(newParty);
+        logger.info("Created new party for player {}", playerId);
+        return newParty;
     }
 }

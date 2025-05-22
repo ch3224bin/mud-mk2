@@ -4,17 +4,19 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Party extends AbstractAggregateRoot<Party> {
+public class Party {
+    private static final int MAX_PARTY_SIZE = 6;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
     private Long leaderId;
     
@@ -28,26 +30,29 @@ public class Party extends AbstractAggregateRoot<Party> {
     private PartyMembers members = new PartyMembers();
     
     // 그룹 생성 메서드
-    public static Party createParty(PartyPolicy partyPolicy, Long leaderId) {
+    public static Party createParty(Long leaderId) {
         Party party = new Party();
+        party.id = UUID.randomUUID().toString();
         party.leaderId = leaderId;
-        party.addMember(partyPolicy, leaderId);
+        party.addMember(leaderId);
         return party;
     }
     
     // 멤버 추가 메서드
-    public boolean addMember(PartyPolicy partyPolicy, Long memberId) {
-        if (partyPolicy.isValidPartySize(members)) {
-            return false;
+    public AddPartyMemberResult addMember(Long memberId) {
+        if (members.size() >= MAX_PARTY_SIZE) {
+            return AddPartyMemberResult.PARTY_FULL;
         }
+
+        // 이미 다른 파티에 속해있는지 확인
         
         // 이미 그룹에 있는지 확인
         if (members.contains(memberId)) {
-            return false;
+            return AddPartyMemberResult.ALREADY_IN_SAME_PARTY;
         }
         
         members.add(this, memberId);
-        return true;
+        return AddPartyMemberResult.SUCCESS;
     }
     
     // 멤버 제거 메서드
@@ -80,5 +85,28 @@ public class Party extends AbstractAggregateRoot<Party> {
         
         this.leaderId = newLeaderId;
         return true;
+    }
+
+    public boolean contains(final Long characterId) {
+        return members.contains(characterId);
+    }
+
+    public boolean isInactive() {
+        return status == PartyStatus.INACTIVE;
+    }
+
+    public List<Long> getMemberIds() {
+        return members.getMemberIds();
+    }
+
+    public boolean isLeader(Long playerId) {
+        return Objects.equals(leaderId, playerId);
+    }
+
+    public enum AddPartyMemberResult {
+        SUCCESS,
+        ALREADY_IN_OTHER_PARTY,
+        ALREADY_IN_SAME_PARTY,
+        PARTY_FULL
     }
 }

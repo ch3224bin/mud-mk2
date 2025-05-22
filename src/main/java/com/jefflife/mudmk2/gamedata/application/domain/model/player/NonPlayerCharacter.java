@@ -12,7 +12,15 @@ import java.util.Map;
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NonPlayerCharacter {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "shared_id_generator")
+    @TableGenerator(
+            name = "shared_id_generator",
+            table = "id_generator_table",
+            pkColumnName = "gen_name",
+            valueColumnName = "gen_value",
+            pkColumnValue = "shared_id",
+            allocationSize = 50
+    )
     private Long id;
 
     @Embedded

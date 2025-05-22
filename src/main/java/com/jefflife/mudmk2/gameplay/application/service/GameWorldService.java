@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ public class GameWorldService {
     private final Map<Long, Room> rooms = new ConcurrentHashMap<>();
     private final Map<Long, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
     private final Map<String, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
+    private final Map<String, Party> parties = new ConcurrentHashMap<>();
 
     public void loadRooms(final Iterable<Room> rooms) {
         rooms.forEach(room -> {
@@ -208,5 +211,80 @@ public class GameWorldService {
     public Iterable<PlayerCharacter> getActivePlayers() {
         return activePlayers.values();
     }
-}
 
+    /**
+     * ID로 NPC를 찾습니다.
+     * @param npcId NPC ID
+     * @return 찾은 NPC, 없으면 null
+     */
+    public NonPlayerCharacter getNpcById(Long npcId) {
+        return activeNpcs.get(npcId);
+    }
+
+    /**
+     * 이름으로 NPC를 찾습니다.
+     * @param name NPC 이름
+     * @return 찾은 NPC, 없으면 null
+     */
+    public NonPlayerCharacter getNpcByName(String name) {
+        return activeNpcs.values().stream()
+                .filter(npc -> npc.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * NPC를 특정 방으로 이동시킵니다.
+     * @param npcId NPC ID
+     * @param roomId 이동할 방 ID
+     * @return 이동 성공 여부
+     */
+    public boolean moveNpcToRoom(Long npcId, Long roomId) {
+        NonPlayerCharacter npc = activeNpcs.get(npcId);
+        if (npc == null || rooms.get(roomId) == null) {
+            return false;
+        }
+
+        // NPC의 방 ID 변경 (BaseCharacter의 roomId 필드 접근)
+        try {
+            java.lang.reflect.Field roomIdField = npc.getBaseCharacterInfo().getClass().getDeclaredField("roomId");
+            roomIdField.setAccessible(true);
+            roomIdField.set(npc.getBaseCharacterInfo(), roomId);
+            logger.debug("Moved NPC {} to room {}", npc.getName(), roomId);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to move NPC to room: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 캐릭터 ID로 사용자 ID를 찾습니다.
+     * @param characterId 캐릭터 ID
+     * @return 사용자 ID
+     */
+    public Long getUserIdByCharacterId(Long characterId) {
+        PlayerCharacter pc = activePlayers.get(characterId);
+        if (pc == null) {
+            throw new IllegalArgumentException("Character not found for ID: " + characterId);
+        }
+        return pc.getUserId();
+    }
+
+    public boolean isInParty(Long characterId) {
+        return parties.values()
+                .stream()
+                .anyMatch(party -> party.contains(characterId));
+    }
+
+    public void addParty(final Party party) {
+        parties.put(party.getId(), party);
+    }
+
+    public Optional<Party> getPartyByPlayerId(Long playerId) {
+        return parties.values()
+                .stream()
+                .filter(party -> party.contains(playerId))
+                .findFirst();
+    }
+}

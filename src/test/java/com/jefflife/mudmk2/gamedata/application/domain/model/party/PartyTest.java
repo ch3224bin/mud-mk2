@@ -8,14 +8,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PartyTest {
 
-    // 테스트에 사용될 PartyPolicy 구현체
-    private record TestPartyPolicy(int maxPartySize) implements PartyPolicy {
-        @Override
-        public boolean isValidPartySize(PartyMembers partyMembers) {
-            return partyMembers.size() >= maxPartySize;
-        }
-    }
-
     @Nested
     @DisplayName("createParty 메소드는")
     class CreatePartyTest {
@@ -25,10 +17,9 @@ class PartyTest {
         void createParty_ShouldCreatePartyAndAddLeader() {
             // given
             Long leaderId = 1L;
-            PartyPolicy policy = new TestPartyPolicy(5);
 
             // when
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // then
             assertThat(party).isNotNull();
@@ -50,14 +41,13 @@ class PartyTest {
             // given
             Long leaderId = 1L;
             Long newMemberId = 2L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // when
-            boolean result = party.addMember(policy, newMemberId);
+            Party.AddPartyMemberResult result = party.addMember(newMemberId);
 
             // then
-            assertThat(result).isTrue();
+            assertThat(result).isEqualTo(Party.AddPartyMemberResult.SUCCESS);
             assertThat(party.getMembers().size()).isEqualTo(2);
             assertThat(party.getMembers().contains(newMemberId)).isTrue();
         }
@@ -67,16 +57,20 @@ class PartyTest {
         void addMember_ShouldNotAddMemberWhenPartyIsFull() {
             // given
             Long leaderId = 1L;
-            Long newMemberId = 2L;
-            PartyPolicy policy = new TestPartyPolicy(1); // 최대 인원 1명 설정
-            Party party = Party.createParty(policy, leaderId);
+            Long newMemberId = 7L;
+            Party party = Party.createParty(leaderId);
+            party.addMember(2L);
+            party.addMember(3L);
+            party.addMember(4L);
+            party.addMember(5L);
+            party.addMember(6L);
 
             // when
-            boolean result = party.addMember(policy, newMemberId);
+            Party.AddPartyMemberResult result = party.addMember(newMemberId);
 
             // then
-            assertThat(result).isFalse();
-            assertThat(party.getMembers().size()).isEqualTo(1);
+            assertThat(result).isEqualTo(Party.AddPartyMemberResult.PARTY_FULL);
+            assertThat(party.getMembers().size()).isEqualTo(6);
             assertThat(party.getMembers().contains(newMemberId)).isFalse();
         }
 
@@ -85,14 +79,13 @@ class PartyTest {
         void addMember_ShouldNotAddExistingMember() {
             // given
             Long leaderId = 1L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // when
-            boolean result = party.addMember(policy, leaderId); // 이미 존재하는 leaderId를 다시 추가
+            Party.AddPartyMemberResult result = party.addMember(leaderId); // 이미 존재하는 leaderId를 다시 추가
 
             // then
-            assertThat(result).isFalse();
+            assertThat(result).isEqualTo(Party.AddPartyMemberResult.ALREADY_IN_SAME_PARTY);
             assertThat(party.getMembers().size()).isEqualTo(1);
         }
     }
@@ -107,9 +100,8 @@ class PartyTest {
             // given
             Long leaderId = 1L;
             Long memberId = 2L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
-            party.addMember(policy, memberId);
+            Party party = Party.createParty(leaderId);
+            party.addMember(memberId);
 
             // when
             boolean result = party.removeMember(memberId);
@@ -128,10 +120,9 @@ class PartyTest {
             Long leaderId = 1L;
             Long member1Id = 2L;
             Long member2Id = 3L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
-            party.addMember(policy, member1Id);
-            party.addMember(policy, member2Id);
+            Party party = Party.createParty(leaderId);
+            party.addMember(member1Id);
+            party.addMember(member2Id);
 
             // when
             boolean result = party.removeMember(leaderId);
@@ -148,8 +139,7 @@ class PartyTest {
         void removeMember_ShouldDeactivatePartyWhenEmpty() {
             // given
             Long leaderId = 1L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // when
             boolean result = party.removeMember(leaderId);
@@ -166,8 +156,7 @@ class PartyTest {
             // given
             Long leaderId = 1L;
             Long nonExistentMemberId = 999L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // when
             boolean result = party.removeMember(nonExistentMemberId);
@@ -189,9 +178,8 @@ class PartyTest {
             // given
             Long originalLeaderId = 1L;
             Long newLeaderId = 2L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, originalLeaderId);
-            party.addMember(policy, newLeaderId);
+            Party party = Party.createParty(originalLeaderId);
+            party.addMember(newLeaderId);
 
             // when
             boolean result = party.changeLeader(newLeaderId);
@@ -207,8 +195,7 @@ class PartyTest {
             // given
             Long leaderId = 1L;
             Long nonMemberId = 999L;
-            PartyPolicy policy = new TestPartyPolicy(5);
-            Party party = Party.createParty(policy, leaderId);
+            Party party = Party.createParty(leaderId);
 
             // when
             boolean result = party.changeLeader(nonMemberId);
