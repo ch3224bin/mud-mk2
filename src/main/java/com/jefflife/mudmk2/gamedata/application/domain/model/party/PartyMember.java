@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,12 +21,12 @@ public class PartyMember {
     @JoinColumn(name = "party_id")
     private Party party;
     
-    private Long characterId;
+    private UUID characterId;
 
     @CreationTimestamp
     private LocalDateTime joinedAt = LocalDateTime.now();
     
-    public PartyMember(Party party, Long characterId) {
+    public PartyMember(Party party, UUID characterId) {
         this.party = party;
         this.characterId = characterId;
     }

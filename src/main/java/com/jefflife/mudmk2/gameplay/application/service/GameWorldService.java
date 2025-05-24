@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -20,12 +17,12 @@ import java.util.stream.Collectors;
 public class GameWorldService {
     private final static Logger logger = LoggerFactory.getLogger(GameWorldService.class);
 
-    private final Map<Long, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
     private final Map<Long, PlayerCharacter> activePlayersByUserId = new ConcurrentHashMap<>();
     private final Map<Long, Room> rooms = new ConcurrentHashMap<>();
-    private final Map<Long, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
-    private final Map<String, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
-    private final Map<String, Party> parties = new ConcurrentHashMap<>();
+    private final Map<UUID, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
+    private final Map<UUID, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
+    private final Map<UUID, Party> parties = new ConcurrentHashMap<>();
 
     public void loadRooms(final Iterable<Room> rooms) {
         rooms.forEach(room -> {
@@ -95,7 +92,7 @@ public class GameWorldService {
      */
     public List<Monster> getMonstersInRoom(Long roomId) {
         return activeMonsters.values().stream()
-                .filter(monster -> !monster.isDead() && monster.getCurrentRoomId().equals(roomId))
+                .filter(monster -> monster.isAlive() && monster.getCurrentRoomId().equals(roomId))
                 .collect(Collectors.toList());
     }
 
@@ -146,7 +143,7 @@ public class GameWorldService {
         int respawnCount = 0;
 
         for (Monster monster : activeMonsters.values()) {
-            if (monster.isDead() && monster.canRespawn()) {
+            if (!monster.isAlive() && monster.canRespawn()) {
                 monster.respawn();
                 respawnCount++;
                 logger.debug("Monster respawned: {} (ID: {}, Room: {})",
@@ -217,7 +214,7 @@ public class GameWorldService {
      * @param npcId NPC ID
      * @return 찾은 NPC, 없으면 null
      */
-    public NonPlayerCharacter getNpcById(Long npcId) {
+    public NonPlayerCharacter getNpcById(UUID npcId) {
         return activeNpcs.get(npcId);
     }
 
@@ -239,7 +236,7 @@ public class GameWorldService {
      * @param roomId 이동할 방 ID
      * @return 이동 성공 여부
      */
-    public boolean moveNpcToRoom(Long npcId, Long roomId) {
+    public boolean moveNpcToRoom(UUID npcId, Long roomId) {
         NonPlayerCharacter npc = activeNpcs.get(npcId);
         if (npc == null || rooms.get(roomId) == null) {
             return false;
@@ -263,7 +260,7 @@ public class GameWorldService {
      * @param characterId 캐릭터 ID
      * @return 사용자 ID
      */
-    public Long getUserIdByCharacterId(Long characterId) {
+    public Long getUserIdByCharacterId(UUID characterId) {
         PlayerCharacter pc = activePlayers.get(characterId);
         if (pc == null) {
             throw new IllegalArgumentException("Character not found for ID: " + characterId);
@@ -271,7 +268,7 @@ public class GameWorldService {
         return pc.getUserId();
     }
 
-    public boolean isInParty(Long characterId) {
+    public boolean isInParty(UUID characterId) {
         return parties.values()
                 .stream()
                 .anyMatch(party -> party.contains(characterId));
@@ -281,7 +278,7 @@ public class GameWorldService {
         parties.put(party.getId(), party);
     }
 
-    public Optional<Party> getPartyByPlayerId(Long playerId) {
+    public Optional<Party> getPartyByPlayerId(UUID playerId) {
         return parties.values()
                 .stream()
                 .filter(party -> party.contains(playerId))

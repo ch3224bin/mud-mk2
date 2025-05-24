@@ -2,26 +2,21 @@ package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+@EqualsAndHashCode(of = "id")
 @Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NonPlayerCharacter {
+public class NonPlayerCharacter implements Combatable {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "shared_id_generator")
-    @TableGenerator(
-            name = "shared_id_generator",
-            table = "id_generator_table",
-            pkColumnName = "gen_name",
-            valueColumnName = "gen_value",
-            pkColumnValue = "shared_id",
-            allocationSize = 50
-    )
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Embedded
     private BaseCharacter baseCharacterInfo;
@@ -48,7 +43,7 @@ public class NonPlayerCharacter {
     private boolean essential = false;
 
     public NonPlayerCharacter(
-            final Long id,
+            final UUID id,
             final BaseCharacter baseCharacterInfo,
             final PlayableCharacter playableCharacterInfo,
             final String persona,
@@ -77,5 +72,10 @@ public class NonPlayerCharacter {
 
     public Long getCurrentRoomId() {
         return baseCharacterInfo.getRoomId();
+    }
+
+    @Override
+    public CharacterStats getStats() {
+        return this.baseCharacterInfo.getStats();
     }
 }

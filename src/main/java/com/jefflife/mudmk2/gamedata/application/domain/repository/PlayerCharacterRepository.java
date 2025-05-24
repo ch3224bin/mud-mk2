@@ -3,7 +3,9 @@ package com.jefflife.mudmk2.gamedata.application.domain.repository;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import org.springframework.data.repository.CrudRepository;
 
-public interface PlayerCharacterRepository extends CrudRepository<PlayerCharacter, Long> {
+import java.util.UUID;
+
+public interface PlayerCharacterRepository extends CrudRepository<PlayerCharacter, UUID> {
     /**
      * Find a player character by user ID
      * @param userId the user ID

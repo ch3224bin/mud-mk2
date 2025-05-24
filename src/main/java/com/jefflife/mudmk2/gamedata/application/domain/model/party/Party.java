@@ -16,9 +16,9 @@ public class Party {
     private static final int MAX_PARTY_SIZE = 6;
 
     @Id
-    private String id;
+    private UUID id;
     
-    private Long leaderId;
+    private UUID leaderId;
     
     @Enumerated(EnumType.STRING)
     private PartyStatus status = PartyStatus.ACTIVE;
@@ -30,16 +30,16 @@ public class Party {
     private PartyMembers members = new PartyMembers();
     
     // 그룹 생성 메서드
-    public static Party createParty(Long leaderId) {
+    public static Party createParty(UUID leaderId) {
         Party party = new Party();
-        party.id = UUID.randomUUID().toString();
+        party.id = UUID.randomUUID();
         party.leaderId = leaderId;
         party.addMember(leaderId);
         return party;
     }
     
     // 멤버 추가 메서드
-    public AddPartyMemberResult addMember(Long memberId) {
+    public AddPartyMemberResult addMember(UUID memberId) {
         if (members.size() >= MAX_PARTY_SIZE) {
             return AddPartyMemberResult.PARTY_FULL;
         }
@@ -56,8 +56,8 @@ public class Party {
     }
     
     // 멤버 제거 메서드
-    public boolean removeMember(Long characterId) {
-        boolean removed =members.remove(characterId);
+    public boolean removeMember(UUID characterId) {
+        boolean removed = members.remove(characterId);
 
         // 리더가 나간 경우 새 리더 지정
         if (removed && Objects.equals(characterId, leaderId) && !members.isEmpty()) {
@@ -75,7 +75,7 @@ public class Party {
     }
     
     // 리더 변경 메서드
-    public boolean changeLeader(Long newLeaderId) {
+    public boolean changeLeader(UUID newLeaderId) {
         // 그룹 멤버인지 확인
         boolean isMember = members.isMember(newLeaderId);
 
@@ -87,7 +87,7 @@ public class Party {
         return true;
     }
 
-    public boolean contains(final Long characterId) {
+    public boolean contains(final UUID characterId) {
         return members.contains(characterId);
     }
 
@@ -95,11 +95,11 @@ public class Party {
         return status == PartyStatus.INACTIVE;
     }
 
-    public List<Long> getMemberIds() {
+    public List<UUID> getMemberIds() {
         return members.getMemberIds();
     }
 
-    public boolean isLeader(Long playerId) {
+    public boolean isLeader(UUID playerId) {
         return Objects.equals(leaderId, playerId);
     }
 

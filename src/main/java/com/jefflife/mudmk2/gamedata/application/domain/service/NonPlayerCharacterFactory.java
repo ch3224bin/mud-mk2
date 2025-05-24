@@ -7,6 +7,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableChar
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class NonPlayerCharacterFactory {
 
@@ -423,7 +424,7 @@ public class NonPlayerCharacterFactory {
      * Builder class for creating NonPlayerCharacter instances
      */
     public static class Builder {
-        private Long id;
+        private UUID id;
         private BaseCharacter baseCharacterInfo;
         private PlayableCharacter playableCharacterInfo;
         private String persona = "";
@@ -436,7 +437,7 @@ public class NonPlayerCharacterFactory {
             // Private constructor to enforce the use of the static factory method
         }
 
-        public Builder id(Long id) {
+        public Builder id(UUID id) {
             this.id = id;
             return this;
         }

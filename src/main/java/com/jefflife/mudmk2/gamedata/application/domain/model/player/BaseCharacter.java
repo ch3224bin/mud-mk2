@@ -34,4 +34,25 @@ public class BaseCharacter {
     public void setRoomId(final Long roomId) {
         this.roomId = roomId;
     }
+
+    public void fullRestore() {
+        this.hp = this.maxHp;
+        this.mp = this.maxMp;
+        this.alive = true;
+    }
+
+    public CharacterStats getStats() {
+        return new CharacterStats(
+                hp,
+                maxHp,
+                mp,
+                maxMp,
+                str,
+                dex,
+                con,
+                intelligence,
+                pow,
+                cha
+        );
+    }
 }

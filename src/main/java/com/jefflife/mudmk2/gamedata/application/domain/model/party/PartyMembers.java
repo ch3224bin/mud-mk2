@@ -18,16 +18,16 @@ public class PartyMembers {
         return members.size();
     }
 
-    public boolean contains(final Long memberId) {
+    public boolean contains(final UUID memberId) {
         return members.stream()
                 .anyMatch(member -> Objects.equals(member.getCharacterId(), memberId));
     }
 
-    public void add(final Party party, final Long memberId) {
+    public void add(final Party party, final UUID memberId) {
         members.add(new PartyMember(party, memberId));
     }
 
-    public boolean remove(final Long characterId) {
+    public boolean remove(final UUID characterId) {
         return members.removeIf(member -> Objects.equals(member.getCharacterId(), characterId));
     }
 
@@ -40,7 +40,7 @@ public class PartyMembers {
         return members.isEmpty();
     }
 
-    public boolean isMember(final Long memberId) {
+    public boolean isMember(final UUID memberId) {
         return members.stream()
                 .anyMatch(member -> Objects.equals(member.getCharacterId(), memberId));
     }
@@ -49,9 +49,9 @@ public class PartyMembers {
      * 파티 멤버들의 ID 목록을 반환합니다.
      * @return 파티 멤버 ID 목록
      */
-    public List<Long> getMemberIds() {
+    public List<UUID> getMemberIds() {
         return members.stream()
                 .map(PartyMember::getCharacterId)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

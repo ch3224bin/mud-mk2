@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 public class NonPlayerCharacterService implements 
@@ -39,7 +40,7 @@ public class NonPlayerCharacterService implements
 
     @Transactional(readOnly = true)
     @Override
-    public NonPlayerCharacterResponse getNonPlayerCharacter(final Long id) {
+    public NonPlayerCharacterResponse getNonPlayerCharacter(final UUID id) {
         final NonPlayerCharacter nonPlayerCharacter = nonPlayerCharacterRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("NonPlayerCharacter not found with id: " + id));
         return NonPlayerCharacterResponse.of(nonPlayerCharacter);
@@ -55,7 +56,7 @@ public class NonPlayerCharacterService implements
 
     @Transactional
     @Override
-    public NonPlayerCharacterResponse updateNonPlayerCharacter(final Long id, final UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest) {
+    public NonPlayerCharacterResponse updateNonPlayerCharacter(final UUID id, final UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest) {
         if (!nonPlayerCharacterRepository.existsById(id)) {
             throw new NoSuchElementException("NonPlayerCharacter not found with id: " + id);
         }
@@ -67,7 +68,7 @@ public class NonPlayerCharacterService implements
 
     @Transactional
     @Override
-    public void deleteNonPlayerCharacter(final Long id) {
+    public void deleteNonPlayerCharacter(final UUID id) {
         if (!nonPlayerCharacterRepository.existsById(id)) {
             throw new NoSuchElementException("NonPlayerCharacter not found with id: " + id);
         }

@@ -3,8 +3,10 @@ package com.jefflife.mudmk2.gamedata.application.service.model.response;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NPCType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 
+import java.util.UUID;
+
 public record NonPlayerCharacterResponse (
-    Long id,
+    UUID id,
     String name,
     String background,
     int hp,

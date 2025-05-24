@@ -17,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,8 +40,8 @@ class RecruitServiceTest {
     private RecruitService recruitService;
 
     private static final Long USER_ID = 1L;
-    private static final Long PLAYER_ID = 1L;
-    private static final Long NPC_ID = 2L;
+    private static final UUID PLAYER_ID = UUID.randomUUID();
+    private static final UUID NPC_ID = UUID.randomUUID();
     private static final Long ROOM_ID = 100L;
     private static final String NPC_NAME = "테스트NPC";
 
@@ -58,7 +58,7 @@ class RecruitServiceTest {
         @BeforeEach
         void setUp() {
             // lenient 모드를 설정하여 "Unnecessary stubbings detected" 경고를 제거합니다.
-            lenient().when(mock(Party.class).isLeader(anyLong())).thenReturn(true);
+            lenient().when(mock(Party.class).isLeader(any())).thenReturn(true);
         }
 
         @Test

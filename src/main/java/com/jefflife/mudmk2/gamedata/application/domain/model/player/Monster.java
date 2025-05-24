@@ -1,37 +1,27 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
+import jakarta.persistence.Embedded;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@EqualsAndHashCode(of = "id")
 @Builder @AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Monster {
-    private String id; // UUID 문자열로 관리
-    private String name;
+public class Monster implements Combatable {
+    private UUID id;
     private String description;
     private int level;
     private Long monsterTypeId; // 원본 MonsterType의 ID
 
-    private int hp;
-    private int maxHp;
-    private int mp;
-    private int maxMp;
-    private int strength;
-    private int dexterity;
-    private int constitution;
-    private int intelligence;
-    private int power;
-    private int charisma;
+    @Embedded
+    private BaseCharacter baseCharacterInfo;
 
     private long experienceReward;
     private LocalDateTime lastDeathTime;
-    private Long currentRoomId;
     private int aggressiveness; // 0-100 범위의 공격성
     private int respawnTime; // 초 단위 리스폰 시간
-
-    private boolean isDead;
 
     /**
      * MonsterType을 기반으로 Monster 인스턴스를 생성합니다.
@@ -52,46 +42,40 @@ public class Monster {
         int charisma = monsterType.getBaseCha() + (level * monsterType.getChaPerLevel());
         long experienceReward = monsterType.getBaseExperience() + (level * monsterType.getExpPerLevel());
 
-        return Monster.builder()
-                .id(UUID.randomUUID().toString())
-                .name(monsterType.getName())
-                .description(monsterType.getDescription())
-                .level(level)
-                .monsterTypeId(monsterType.getId())
+        BaseCharacter baseCharacterInfo = BaseCharacter.builder()
                 .hp(maxHp)
                 .maxHp(maxHp)
                 .mp(maxMp)
                 .maxMp(maxMp)
-                .strength(strength)
-                .dexterity(dexterity)
-                .constitution(constitution)
+                .str(strength)
+                .dex(dexterity)
+                .con(constitution)
                 .intelligence(intelligence)
-                .power(power)
-                .charisma(charisma)
+                .pow(power)
+                .cha(charisma)
+                .name(monsterType.getName())
+                .background(monsterType.getDescription())
+                .roomId(roomId)
+                .alive(true)
+                .build();
+
+        return Monster.builder()
+                .id(UUID.randomUUID())
+                .description(monsterType.getDescription())
+                .level(level)
+                .monsterTypeId(monsterType.getId())
                 .experienceReward(experienceReward)
-                .currentRoomId(roomId)
                 .aggressiveness(monsterType.getAggressiveness())
                 .respawnTime(monsterType.getRespawnTime())
-                .isDead(false)
+                .baseCharacterInfo(baseCharacterInfo)
                 .build();
-    }
-
-    /**
-     * 몬스터가 죽은 경우 호출됩니다.
-     */
-    public void die() {
-        this.hp = 0;
-        this.isDead = true;
-        this.lastDeathTime = LocalDateTime.now();
     }
 
     /**
      * 몬스터를 리스폰합니다.
      */
     public void respawn() {
-        this.hp = this.maxHp;
-        this.mp = this.maxMp;
-        this.isDead = false;
+        this.baseCharacterInfo.fullRestore();
     }
 
     /**
@@ -99,7 +83,7 @@ public class Monster {
      * @return 남은 리스폰 시간(초), 죽지 않은 경우 0 반환
      */
     public int getRemainingRespawnTime() {
-        if (!isDead || lastDeathTime == null) {
+        if (!this.baseCharacterInfo.isAlive() || lastDeathTime == null) {
             return 0;
         }
 
@@ -113,20 +97,23 @@ public class Monster {
      * @return 리스폰 가능 여부
      */
     public boolean canRespawn() {
-        return isDead && getRemainingRespawnTime() <= 0;
+        return !this.baseCharacterInfo.isAlive() && getRemainingRespawnTime() <= 0;
     }
 
-    /**
-     * 몬스터가 대미지를 입습니다.
-     * @param damage 입을 대미지 양
-     * @return 몬스터가 죽었는지 여부
-     */
-    public boolean takeDamage(int damage) {
-        this.hp = Math.max(0, this.hp - damage);
-        if (this.hp == 0) {
-            die();
-            return true;
-        }
-        return false;
+    public Long getCurrentRoomId() {
+        return this.baseCharacterInfo.getRoomId();
+    }
+
+    public String getName() {
+        return baseCharacterInfo.getName();
+    }
+
+    @Override
+    public CharacterStats getStats() {
+        return this.baseCharacterInfo.getStats();
+    }
+
+    public boolean isAlive() {
+        return this.baseCharacterInfo.isAlive();
     }
 }

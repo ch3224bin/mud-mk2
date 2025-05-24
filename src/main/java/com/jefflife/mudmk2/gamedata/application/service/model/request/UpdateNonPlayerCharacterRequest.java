@@ -6,6 +6,8 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.service.NonPlayerCharacterFactory;
 
+import java.util.UUID;
+
 public record UpdateNonPlayerCharacterRequest(
     // BaseCharacter fields
     String name,
@@ -35,7 +37,7 @@ public record UpdateNonPlayerCharacterRequest(
     Long spawnRoomId,
     boolean essential
 ) {
-    public NonPlayerCharacter toDomain(Long id) {
+    public NonPlayerCharacter toDomain(UUID id) {
         return NonPlayerCharacterFactory.builder()
                 .id(id)
                 .baseCharacter(

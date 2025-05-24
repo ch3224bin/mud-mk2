@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * 플레이어 이동 이벤트를 수신하여 NPC 파티 멤버들이 리더를 따라갈 수 있도록 처리하는 리스너
@@ -34,7 +35,7 @@ public class PartyMemberMoveListener {
     @Async("taskExecutor")
     @EventListener
     public void onApplicationEvent(PlayerMoveEvent event) {
-        Long characterId = event.characterId();
+        UUID characterId = event.characterId();
         Long toRoomId = event.toRoomId();
 
         // 파티가 있는지 확인하고, 리더인지 확인
@@ -49,7 +50,7 @@ public class PartyMemberMoveListener {
         }
 
         // 파티 멤버들 중 NPC를 찾아서 리더를 따라가게 함
-        for (Long memberId : party.getMemberIds()) {
+        for (UUID memberId : party.getMemberIds()) {
             if (memberId.equals(characterId)) {
                 continue; // 리더 자신은 건너뜀
             }

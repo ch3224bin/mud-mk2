@@ -4,26 +4,21 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
-@Entity
+@EqualsAndHashCode(of = "id")
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlayerCharacter {
+@Entity
+public class PlayerCharacter implements Combatable {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "shared_id_generator")
-    @TableGenerator(
-            name = "shared_id_generator",
-            table = "id_generator_table",
-            pkColumnName = "gen_name",
-            valueColumnName = "gen_value",
-            pkColumnValue = "shared_id",
-            allocationSize = 50
-    )
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Embedded
     private BaseCharacter baseCharacterInfo;
@@ -47,7 +42,7 @@ public class PlayerCharacter {
     private LocalDateTime lastActiveAt;
 
     public PlayerCharacter(
-            final Long id,
+            final UUID id,
             final BaseCharacter baseCharacterInfo,
             final PlayableCharacter playableCharacterInfo,
             final Long userId,
@@ -93,6 +88,16 @@ public class PlayerCharacter {
 
     public Long getCurrentRoomId() {
         return this.baseCharacterInfo.getRoomId();
+    }
+
+    @Override
+    public String getName() {
+        return this.nickname;
+    }
+
+    @Override
+    public CharacterStats getStats() {
+        return this.baseCharacterInfo.getStats();
     }
 
     public enum MoveResult {

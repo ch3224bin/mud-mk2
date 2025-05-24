@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(NonPlayerCharacterController.BASE_PATH)
@@ -47,7 +48,7 @@ public class NonPlayerCharacterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NonPlayerCharacterResponse> getNonPlayerCharacter(@PathVariable final Long id) {
+    public ResponseEntity<NonPlayerCharacterResponse> getNonPlayerCharacter(@PathVariable final UUID id) {
         try {
             final NonPlayerCharacterResponse nonPlayerCharacterResponse = getNonPlayerCharacterUseCase.getNonPlayerCharacter(id);
             return ResponseEntity.ok(nonPlayerCharacterResponse);
@@ -64,7 +65,7 @@ public class NonPlayerCharacterController {
 
     @PutMapping("/{id}")
     public ResponseEntity<NonPlayerCharacterResponse> updateNonPlayerCharacter(
-            @PathVariable final Long id,
+            @PathVariable final UUID id,
             @RequestBody final UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest
     ) {
         try {
@@ -76,7 +77,7 @@ public class NonPlayerCharacterController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNonPlayerCharacter(@PathVariable final Long id) {
+    public ResponseEntity<Void> deleteNonPlayerCharacter(@PathVariable final UUID id) {
         try {
             deleteNonPlayerCharacterUseCase.deleteNonPlayerCharacter(id);
             return ResponseEntity.noContent().build();

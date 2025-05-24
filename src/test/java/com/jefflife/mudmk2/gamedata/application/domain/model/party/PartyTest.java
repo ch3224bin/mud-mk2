@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PartyTest {
@@ -16,7 +18,7 @@ class PartyTest {
         @DisplayName("파티를 생성하고 리더를 파티에 추가한다")
         void createParty_ShouldCreatePartyAndAddLeader() {
             // given
-            Long leaderId = 1L;
+            UUID leaderId = UUID.randomUUID();
 
             // when
             Party party = Party.createParty(leaderId);
@@ -39,8 +41,8 @@ class PartyTest {
         @DisplayName("파티에 멤버를 추가한다")
         void addMember_ShouldAddMemberToParty() {
             // given
-            Long leaderId = 1L;
-            Long newMemberId = 2L;
+            UUID leaderId = UUID.randomUUID();
+            UUID newMemberId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
 
             // when
@@ -56,14 +58,14 @@ class PartyTest {
         @DisplayName("파티가 꽉 찼을 때는 멤버를 추가하지 않는다")
         void addMember_ShouldNotAddMemberWhenPartyIsFull() {
             // given
-            Long leaderId = 1L;
-            Long newMemberId = 7L;
+            UUID leaderId = UUID.randomUUID();
+            UUID newMemberId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
-            party.addMember(2L);
-            party.addMember(3L);
-            party.addMember(4L);
-            party.addMember(5L);
-            party.addMember(6L);
+            party.addMember(UUID.randomUUID());
+            party.addMember(UUID.randomUUID());
+            party.addMember(UUID.randomUUID());
+            party.addMember(UUID.randomUUID());
+            party.addMember(UUID.randomUUID());
 
             // when
             Party.AddPartyMemberResult result = party.addMember(newMemberId);
@@ -78,7 +80,7 @@ class PartyTest {
         @DisplayName("이미 파티에 있는 멤버는 다시 추가되지 않는다")
         void addMember_ShouldNotAddExistingMember() {
             // given
-            Long leaderId = 1L;
+            UUID leaderId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
 
             // when
@@ -98,8 +100,8 @@ class PartyTest {
         @DisplayName("파티에서 멤버를 제거한다")
         void removeMember_ShouldRemoveMemberFromParty() {
             // given
-            Long leaderId = 1L;
-            Long memberId = 2L;
+            UUID leaderId = UUID.randomUUID();
+            UUID memberId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
             party.addMember(memberId);
 
@@ -117,9 +119,9 @@ class PartyTest {
         @DisplayName("리더가 나갈 경우 가장 오래된 멤버가 리더가 된다")
         void removeMember_ShouldAssignNewLeaderWhenLeaderLeaves() {
             // given
-            Long leaderId = 1L;
-            Long member1Id = 2L;
-            Long member2Id = 3L;
+            UUID leaderId = UUID.randomUUID();
+            UUID member1Id = UUID.randomUUID();
+            UUID member2Id = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
             party.addMember(member1Id);
             party.addMember(member2Id);
@@ -138,7 +140,7 @@ class PartyTest {
         @DisplayName("모든 멤버가 나갈 경우 파티가 비활성화된다")
         void removeMember_ShouldDeactivatePartyWhenEmpty() {
             // given
-            Long leaderId = 1L;
+            UUID leaderId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
 
             // when
@@ -154,8 +156,8 @@ class PartyTest {
         @DisplayName("파티에 없는 멤버를 제거하려고 하면 false를 반환한다")
         void removeMember_ShouldReturnFalseForNonExistentMember() {
             // given
-            Long leaderId = 1L;
-            Long nonExistentMemberId = 999L;
+            UUID leaderId = UUID.randomUUID();
+            UUID nonExistentMemberId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
 
             // when
@@ -176,8 +178,8 @@ class PartyTest {
         @DisplayName("파티 리더를 변경한다")
         void changeLeader_ShouldChangePartyLeader() {
             // given
-            Long originalLeaderId = 1L;
-            Long newLeaderId = 2L;
+            UUID originalLeaderId = UUID.randomUUID();
+            UUID newLeaderId = UUID.randomUUID();
             Party party = Party.createParty(originalLeaderId);
             party.addMember(newLeaderId);
 
@@ -193,8 +195,8 @@ class PartyTest {
         @DisplayName("파티 멤버가 아닌 사람으로 리더를 변경하려고 하면 false를 반환한다")
         void changeLeader_ShouldReturnFalseForNonMember() {
             // given
-            Long leaderId = 1L;
-            Long nonMemberId = 999L;
+            UUID leaderId = UUID.randomUUID();
+            UUID nonMemberId = UUID.randomUUID();
             Party party = Party.createParty(leaderId);
 
             // when

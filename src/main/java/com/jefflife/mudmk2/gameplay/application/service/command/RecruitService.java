@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class RecruitService implements RecruitUseCase {
     private static final Logger logger = LoggerFactory.getLogger(RecruitService.class);
@@ -30,7 +32,7 @@ public class RecruitService implements RecruitUseCase {
     public void recruit(final RecruitCommand recruitCommand) {
         // 1. 플레이어 정보 가져오기
         PlayerCharacter player = gameWorldService.getPlayerByUserId(recruitCommand.userId());
-        Long playerId = player.getId();
+        UUID playerId = player.getId();
         Long playerRoomId = player.getCurrentRoomId();
 
         // 2. 초대할 NPC 찾기
@@ -53,7 +55,7 @@ public class RecruitService implements RecruitUseCase {
         }
 
         // 4. NPC가 이미 다른 파티에 속해 있는지 확인 (NPC ID를 사용)
-        Long npcId = targetNpc.getId();
+        UUID npcId = targetNpc.getId();
         if (gameWorldService.isInParty(npcId)) {
             sendMessageToUserPort.messageToUser(
                     recruitCommand.userId(),
@@ -107,7 +109,7 @@ public class RecruitService implements RecruitUseCase {
         }
     }
 
-    private Party createParty(Long playerId) {
+    private Party createParty(UUID playerId) {
         Party newParty = Party.createParty(playerId);
         gameWorldService.addParty(newParty);
         logger.info("Created new party for player {}", playerId);
