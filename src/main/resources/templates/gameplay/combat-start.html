@@ -1,0 +1,52 @@
+<div class="combat-start-message font-terminal my-3">
+    <div class="combat-header">
+        <h4 class="text-info text-shadow-sm mb-2">전투가 시작되었습니다</h4>
+    </div>
+    <div class="initiative-info my-2">
+        <p class="initiative-result">
+            <span class="text-warning font-bold">선제권 주사위 굴림 결과:</span>
+            <span th:if="${initiativeGroup == 'ALLY'}" class="text-success font-bold">아군</span>
+            <span th:if="${initiativeGroup == 'ENEMY'}" class="text-danger font-bold">적군</span>
+            <span class="text-secondary">이 먼저 행동합니다</span>
+        </p>
+        <div class="initiative-details mt-2">
+            <p class="initiative-rolls">
+                <span class="text-success">아군 </span>
+                <span class="text-highlight" th:text="${allyInitiative.total()}">23</span>
+                <span class="text-secondary">(</span>
+                <span class="text-info" th:text="${allyInitiative.diceRoll()}">20</span>
+                <span class="text-secondary font-italic">(1d20)</span>
+                <span class="text-secondary" th:if="${allyInitiative.dexBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${allyInitiative.dexBonus() != 0}" th:text="${allyInitiative.dexBonus()}">3</span>
+                <span class="text-secondary font-italic" th:if="${allyInitiative.dexBonus() != 0}">(민첩)</span>
+                <span class="text-secondary" th:if="${allyInitiative.skillBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${allyInitiative.skillBonus() != 0}" th:text="${allyInitiative.skillBonus()}">0</span>
+                <span class="text-secondary font-italic" th:if="${allyInitiative.skillBonus() != 0}">(스킬)</span>
+                <span class="text-secondary" th:if="${allyInitiative.miscBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${allyInitiative.miscBonus() != 0}" th:text="${allyInitiative.miscBonus()}">0</span>
+                <span class="text-secondary font-italic" th:if="${allyInitiative.miscBonus() != 0}">(기타)</span>
+                <span class="text-secondary">)</span>
+                <span class="text-secondary"> vs </span>
+                <span class="text-danger">적군 </span>
+                <span class="text-highlight" th:text="${enemyInitiative.total()}">19</span>
+                <span class="text-secondary">(</span>
+                <span class="text-info" th:text="${enemyInitiative.diceRoll()}">17</span>
+                <span class="text-secondary font-italic">(1d20)</span>
+                <span class="text-secondary" th:if="${enemyInitiative.dexBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${enemyInitiative.dexBonus() != 0}" th:text="${enemyInitiative.dexBonus()}">2</span>
+                <span class="text-secondary font-italic" th:if="${enemyInitiative.dexBonus() != 0}">(민첩)</span>
+                <span class="text-secondary" th:if="${enemyInitiative.skillBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${enemyInitiative.skillBonus() != 0}" th:text="${enemyInitiative.skillBonus()}">0</span>
+                <span class="text-secondary font-italic" th:if="${enemyInitiative.skillBonus() != 0}">(스킬)</span>
+                <span class="text-secondary" th:if="${enemyInitiative.miscBonus() != 0}"> + </span>
+                <span class="text-info" th:if="${enemyInitiative.miscBonus() != 0}" th:text="${enemyInitiative.miscBonus()}">0</span>
+                <span class="text-secondary font-italic" th:if="${enemyInitiative.miscBonus() != 0}">(기타)</span>
+                <span class="text-secondary">)</span>
+            </p>
+        </div>
+    </div>
+    <div class="combat-message mt-2 mb-1">
+        <p class="text-secondary font-italic">주사위 소리가 울려퍼지며 전투가 시작됩니다...</p>
+    </div>
+</div>
+

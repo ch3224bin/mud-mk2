@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class AttackService implements AttackUseCase {
@@ -50,6 +51,7 @@ public class AttackService implements AttackUseCase {
 
         // 3. Combat 생성하여 등록
         combatService.startCombat(player, target);
+        sendAttackNoticeOtherPlayersInRoom(playerRoomId, player, target);
     }
 
     private Statable getMonsterInRoom(final AttackCommand command, final Long playerRoomId) {
@@ -78,5 +80,13 @@ public class AttackService implements AttackUseCase {
             }
             return 0; // 둘 다 NORMAL이거나 둘 다 비정상 상태면 순서 유지
         };
+    }
+
+    private void sendAttackNoticeOtherPlayersInRoom(Long playerRoomId, PlayerCharacter player, Statable target) {
+        List<PlayerCharacter> playersInRoom = gameWorldService.getPlayersInRoom(playerRoomId);
+        String message = String.format("%s이(가) %s을(를) 공격합니다!", player.getName(), target.getName());
+        for (PlayerCharacter playerInRoom : playersInRoom) {
+            sendMessageToUserPort.messageToUser(playerInRoom.getUserId(), message);
+        }
     }
 }

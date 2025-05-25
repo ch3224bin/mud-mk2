@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Combat {
@@ -55,5 +56,9 @@ public class Combat {
 
     public void close() {
         // GC를 위한 참조 해제
+    }
+
+    public List<Long> getAllyUserIds() {
+        return allyGroup.getUserIds();
     }
 }

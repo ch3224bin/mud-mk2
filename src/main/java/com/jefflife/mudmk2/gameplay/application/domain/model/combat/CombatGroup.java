@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public class CombatGroup {
     }
 
     public InitiativeRoll getInitiativeRoll(InitiativeProvider initiativeProvider) {
-        return null;
+        return participants.stream()
+                .filter(participant -> !participant.isDefeated())
+                .map(participant -> initiativeProvider.calculate(participant.getParticipant().getStats()))
+                .max(Comparator.comparingInt(InitiativeRoll::total))
+                .orElse(new InitiativeRoll(0, 0, 0, 0));
+    }
+
+    public List<Long> getUserIds() {
+        return participants.stream()
+                .map(CombatParticipant::getParticipant)
+                .filter(combatable -> combatable instanceof PlayerCharacter)
+                .map(combatable -> ((PlayerCharacter) combatable).getUserId())
+                .toList();
     }
 }
