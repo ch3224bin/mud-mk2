@@ -8,6 +8,8 @@ import lombok.*;
 @Builder @AllArgsConstructor
 public class BaseCharacter {
     private String name;
+    @Builder.Default
+    private CharacterState state = CharacterState.NORMAL;
     
     @Column(length = 1000)
     private String background;

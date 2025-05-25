@@ -9,7 +9,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Builder @AllArgsConstructor
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Monster implements Combatable {
+public class Monster implements Combatable, Statable {
     private UUID id;
     private String description;
     private int level;
@@ -115,5 +115,10 @@ public class Monster implements Combatable {
 
     public boolean isAlive() {
         return this.baseCharacterInfo.isAlive();
+    }
+
+    @Override
+    public CharacterState getState() {
+        return this.baseCharacterInfo.getState();
     }
 }

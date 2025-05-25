@@ -13,7 +13,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Entity
 @Getter @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NonPlayerCharacter implements Combatable {
+public class NonPlayerCharacter implements Combatable, Statable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -77,5 +77,10 @@ public class NonPlayerCharacter implements Combatable {
     @Override
     public CharacterStats getStats() {
         return this.baseCharacterInfo.getStats();
+    }
+
+    @Override
+    public CharacterState getState() {
+        return baseCharacterInfo.getState();
     }
 }

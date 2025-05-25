@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.parser;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.AttackCommand;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
+import com.jefflife.mudmk2.gameplay.application.domain.model.command.CommandDictionary;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class AttackCommandParser extends AbstractCommandParser {
-    private static final Pattern ATTACK_PATTERN = Pattern.compile("(\\S+) 때려");
+    private static final Pattern ATTACK_PATTERN = Pattern.compile("(\\S+) (" + CommandDictionary.ATTACK.toRegex() + ")");
     
     @Override
     protected Command parseCommand(Long userId, String content) {

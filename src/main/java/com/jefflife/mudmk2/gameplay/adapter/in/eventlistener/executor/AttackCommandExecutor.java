@@ -5,7 +5,6 @@ import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
 import com.jefflife.mudmk2.gameplay.application.port.in.AttackUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,8 +15,7 @@ public class AttackCommandExecutor implements CommandExecutor {
     private static final Logger logger = LoggerFactory.getLogger(AttackCommandExecutor.class);
     private final AttackUseCase attackUseCase;
 
-    @Autowired
-    public AttackCommandExecutor(@Autowired(required = false) AttackUseCase attackUseCase) {
+    public AttackCommandExecutor(AttackUseCase attackUseCase) {
         this.attackUseCase = attackUseCase;
     }
 
@@ -32,10 +30,7 @@ public class AttackCommandExecutor implements CommandExecutor {
             throw new IllegalArgumentException("Command must be an AttackCommand");
         }
 
-        if (attackUseCase != null) {
-            attackUseCase.attack(attackCommand);
-        } else {
-            logger.info("Executed AttackCommand: {}", attackCommand);
-        }
+        attackUseCase.attack(attackCommand);
+        logger.info("Executed attack command: {}", attackCommand);
     }
 }

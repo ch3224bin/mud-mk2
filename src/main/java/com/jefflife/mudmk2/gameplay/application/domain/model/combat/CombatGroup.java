@@ -15,10 +15,18 @@ public class CombatGroup {
         this.combatGroupType = combatGroupType;
     }
 
+    public void addParticipant(CombatParticipant participant) {
+        participants.add(participant);
+    }
+
     public CombatParticipant getTarget() {
         return participants.stream()
                 .filter(participant -> !participant.isDefeated())
                 .max(Comparator.comparingLong(CombatParticipant::getAggroScore))
                 .orElse(null);
+    }
+
+    public InitiativeRoll getInitiativeRoll(InitiativeProvider initiativeProvider) {
+        return null;
     }
 }

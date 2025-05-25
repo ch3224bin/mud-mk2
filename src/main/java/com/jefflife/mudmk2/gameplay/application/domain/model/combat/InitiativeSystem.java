@@ -9,11 +9,6 @@ public class InitiativeSystem {
         this.randomGenerator = randomGenerator;
     }
 
-    // 1d20 굴리기
-    public int rollD20() {
-        return randomGenerator.nextInt(20) + 1;
-    }
-
     public InitiativeRoll rollInitiative(CharacterStats stats) {
         int diceRoll = rollD20();
         int dexBonus = stats.getDexterityModifier();
@@ -25,5 +20,10 @@ public class InitiativeSystem {
                 skillBonus,
                 miscBonus
         );
+    }
+
+    // 1d20 굴리기
+    private int rollD20() {
+        return randomGenerator.nextInt(20) + 1;
     }
 }
