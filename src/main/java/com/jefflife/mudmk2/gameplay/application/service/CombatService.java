@@ -6,6 +6,8 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.combat.*;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendCombatMessagePort;
+import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatActionVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatStartVariables;
 import com.jefflife.mudmk2.gameplay.application.tick.TickListener;
 import org.springframework.scheduling.annotation.Async;
@@ -23,10 +25,12 @@ public class CombatService implements TickListener {
 
     private final GameWorldService gameWorldService;
     private final SendCombatMessagePort sendCombatMessagePort;
+    private final SendMessageToUserPort sendMessageToUserPort;
 
-    public CombatService(GameWorldService gameWorldService, SendCombatMessagePort sendCombatMessagePort) {
+    public CombatService(GameWorldService gameWorldService, SendCombatMessagePort sendCombatMessagePort, SendMessageToUserPort sendMessageToUserPort) {
         this.gameWorldService = gameWorldService;
         this.sendCombatMessagePort = sendCombatMessagePort;
+        this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
@@ -34,11 +38,14 @@ public class CombatService implements TickListener {
     public void onTick(long tickCount) {
         combatMap.values()
                 .forEach(combat -> {
-                    combat.action();
+                    CombatActionResult actionResult = combat.action();
+                    if (actionResult.isActed()) {
+                        sendCombatActionMessage(combat, actionResult);
+                    }
                     if (combat.isFinished()) {
+                        sendCombatFinishMessage(combat);
                         combat.close();
                         combatMap.remove(combat.getId());
-                        return;
                     }
                 });
     }
@@ -88,6 +95,21 @@ public class CombatService implements TickListener {
         List<Long> allyUserIds = combat.getAllyUserIds();
         for (Long allyUserId : allyUserIds) {
             sendCombatMessagePort.sendCombatStartMessageToUser(new CombatStartVariables(allyUserId, startResult));
+        }
+    }
+
+    private void sendCombatActionMessage(Combat combat, CombatActionResult combatActionResult) {
+        List<Long> allyUserIds = combat.getAllyUserIds();
+        List<PlayerCharacter> users = combat.getAllyUsers();
+        for (PlayerCharacter user : users) {
+            sendCombatMessagePort.sendCombatActionMessageToUser(new CombatActionVariables(user.getUserId(), user.getId(), combatActionResult));
+        }
+    }
+
+    private void sendCombatFinishMessage(Combat combat) {
+        List<Long> allyUserIds = combat.getAllyUserIds();
+        for (Long allyUserId : allyUserIds) {
+            sendMessageToUserPort.messageToUser(allyUserId, "전투가 종료 되었습니다.");
         }
     }
 }

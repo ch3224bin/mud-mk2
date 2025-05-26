@@ -1,0 +1,54 @@
+<div th:each="log : ${combatActionResult.logs}">
+    <div class="combat-action-message font-terminal my-2">
+        <!-- 플레이어 공격 메시지 (내가 공격한 경우) -->
+        <div th:if="${log.attackerId == userUuid}" class="player-attack">
+            <!-- 공격 성공 -->
+            <p th:if="${log.hitSuccess}">
+                <span class="text-player font-bold">당신</span><span class="text-secondary">은 </span>
+                <span class="text-monster font-bold" th:text="${log.targetName}"></span><span class="text-secondary">를 공격했습니다. </span>
+                <span class="text-secondary">데미지: </span><span class="text-highlight font-bold" th:text="${log.finalDamage}"></span>
+            </p>
+            <!-- 공격 실패 -->
+            <p th:unless="${log.hitSuccess}">
+                <span class="text-player font-bold">당신</span><span class="text-secondary">은 </span>
+                <span class="text-monster font-bold" th:text="${log.targetName}"></span><span class="text-secondary">를 공격했지만, 공격이 빗나갔습니다. </span>
+                <span class="text-secondary">(명중굴림: </span><span class="text-info" th:text="${log.attackTotal}"></span>
+                <span class="text-secondary"> vs </span><span class="text-info" th:text="${log.defenseTotal}"></span><span class="text-secondary">)</span>
+            </p>
+        </div>
+
+        <!-- 적(몬스터) 공격 메시지 (몬스터가 나를 공격한 경우) -->
+        <div th:if="${log.targetId == userUuid}" class="enemy-attack">
+            <!-- 공격 성공 -->
+            <p th:if="${log.hitSuccess}">
+                <span class="text-monster font-bold" th:text="${log.attackerName}"></span><span class="text-secondary">이(가) </span>
+                <span class="text-player font-bold">당신</span><span class="text-secondary">을 공격했습니다. </span>
+                <span class="text-secondary">데미지: </span><span class="text-highlight font-bold" th:text="${log.finalDamage}"></span>
+            </p>
+            <!-- 공격 실패 -->
+            <p th:unless="${log.hitSuccess}">
+                <span class="text-monster font-bold" th:text="${log.attackerName}"></span><span class="text-secondary">이(가) </span>
+                <span class="text-player font-bold">당신</span><span class="text-secondary">을 공격했지만, 공격이 빗나갔습니다. </span>
+                <span class="text-secondary">(명중굴림: </span><span class="text-info" th:text="${log.attackTotal}"></span>
+                <span class="text-secondary"> vs </span><span class="text-info" th:text="${log.defenseTotal}"></span><span class="text-secondary">)</span>
+            </p>
+        </div>
+
+        <!-- 아군(동료) 공격 메시지 (다른 플레이어가 공격한 경우) -->
+        <div th:if="${log.attackerId != userUuid && log.targetId != userUuid}" class="ally-attack">
+            <!-- 공격 성공 -->
+            <p th:if="${log.hitSuccess}">
+                <span class="text-player font-bold" th:text="${log.attackerName}"></span><span class="text-secondary">이(가) </span>
+                <span class="text-monster font-bold" th:text="${log.targetName}"></span><span class="text-secondary">을(를) 공격했습니다. </span>
+                <span class="text-secondary">데미지: </span><span class="text-highlight font-bold" th:text="${log.finalDamage}"></span>
+            </p>
+            <!-- 공격 실패 -->
+            <p th:unless="${log.hitSuccess}">
+                <span class="text-player font-bold" th:text="${log.attackerName}"></span><span class="text-secondary">이(가) </span>
+                <span class="text-monster font-bold" th:text="${log.targetName}"></span><span class="text-secondary">을(를) 공격했지만, 공격이 빗나갔습니다. </span>
+                <span class="text-secondary">(명중굴림: </span><span class="text-info" th:text="${log.attackTotal}"></span>
+                <span class="text-secondary"> vs </span><span class="text-info" th:text="${log.defenseTotal}"></span><span class="text-secondary">)</span>
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import lombok.Getter;
 
@@ -45,5 +46,13 @@ public class CombatGroup {
 
     public void enterCombatState() {
         participants.forEach(CombatParticipant::enterCombatState);
+    }
+
+    public List<PlayerCharacter> getUsers() {
+        return participants.stream()
+                .map(CombatParticipant::getParticipant)
+                .filter(combatable -> combatable instanceof PlayerCharacter)
+                .map(combatable -> (PlayerCharacter) combatable)
+                .toList();
     }
 }

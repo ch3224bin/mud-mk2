@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.adapter.out.eventpublisher.chat;
 
 import com.jefflife.mudmk2.gameplay.application.port.out.SendCombatMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatActionVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatStartVariables;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -24,6 +25,16 @@ public class CombatMessageSender implements SendCombatMessagePort {
         context.setVariable("enemyInitiative", variables.startResult().enemyInitiative());
 
         String htmlContent = templateEngine.process("gameplay/combat-start", context);
+        chatEventPublisher.messageToUser(variables.userId(), htmlContent);
+    }
+
+    @Override
+    public void sendCombatActionMessageToUser(CombatActionVariables variables) {
+        Context context = new Context();
+        context.setVariable("combatActionResult", variables.combatActionResult());
+        context.setVariable("userUuid", variables.userUuid());
+
+        String htmlContent = templateEngine.process("gameplay/combat-action", context);
         chatEventPublisher.messageToUser(variables.userId(), htmlContent);
     }
 }

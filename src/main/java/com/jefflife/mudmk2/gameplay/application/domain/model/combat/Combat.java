@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -229,5 +230,9 @@ public class Combat {
 
     public List<Long> getAllyUserIds() {
         return allyGroup.getUserIds();
+    }
+
+    public List<PlayerCharacter> getAllyUsers() {
+        return allyGroup.getUsers();
     }
 }
