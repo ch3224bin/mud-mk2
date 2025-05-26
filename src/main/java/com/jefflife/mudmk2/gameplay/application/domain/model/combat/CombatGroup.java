@@ -42,4 +42,8 @@ public class CombatGroup {
                 .map(combatable -> ((PlayerCharacter) combatable).getUserId())
                 .toList();
     }
+
+    public void enterCombatState() {
+        participants.forEach(CombatParticipant::enterCombatState);
+    }
 }

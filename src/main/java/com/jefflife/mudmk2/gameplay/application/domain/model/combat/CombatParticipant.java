@@ -20,4 +20,8 @@ public class CombatParticipant {
         this.aggroScore = aggroScore;
         this.defeated = defeated;
     }
+
+    public void enterCombatState() {
+        participant.enterCombatState();
+    }
 }

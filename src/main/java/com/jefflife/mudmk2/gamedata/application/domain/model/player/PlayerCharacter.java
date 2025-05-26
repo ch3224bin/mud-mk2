@@ -105,6 +105,11 @@ public class PlayerCharacter implements Combatable, Statable {
         return this.baseCharacterInfo.getState();
     }
 
+    @Override
+    public void enterCombatState() {
+        this.baseCharacterInfo.setState(CharacterState.COMBAT);
+    }
+
     public enum MoveResult {
         NO_WAY,
         LOCKED,

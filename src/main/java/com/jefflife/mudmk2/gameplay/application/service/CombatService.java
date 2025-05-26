@@ -44,6 +44,8 @@ public class CombatService implements TickListener {
     }
 
     public void startCombat(PlayerCharacter attacker, Statable defender) {
+        // PC, NPC, 몬스터의 상태를 전투중으로 변경
+
         CombatGroup allyGroup = createAllyGroup(attacker);
         CombatGroup enemyGroup = createEnemyGroup(defender);
 

@@ -83,4 +83,9 @@ public class NonPlayerCharacter implements Combatable, Statable {
     public CharacterState getState() {
         return baseCharacterInfo.getState();
     }
+
+    @Override
+    public void enterCombatState() {
+        this.baseCharacterInfo.setState(CharacterState.COMBAT);
+    }
 }

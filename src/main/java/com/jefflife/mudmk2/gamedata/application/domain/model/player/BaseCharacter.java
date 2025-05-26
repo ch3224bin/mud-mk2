@@ -57,4 +57,8 @@ public class BaseCharacter {
                 cha
         );
     }
+
+    public void setState(CharacterState characterState) {
+        this.state = characterState;
+    }
 }

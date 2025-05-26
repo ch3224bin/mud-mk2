@@ -7,4 +7,5 @@ public interface Combatable {
     Long getCurrentRoomId();
     String getName();
     CharacterStats getStats();
+    void enterCombatState();
 }

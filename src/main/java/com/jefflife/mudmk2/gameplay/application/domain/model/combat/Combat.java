@@ -37,6 +37,8 @@ public class Combat {
 
     public CombatStartResult start() {
         combatState = CombatState.ACTIVE;
+        allyGroup.enterCombatState();
+        enemyGroup.enterCombatState();
 
         InitiativeRoll allyInitiative = allyGroup.getInitiativeRoll(initiativeProvider);
         InitiativeRoll enemyInitiative = enemyGroup.getInitiativeRoll(initiativeProvider);
