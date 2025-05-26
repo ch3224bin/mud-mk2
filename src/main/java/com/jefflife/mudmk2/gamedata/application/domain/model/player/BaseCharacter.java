@@ -61,4 +61,11 @@ public class BaseCharacter {
     public void setState(CharacterState characterState) {
         this.state = characterState;
     }
+
+    public void decreaseHp(int hp) {
+        this.hp -= hp;
+        if (this.hp <= 0) {
+            this.alive = false;
+        }
+    }
 }

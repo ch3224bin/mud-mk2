@@ -88,4 +88,14 @@ public class NonPlayerCharacter implements Combatable, Statable {
     public void enterCombatState() {
         this.baseCharacterInfo.setState(CharacterState.COMBAT);
     }
+
+    @Override
+    public void damaged(int damage) {
+        baseCharacterInfo.decreaseHp(damage);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return baseCharacterInfo.isAlive();
+    }
 }

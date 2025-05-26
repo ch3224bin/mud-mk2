@@ -118,6 +118,11 @@ public class Monster implements Combatable, Statable {
         this.baseCharacterInfo.setState(CharacterState.COMBAT);
     }
 
+    @Override
+    public void damaged(int damage) {
+        baseCharacterInfo.decreaseHp(damage);
+    }
+
     public boolean isAlive() {
         return this.baseCharacterInfo.isAlive();
     }

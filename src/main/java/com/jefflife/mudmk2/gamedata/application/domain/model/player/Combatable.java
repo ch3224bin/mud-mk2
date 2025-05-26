@@ -8,4 +8,6 @@ public interface Combatable {
     String getName();
     CharacterStats getStats();
     void enterCombatState();
+    void damaged(int finalDamage);
+    boolean isAlive();
 }

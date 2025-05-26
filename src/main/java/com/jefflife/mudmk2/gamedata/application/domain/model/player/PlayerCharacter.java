@@ -110,6 +110,16 @@ public class PlayerCharacter implements Combatable, Statable {
         this.baseCharacterInfo.setState(CharacterState.COMBAT);
     }
 
+    @Override
+    public void damaged(int damage) {
+        baseCharacterInfo.decreaseHp(damage);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return baseCharacterInfo.isAlive();
+    }
+
     public enum MoveResult {
         NO_WAY,
         LOCKED,
