@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.service.model.request;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 public record CreateMonsterTypeRequest(
     String name,
     String description,
+    Gender gender,
     int baseHp,
     int baseMp,
     int baseStr,
@@ -32,6 +34,7 @@ public record CreateMonsterTypeRequest(
         return MonsterType.builder()
                 .name(name)
                 .description(description)
+                .gender(gender)
                 .baseHp(baseHp)
                 .baseMp(baseMp)
                 .baseStr(baseStr)

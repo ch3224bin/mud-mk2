@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.domain.model.character.CharacterCreationState;
@@ -18,20 +19,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class CharacterCreationService {
     private static final Logger logger = LoggerFactory.getLogger(CharacterCreationService.class);
-    
+
     private final PlayerCharacterService playerCharacterService;
     private final SendMessageToUserPort sendMessageToUserPort;
-    
+
     // Store creation states by username
     private final Map<Long, CharacterCreationState> creationStates = new ConcurrentHashMap<>();
-    
+
     public CharacterCreationService(
             PlayerCharacterService playerCharacterService,
             SendMessageToUserPort sendMessageToUserPort) {
         this.playerCharacterService = playerCharacterService;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
-    
+
     /**
      * Start character creation for a user.
      * @param userId the user ID
@@ -42,19 +43,19 @@ public class CharacterCreationService {
             sendMessageToUserPort.messageToUser(userId, "You already have a character.");
             return;
         }
-        
+
         // Create a new state and store it
         CharacterCreationState state = new CharacterCreationState(userId);
         creationStates.put(userId, state);
-        
+
         // Move to the first step (asking for name)
         state.nextStep();
-        
+
         // Send welcome message
         sendMessageToUserPort.messageToUser(userId, "Welcome to the game! Let's create your character.");
         sendMessageToUserPort.messageToUser(userId, "What is your character's name?");
     }
-    
+
     /**
      * Process a message from a user who is creating a character.
      * @param userId the user ID
@@ -63,12 +64,12 @@ public class CharacterCreationService {
      */
     public boolean processMessage(Long userId, String message) {
         CharacterCreationState state = creationStates.get(userId);
-        
+
         // If the user is not in character creation, return false
         if (state == null) {
             return false;
         }
-        
+
         // Process the message based on the current step
         return switch (state.getCurrentStep()) {
             case AWAITING_NAME -> {
@@ -79,12 +80,16 @@ public class CharacterCreationService {
                 processClassInput(state, message);
                 yield true;
             }
+            case AWAITING_GENDER -> {
+                processGenderInput(state, message);
+                yield true;
+            }
             default ->
                 // Not in a state that expects input
                 false;
         };
     }
-    
+
     /**
      * Process name input from the user.
      * @param state the character creation state
@@ -93,14 +98,14 @@ public class CharacterCreationService {
     private void processNameInput(CharacterCreationState state, String name) {
         // Set the name in the state
         state.setCharacterName(name);
-        
+
         // Send confirmation and ask for class
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Your character's name is " + name + ". Now, choose your class:");
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Available classes: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
     }
-    
+
     /**
      * Process class input from the user.
      * @param state the character creation state
@@ -110,20 +115,46 @@ public class CharacterCreationService {
         try {
             // Try to parse the class
             CharacterClass characterClass = CharacterClass.valueOf(classInput.toUpperCase());
-            
+
             // Set the class in the state
             state.setCharacterClass(characterClass);
-            
-            // Create the character
-            createCharacter(state);
-            
+
+            // Ask for gender
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "Your character's class is " + characterClass + ". Now, choose your gender:");
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "Available genders: MALE, FEMALE");
+
         } catch (IllegalArgumentException e) {
             // Invalid class, ask again
             sendMessageToUserPort.messageToUser(state.getUserId(),
                     "Invalid class. Please choose from: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
         }
     }
-    
+
+    /**
+     * Process gender input from the user.
+     * @param state the character creation state
+     * @param genderInput the gender input
+     */
+    private void processGenderInput(CharacterCreationState state, String genderInput) {
+        try {
+            // Try to parse the gender
+            Gender gender = Gender.valueOf(genderInput.toUpperCase());
+
+            // Set the gender in the state
+            state.setCharacterGender(gender);
+
+            // Create the character
+            createCharacter(state);
+
+        } catch (IllegalArgumentException e) {
+            // Invalid gender, ask again
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "Invalid gender. Please choose from: MALE, FEMALE");
+        }
+    }
+
     /**
      * Create a character based on the state.
      * @param state the character creation state
@@ -133,24 +164,25 @@ public class CharacterCreationService {
             logger.error("Attempted to create character with incomplete state: {}", state);
             return;
         }
-        
+
         // Create the character
         PlayerCharacter character = playerCharacterService.createCharacter(
                 state.getUserId(),
                 state.getCharacterName(),
-                state.getCharacterClass()
+                state.getCharacterClass(),
+                state.getCharacterGender()
         );
-        
+
         // Send confirmation
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "Character created! Welcome, " + character.getNickname() + " the " + character.getCharacterClass() + ".");
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "You are now in room " + character.getBaseCharacterInfo().getRoomId() + ".");
-        
+
         // Remove the state
         creationStates.remove(state.getUserId());
     }
-    
+
     /**
      * Check if a user is in character creation.
      * @param userId the user ID

@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
@@ -48,13 +49,14 @@ public class PlayerCharacterService {
      * @param userId the user ID
      * @param name the character name
      * @param characterClass the character class
+     * @param gender the character gender
      * @return the created player character
      */
     @Transactional
-    public PlayerCharacter createCharacter(Long userId, String name, CharacterClass characterClass) {
+    public PlayerCharacter createCharacter(Long userId, String name, CharacterClass characterClass, Gender gender) {
         // Create base character with stats based on class
-        final BaseCharacter baseCharacter = createBaseCharacter(name, characterClass);
-        
+        final BaseCharacter baseCharacter = createBaseCharacter(name, characterClass, gender);
+
         // Create playable character
         final PlayableCharacter playableCharacter = PlayableCharacter.builder()
                 .level(1)
@@ -62,7 +64,7 @@ public class PlayerCharacterService {
                 .nextLevelExp(100)
                 .conversable(true)
                 .build();
-        
+
         // Create player character
         final PlayerCharacter playerCharacter = new PlayerCharacter(
                 null, // ID will be generated
@@ -74,7 +76,7 @@ public class PlayerCharacterService {
                 true, // Online
                 LocalDateTime.now() // Last active now
         );
-        
+
         // Save character
         final PlayerCharacter savedCharacter = playerCharacterRepository.save(playerCharacter);
 
@@ -83,17 +85,30 @@ public class PlayerCharacterService {
 
         return savedCharacter;
     }
-    
+
+    /**
+     * Create a new player character with default gender (MALE)
+     * @param userId the user ID
+     * @param name the character name
+     * @param characterClass the character class
+     * @return the created player character
+     */
+    @Transactional
+    public PlayerCharacter createCharacter(Long userId, String name, CharacterClass characterClass) {
+        return createCharacter(userId, name, characterClass, Gender.MALE);
+    }
+
     /**
      * Create a base character with stats based on class
      * @param name the character name
      * @param characterClass the character class
+     * @param gender the character gender
      * @return the base character
      */
-    private BaseCharacter createBaseCharacter(String name, CharacterClass characterClass) {
+    private BaseCharacter createBaseCharacter(String name, CharacterClass characterClass, Gender gender) {
         // Set base stats based on class
         int hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha;
-        
+
         switch (characterClass) {
             case WARRIOR:
                 hp = maxHp = 100;
@@ -156,7 +171,7 @@ public class PlayerCharacterService {
                 cha = 10;
                 break;
         }
-        
+
         return BaseCharacter.builder()
                 .name(name)
                 .background("A new adventurer")
@@ -172,7 +187,7 @@ public class PlayerCharacterService {
                 .cha(cha)
                 .roomId(1L) // Start in room 1
                 .alive(true)
+                .gender(gender)
                 .build();
     }
 }
-

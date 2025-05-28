@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gamedata.adapter.in;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.MonsterSpawnRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
@@ -42,6 +43,7 @@ public class MonsterTypeControllerSystemTest {
         CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(
                 monsterTypeName,
                 description,
+                Gender.MALE, // gender
                 100, // baseHp
                 50,  // baseMp
                 10,  // baseStr
@@ -232,7 +234,7 @@ public class MonsterTypeControllerSystemTest {
     }
 
     private MonsterTypeResponse createTestMonsterType(String name, String description, int baseHp, int baseMp, int baseStr, int baseDex, int baseCon, int baseIntelligence, int basePow, int baseCha, long baseExperience, int hpPerLevel, int strPerLevel, int dexPerLevel, int conPerLevel, int intelligencePerLevel, int powPerLevel, int chaPerLevel, int expPerLevel, List<MonsterSpawnRoomRequest> spawnRooms, int aggressiveness, int respawnTime) throws Exception {
-        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(name, description, baseHp, baseMp, baseStr, baseDex, baseCon, baseIntelligence, basePow, baseCha, baseExperience, hpPerLevel, strPerLevel, dexPerLevel, conPerLevel, intelligencePerLevel, powPerLevel, chaPerLevel, expPerLevel, spawnRooms, aggressiveness, respawnTime);
+        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(name, description, Gender.MALE, baseHp, baseMp, baseStr, baseDex, baseCon, baseIntelligence, basePow, baseCha, baseExperience, hpPerLevel, strPerLevel, dexPerLevel, conPerLevel, intelligencePerLevel, powPerLevel, chaPerLevel, expPerLevel, spawnRooms, aggressiveness, respawnTime);
         String requestJson = objectMapper.writeValueAsString(createRequest);
 
         MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -248,6 +250,7 @@ public class MonsterTypeControllerSystemTest {
         CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(
                 name,                // name
                 "Description for " + name, // description
+                Gender.MALE,        // gender
                 baseHp,             // baseHp
                 50,                 // baseMp
                 baseStr,            // baseStr

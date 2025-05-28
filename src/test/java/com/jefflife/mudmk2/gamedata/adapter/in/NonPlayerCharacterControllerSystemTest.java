@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NPCType;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayerCharacterResponse;
@@ -37,6 +38,7 @@ public class NonPlayerCharacterControllerSystemTest {
         // Given
         String name = "Test NPC";
         String background = "This is a test NPC";
+        Gender gender = Gender.MALE;
         int hp = 100;
         int maxHp = 100;
         int mp = 50;
@@ -58,7 +60,7 @@ public class NonPlayerCharacterControllerSystemTest {
         boolean essential = true;
 
         String requestJson = createNonPlayerCharacterJson(
-                name, background, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
+                name, background, gender, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
                 level, experience, nextLevelExp, conversable, persona, npcType, spawnRoomId, essential
         );
 
@@ -76,6 +78,7 @@ public class NonPlayerCharacterControllerSystemTest {
         assertThat(response.id()).isNotNull();
         assertThat(response.name()).isEqualTo(name);
         assertThat(response.background()).isEqualTo(background);
+        assertThat(response.gender()).isEqualTo(gender);
         assertThat(response.hp()).isEqualTo(hp);
         assertThat(response.maxHp()).isEqualTo(maxHp);
         assertThat(response.mp()).isEqualTo(mp);
@@ -102,13 +105,13 @@ public class NonPlayerCharacterControllerSystemTest {
     }
 
     private String createNonPlayerCharacterJson(
-            String name, String background, int hp, int maxHp, int mp, int maxMp,
+            String name, String background, Gender gender, int hp, int maxHp, int mp, int maxMp,
             int str, int dex, int con, int intelligence, int pow, int cha, Long roomId,
             int level, long experience, long nextLevelExp, boolean conversable,
             String persona, NPCType npcType, Long spawnRoomId, boolean essential
     ) throws Exception {
         CreateNonPlayerCharacterRequest request = new CreateNonPlayerCharacterRequest(
-                name, background, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
+                name, background, gender, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
                 level, experience, nextLevelExp, conversable, persona, npcType, spawnRoomId, essential
         );
         return objectMapper.writeValueAsString(request);

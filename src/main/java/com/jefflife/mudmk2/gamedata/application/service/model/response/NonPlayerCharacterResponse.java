@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.service.model.response;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NPCType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 
@@ -9,6 +10,7 @@ public record NonPlayerCharacterResponse (
     UUID id,
     String name,
     String background,
+    Gender gender,
     int hp,
     int maxHp,
     int mp,
@@ -35,6 +37,7 @@ public record NonPlayerCharacterResponse (
             nonPlayerCharacter.getId(),
             nonPlayerCharacter.getBaseCharacterInfo().getName(),
             nonPlayerCharacter.getBaseCharacterInfo().getBackground(),
+            nonPlayerCharacter.getBaseCharacterInfo().getGender(),
             nonPlayerCharacter.getBaseCharacterInfo().getHp(),
             nonPlayerCharacter.getBaseCharacterInfo().getMaxHp(),
             nonPlayerCharacter.getBaseCharacterInfo().getMp(),

@@ -240,6 +240,11 @@
             color: #ff9900;
         }
 
+        .detail-badge.gender {
+            border-color: #ff66cc;
+            color: #ff66cc;
+        }
+
         .detail-badge.stats {
             border-color: #00ccff;
             color: #00ccff;
@@ -453,6 +458,15 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="npcGender" class="form-label">Gender</label>
+                                        <select class="form-select" id="npcGender" required>
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="mb-3">
                                     <label for="npcBackground" class="form-label">Background</label>
@@ -622,6 +636,7 @@
         const roomId = document.getElementById('roomId');
         const npcName = document.getElementById('npcName');
         const npcType = document.getElementById('npcType');
+        const npcGender = document.getElementById('npcGender');
         const npcBackground = document.getElementById('npcBackground');
         const npcPersona = document.getElementById('npcPersona');
         const npcHp = document.getElementById('npcHp');
@@ -776,6 +791,13 @@
                     ${npc.npcType}
                 </div>`;
 
+                // Gender badge
+                detailsHtml += `
+                <div class="detail-badge gender">
+                    <i class="fas fa-venus-mars"></i>
+                    ${npc.gender}
+                </div>`;
+
                 // Stats badge
                 detailsHtml += `
                 <div class="detail-badge stats">
@@ -864,6 +886,7 @@
             npcId.value = '';
             npcName.value = '';
             npcType.value = '';
+            npcGender.value = 'MALE';
             npcBackground.value = '';
             npcPersona.value = '';
             npcHp.value = '100';
@@ -891,6 +914,7 @@
             npcId.value = npc.id;
             npcName.value = npc.name;
             npcType.value = npc.npcType;
+            npcGender.value = npc.gender;
             npcBackground.value = npc.background;
             npcPersona.value = npc.persona;
             npcHp.value = npc.hp;
@@ -1034,6 +1058,7 @@
             const npcData = {
                 name: npcName.value.trim(),
                 background: npcBackground.value.trim(),
+                gender: npcGender.value,
                 hp: parseInt(npcHp.value),
                 maxHp: parseInt(npcMaxHp.value),
                 mp: parseInt(npcMp.value),

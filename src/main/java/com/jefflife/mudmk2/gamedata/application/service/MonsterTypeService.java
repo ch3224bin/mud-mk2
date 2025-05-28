@@ -102,6 +102,7 @@ public class MonsterTypeService implements CreateMonsterTypeUseCase, GetMonsterT
     private void updateMonsterTypeFromRequest(MonsterType monsterType, UpdateMonsterTypeRequest request) {
         monsterType.setName(request.name());
         monsterType.setDescription(request.description());
+        monsterType.setGender(request.gender());
         monsterType.setBaseHp(request.baseHp());
         monsterType.setBaseMp(request.baseMp());
         monsterType.setBaseStr(request.baseStr());

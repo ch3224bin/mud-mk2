@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service.model.request;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NPCType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
@@ -11,6 +12,7 @@ public record CreateNonPlayerCharacterRequest (
     // BaseCharacter fields
     String name,
     String background,
+    Gender gender,
     int hp,
     int maxHp,
     int mp,
@@ -53,6 +55,7 @@ public record CreateNonPlayerCharacterRequest (
                         .cha(cha)
                         .roomId(roomId)
                         .alive(true)
+                        .gender(gender)
                         .build())
                 .playableCharacter(
                         PlayableCharacter.builder()

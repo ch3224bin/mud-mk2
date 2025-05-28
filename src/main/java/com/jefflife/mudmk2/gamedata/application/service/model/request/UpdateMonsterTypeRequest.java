@@ -1,10 +1,12 @@
 package com.jefflife.mudmk2.gamedata.application.service.model.request;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import java.util.List;
 
 public record UpdateMonsterTypeRequest(
     String name,
     String description,
+    Gender gender,
     int baseHp,
     int baseMp,
     int baseStr,

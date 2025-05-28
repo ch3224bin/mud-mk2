@@ -61,8 +61,9 @@
                     <thead>
                     <tr>
                         <th style="width: 5%">ID</th>
-                        <th style="width: 20%">이름</th>
-                        <th style="width: 30%">설명</th>
+                        <th style="width: 15%">이름</th>
+                        <th style="width: 25%">설명</th>
+                        <th style="width: 10%">성별</th>
                         <th style="width: 10%">기본 HP/MP</th>
                         <th style="width: 10%">경험치</th>
                         <th style="width: 10%">공격성</th>
@@ -101,6 +102,15 @@
                                 <div class="form-group col-md-6">
                                     <label for="monsterDescription">설명</label>
                                     <textarea class="form-control" id="monsterDescription" name="description" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="monsterGender">성별</label>
+                                    <select class="form-control" id="monsterGender" name="gender" required>
+                                        <option value="MALE">남성</option>
+                                        <option value="FEMALE">여성</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -357,6 +367,7 @@
                         <td>${monster.id}</td>
                         <td>${monster.name}</td>
                         <td title="${monster.description}">${monster.description}</td>
+                        <td>${monster.gender === 'MALE' ? '남성' : monster.gender === 'FEMALE' ? '여성' : ''}</td>
                         <td>${monster.baseHp}/${monster.baseMp}</td>
                         <td>${monster.baseExperience}</td>
                         <td>${monster.aggressiveness}</td>
@@ -406,6 +417,7 @@
             $("#monsterId").val(monster.id);
             $("#monsterName").val(monster.name);
             $("#monsterDescription").val(monster.description);
+            $("#monsterGender").val(monster.gender || "MALE");
             $("#baseHp").val(monster.baseHp);
             $("#baseMp").val(monster.baseMp);
             $("#baseStr").val(monster.baseStr);
@@ -637,6 +649,7 @@
             const formData = {
                 name: $("#monsterName").val(),
                 description: $("#monsterDescription").val(),
+                gender: $("#monsterGender").val(),
                 baseHp: parseInt($("#baseHp").val()),
                 baseMp: parseInt($("#baseMp").val()),
                 baseStr: parseInt($("#baseStr").val()),

@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.service.model.response;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ public record MonsterTypeResponse(
     Long id,
     String name,
     String description,
+    Gender gender,
     int baseHp,
     int baseMp,
     int baseStr,
@@ -43,6 +45,7 @@ public record MonsterTypeResponse(
                 monsterType.getId(),
                 monsterType.getName(),
                 monsterType.getDescription(),
+                monsterType.getGender(),
                 monsterType.getBaseHp(),
                 monsterType.getBaseMp(),
                 monsterType.getBaseStr(),

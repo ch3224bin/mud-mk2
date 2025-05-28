@@ -10,10 +10,15 @@ public class BaseCharacter {
     private String name;
     @Builder.Default
     private CharacterState state = CharacterState.NORMAL;
-    
+
     @Column(length = 1000)
     private String background;
-    
+
+    // 성별
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Gender gender = Gender.MALE;
+
     // 스탯
     private int hp;
     private int maxHp;
@@ -25,10 +30,10 @@ public class BaseCharacter {
     private int intelligence; // 지능
     private int pow; // 마력
     private int cha; // 매력
-    
+
     // 위치 정보
     private Long roomId;
-    
+
     // 생존 여부
     @Builder.Default
     private boolean alive = true;

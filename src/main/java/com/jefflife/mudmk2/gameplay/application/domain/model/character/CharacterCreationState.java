@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.character;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import lombok.Getter;
 
 /**
@@ -12,6 +13,7 @@ public class CharacterCreationState {
     private CreationStep currentStep;
     private String characterName;
     private CharacterClass characterClass;
+    private Gender characterGender;
 
     public CharacterCreationState(Long userId) {
         this.userId = userId;
@@ -30,6 +32,9 @@ public class CharacterCreationState {
                 currentStep = CreationStep.AWAITING_CLASS;
                 break;
             case AWAITING_CLASS:
+                currentStep = CreationStep.AWAITING_GENDER;
+                break;
+            case AWAITING_GENDER:
                 currentStep = CreationStep.COMPLETE;
                 break;
             case COMPLETE:
@@ -61,6 +66,17 @@ public class CharacterCreationState {
     }
 
     /**
+     * Set the character gender and move to the next step.
+     * @param gender the character gender
+     */
+    public void setCharacterGender(Gender gender) {
+        if (currentStep == CreationStep.AWAITING_GENDER) {
+            this.characterGender = gender;
+            nextStep();
+        }
+    }
+
+    /**
      * Check if character creation is complete.
      * @return true if complete, false otherwise
      */
@@ -73,7 +89,7 @@ public class CharacterCreationState {
      * @return true if ready, false otherwise
      */
     public boolean isReadyToCreate() {
-        return characterName != null && characterClass != null;
+        return characterName != null && characterClass != null && characterGender != null;
     }
 
     /**
@@ -83,6 +99,7 @@ public class CharacterCreationState {
         INITIAL,
         AWAITING_NAME,
         AWAITING_CLASS,
+        AWAITING_GENDER,
         COMPLETE
     }
 }

@@ -57,6 +57,7 @@ public class Monster implements Combatable, Statable {
                 .background(monsterType.getDescription())
                 .roomId(roomId)
                 .alive(true)
+                .gender(monsterType.getGender())
                 .build();
 
         return Monster.builder()

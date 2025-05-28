@@ -14,10 +14,14 @@ public class MonsterType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String name;
     private String description;
-    
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Gender gender = Gender.MALE;
+
     // 기본 스탯
     private int baseHp;
     private int baseMp;
@@ -30,7 +34,7 @@ public class MonsterType {
 
     // 기본 경험치 보상
     private long baseExperience;
-    
+
     // 레벨별 스탯 증가치
     private int hpPerLevel;
     private int strPerLevel;
@@ -69,4 +73,3 @@ public class MonsterType {
         }
     }
 }
-
