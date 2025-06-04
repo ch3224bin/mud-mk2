@@ -104,6 +104,7 @@ public class MonsterTypeControllerSystemTest {
         UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest(
                 "Non Existent",     // name
                 "Description",      // description
+                Gender.MALE,
                 100,                // baseHp
                 50,                 // baseMp
                 10,                 // baseStr
@@ -175,6 +176,7 @@ public class MonsterTypeControllerSystemTest {
         UpdateMonsterTypeRequest updateRequest = new UpdateMonsterTypeRequest(
                 updatedMonsterTypeName, // name
                 "Updated Description",  // description
+                Gender.MALE,
                 220,                    // baseHp
                 60,                     // baseMp
                 22,                     // baseStr
