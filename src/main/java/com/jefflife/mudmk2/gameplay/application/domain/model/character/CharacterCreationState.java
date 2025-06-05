@@ -29,12 +29,12 @@ public class CharacterCreationState {
                 currentStep = CreationStep.AWAITING_NAME;
                 break;
             case AWAITING_NAME:
-                currentStep = CreationStep.AWAITING_CLASS;
-                break;
-            case AWAITING_CLASS:
                 currentStep = CreationStep.AWAITING_GENDER;
                 break;
             case AWAITING_GENDER:
+                currentStep = CreationStep.AWAITING_CLASS;
+                break;
+            case AWAITING_CLASS:
                 currentStep = CreationStep.COMPLETE;
                 break;
             case COMPLETE:
