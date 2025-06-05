@@ -40,7 +40,7 @@ public class CharacterCreationService {
     public void startCharacterCreation(Long userId) {
         // Check if the user already has a character
         if (playerCharacterService.hasCharacter(userId)) {
-            sendMessageToUserPort.messageToUser(userId, "You already have a character.");
+            sendMessageToUserPort.messageToUser(userId, "이미 캐릭터가 있습니다.");
             return;
         }
 
@@ -52,8 +52,8 @@ public class CharacterCreationService {
         state.nextStep();
 
         // Send welcome message
-        sendMessageToUserPort.messageToUser(userId, "Welcome to the game! Let's create your character.");
-        sendMessageToUserPort.messageToUser(userId, "What is your character's name?");
+        sendMessageToUserPort.messageToUser(userId, "게임에 오신 것을 환영합니다! 캐릭터를 생성해 봅시다.");
+        sendMessageToUserPort.messageToUser(userId, "캐릭터의 이름은 무엇인가요?");
     }
 
     /**
@@ -101,9 +101,9 @@ public class CharacterCreationService {
 
         // Send confirmation and ask for class
         sendMessageToUserPort.messageToUser(state.getUserId(),
-                "Your character's name is " + name + ". Now, choose your class:");
+                "캐릭터의 이름은 " + name + "입니다. 이제 클래스를 선택하세요:");
         sendMessageToUserPort.messageToUser(state.getUserId(),
-                "Available classes: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
+                "사용 가능한 클래스: WARRIOR(전사), MAGE(마법사), ROGUE(도적), CLERIC(성직자), RANGER(레인저)");
     }
 
     /**
@@ -121,14 +121,14 @@ public class CharacterCreationService {
 
             // Ask for gender
             sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "Your character's class is " + characterClass + ". Now, choose your gender:");
+                    "캐릭터의 클래스는 " + characterClass + "입니다. 이제 성별을 선택하세요:");
             sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "Available genders: MALE, FEMALE");
+                    "사용 가능한 성별: MALE(남성), FEMALE(여성)");
 
         } catch (IllegalArgumentException e) {
             // Invalid class, ask again
             sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "Invalid class. Please choose from: WARRIOR, MAGE, ROGUE, CLERIC, RANGER");
+                    "유효하지 않은 클래스입니다. 다음 중에서 선택하세요: WARRIOR(전사), MAGE(마법사), ROGUE(도적), CLERIC(성직자), RANGER(레인저)");
         }
     }
 
@@ -151,7 +151,7 @@ public class CharacterCreationService {
         } catch (IllegalArgumentException e) {
             // Invalid gender, ask again
             sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "Invalid gender. Please choose from: MALE, FEMALE");
+                    "유효하지 않은 성별입니다. 다음 중에서 선택하세요: MALE(남성), FEMALE(여성)");
         }
     }
 
@@ -175,9 +175,9 @@ public class CharacterCreationService {
 
         // Send confirmation
         sendMessageToUserPort.messageToUser(state.getUserId(),
-                "Character created! Welcome, " + character.getNickname() + " the " + character.getCharacterClass() + ".");
+                "캐릭터가 생성되었습니다! " + character.getCharacterClass() + " " + character.getNickname() + "님, 환영합니다.");
         sendMessageToUserPort.messageToUser(state.getUserId(),
-                "You are now in room " + character.getBaseCharacterInfo().getRoomId() + ".");
+                "현재 " + character.getBaseCharacterInfo().getRoomId() + "번 방에 있습니다.");
 
         // Remove the state
         creationStates.remove(state.getUserId());
