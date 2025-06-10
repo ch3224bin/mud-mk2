@@ -12,11 +12,18 @@ public interface PlayerCharacterRepository extends CrudRepository<PlayerCharacte
      * @return the player character, or null if not found
      */
     PlayerCharacter findByUserId(Long userId);
-    
+
     /**
      * Check if a player character exists for the given user ID
      * @param userId the user ID
      * @return true if a player character exists, false otherwise
      */
     boolean existsByUserId(Long userId);
+
+    /**
+     * Check if a player character exists with the given nickname
+     * @param nickname the character nickname
+     * @return true if a player character exists with the nickname, false otherwise
+     */
+    boolean existsByNickname(String nickname);
 }

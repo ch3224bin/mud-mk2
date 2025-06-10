@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.domain.model.character.CharacterCreationState;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
@@ -21,6 +22,7 @@ public class CharacterCreationService {
     private static final Logger logger = LoggerFactory.getLogger(CharacterCreationService.class);
 
     private final PlayerCharacterService playerCharacterService;
+    private final PlayerCharacterRepository playerCharacterRepository;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     // Store creation states by username
@@ -28,8 +30,10 @@ public class CharacterCreationService {
 
     public CharacterCreationService(
             PlayerCharacterService playerCharacterService,
+            PlayerCharacterRepository playerCharacterRepository,
             SendMessageToUserPort sendMessageToUserPort) {
         this.playerCharacterService = playerCharacterService;
+        this.playerCharacterRepository = playerCharacterRepository;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
@@ -96,10 +100,14 @@ public class CharacterCreationService {
      * @param name the name input
      */
     private void processNameInput(CharacterCreationState state, String name) {
-        // Set the name in the state
+        if (playerCharacterRepository.existsByNickname(name)) {
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "이미 존재하는 이름입니다. 다시 입력해주세요");
+            return;
+        }
+
         state.setCharacterName(name);
 
-        // Send confirmation and ask for gender
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "캐릭터의 이름은 " + name + "입니다. 이제 성별을 선택하세요:");
         sendMessageToUserPort.messageToUser(state.getUserId(),
