@@ -3,7 +3,6 @@ package com.jefflife.mudmk2.gameplay.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.domain.model.character.CharacterCreationState;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
@@ -22,19 +21,19 @@ public class CharacterCreationService {
     private static final Logger logger = LoggerFactory.getLogger(CharacterCreationService.class);
 
     private final PlayerCharacterService playerCharacterService;
-    private final PlayerCharacterRepository playerCharacterRepository;
     private final SendMessageToUserPort sendMessageToUserPort;
+    private final CharacterNameValidator characterNameValidator;
 
     // Store creation states by username
     private final Map<Long, CharacterCreationState> creationStates = new ConcurrentHashMap<>();
 
     public CharacterCreationService(
             PlayerCharacterService playerCharacterService,
-            PlayerCharacterRepository playerCharacterRepository,
-            SendMessageToUserPort sendMessageToUserPort) {
+            SendMessageToUserPort sendMessageToUserPort,
+            CharacterNameValidator characterNameValidator) {
         this.playerCharacterService = playerCharacterService;
-        this.playerCharacterRepository = playerCharacterRepository;
         this.sendMessageToUserPort = sendMessageToUserPort;
+        this.characterNameValidator = characterNameValidator;
     }
 
     /**
@@ -100,27 +99,15 @@ public class CharacterCreationService {
      * @param name the name input
      */
     private void processNameInput(CharacterCreationState state, String name) {
-        // Trim leading and trailing spaces
+        // Trim the name first
         String trimmedName = name.trim();
 
-        // Check if the name contains spaces
-        if (trimmedName.contains(" ")) {
-            sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "케릭터 이름에는 공백이 포함될 수 없습니다. 다시 입력해주세요");
-            return;
-        }
+        // Validate the trimmed name
+        ValidationResult validationResult = characterNameValidator.validate(trimmedName);
 
-        // Check if the name contains only Korean or English characters
-        if (!trimmedName.matches("^[가-힣a-zA-Z]+$")) {
-            sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "케릭터 이름은 한글 또는 영문으로만 작성해야 합니다. 다시 입력해주세요");
-            return;
-        }
-
-        // Check if the name already exists
-        if (playerCharacterRepository.existsByNickname(trimmedName)) {
-            sendMessageToUserPort.messageToUser(state.getUserId(),
-                    "이미 존재하는 이름입니다. 다시 입력해주세요");
+        if (!validationResult.valid()) {
+            // Send the validation error message to the user
+            sendMessageToUserPort.messageToUser(state.getUserId(), validationResult.errorMessage());
             return;
         }
 

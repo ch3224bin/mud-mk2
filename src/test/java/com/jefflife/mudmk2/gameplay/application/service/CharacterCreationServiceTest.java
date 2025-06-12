@@ -1,10 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
@@ -12,11 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,17 +18,19 @@ class CharacterCreationServiceTest {
     private FakePlayerCharacterService fakePlayerCharacterService;
     private FakePlayerCharacterRepository fakePlayerCharacterRepository;
     private FakeSendMessageToUserPort fakeSendMessageToUserPort;
+    private CharacterNameValidator characterNameValidator;
 
     @BeforeEach
     void setUp() {
         fakePlayerCharacterService = new FakePlayerCharacterService();
         fakePlayerCharacterRepository = new FakePlayerCharacterRepository();
         fakeSendMessageToUserPort = new FakeSendMessageToUserPort();
+        characterNameValidator = new CharacterNameValidator(fakePlayerCharacterRepository);
 
         characterCreationService = new CharacterCreationService(
                 fakePlayerCharacterService,
-                fakePlayerCharacterRepository,
-                fakeSendMessageToUserPort
+                fakeSendMessageToUserPort,
+                characterNameValidator
         );
     }
 
@@ -400,4 +394,5 @@ class CharacterCreationServiceTest {
             messagesByUserId.clear();
         }
     }
+
 }
