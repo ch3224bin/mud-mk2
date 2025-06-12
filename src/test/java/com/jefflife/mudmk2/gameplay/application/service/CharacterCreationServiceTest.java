@@ -114,6 +114,83 @@ class CharacterCreationServiceTest {
         assertThat(messages).isEmpty();
     }
 
+    @Test
+    @DisplayName("이름 입력 시 앞뒤 공백이 제거되어야 함")
+    void processMessage_shouldTrimSpaces_whenProcessingName() {
+        // given
+        Long userId = 1L;
+        String nameWithSpaces = "  TestCharacter  ";
+        String trimmedName = "TestCharacter";
+
+        // Start character creation to set up the state
+        characterCreationService.startCharacterCreation(userId);
+
+        // Clear messages from startCharacterCreation
+        fakeSendMessageToUserPort.clearMessages();
+
+        // when
+        boolean result = characterCreationService.processMessage(userId, nameWithSpaces);
+
+        // then
+        assertThat(result).isTrue();
+
+        // Verify messages sent to user
+        List<String> messages = fakeSendMessageToUserPort.getMessagesForUser(userId);
+        assertThat(messages).hasSize(2);
+        assertThat(messages.get(0)).contains("캐릭터의 이름은 " + trimmedName + "입니다");
+        assertThat(messages.get(1)).contains("사용 가능한 성별");
+    }
+
+    @Test
+    @DisplayName("이름에 공백이 포함되면 오류 메시지를 보내야 함")
+    void processMessage_shouldRejectSpaces_whenNameContainsSpaces() {
+        // given
+        Long userId = 1L;
+        String nameWithSpaces = "Test Character";
+
+        // Start character creation to set up the state
+        characterCreationService.startCharacterCreation(userId);
+
+        // Clear messages from startCharacterCreation
+        fakeSendMessageToUserPort.clearMessages();
+
+        // when
+        boolean result = characterCreationService.processMessage(userId, nameWithSpaces);
+
+        // then
+        assertThat(result).isTrue();
+
+        // Verify error message was sent
+        List<String> messages = fakeSendMessageToUserPort.getMessagesForUser(userId);
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0)).contains("케릭터 이름에는 공백이 포함될 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("이름에 한글이나 영문이 아닌 문자가 포함되면 오류 메시지를 보내야 함")
+    void processMessage_shouldRejectInvalidCharacters_whenNameContainsNonKoreanOrEnglish() {
+        // given
+        Long userId = 1L;
+        String nameWithInvalidChars = "Test123";
+
+        // Start character creation to set up the state
+        characterCreationService.startCharacterCreation(userId);
+
+        // Clear messages from startCharacterCreation
+        fakeSendMessageToUserPort.clearMessages();
+
+        // when
+        boolean result = characterCreationService.processMessage(userId, nameWithInvalidChars);
+
+        // then
+        assertThat(result).isTrue();
+
+        // Verify error message was sent
+        List<String> messages = fakeSendMessageToUserPort.getMessagesForUser(userId);
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0)).contains("케릭터 이름은 한글 또는 영문으로만 작성해야 합니다");
+    }
+
     // Fake implementation of PlayerCharacterService
     static class FakePlayerCharacterService extends PlayerCharacterService {
         private final Map<Long, Boolean> hasCharacterMap = new HashMap<>();

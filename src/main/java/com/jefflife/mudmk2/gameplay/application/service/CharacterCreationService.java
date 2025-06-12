@@ -100,16 +100,34 @@ public class CharacterCreationService {
      * @param name the name input
      */
     private void processNameInput(CharacterCreationState state, String name) {
-        if (playerCharacterRepository.existsByNickname(name)) {
+        // Trim leading and trailing spaces
+        String trimmedName = name.trim();
+
+        // Check if the name contains spaces
+        if (trimmedName.contains(" ")) {
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "케릭터 이름에는 공백이 포함될 수 없습니다. 다시 입력해주세요");
+            return;
+        }
+
+        // Check if the name contains only Korean or English characters
+        if (!trimmedName.matches("^[가-힣a-zA-Z]+$")) {
+            sendMessageToUserPort.messageToUser(state.getUserId(),
+                    "케릭터 이름은 한글 또는 영문으로만 작성해야 합니다. 다시 입력해주세요");
+            return;
+        }
+
+        // Check if the name already exists
+        if (playerCharacterRepository.existsByNickname(trimmedName)) {
             sendMessageToUserPort.messageToUser(state.getUserId(),
                     "이미 존재하는 이름입니다. 다시 입력해주세요");
             return;
         }
 
-        state.setCharacterName(name);
+        state.setCharacterName(trimmedName);
 
         sendMessageToUserPort.messageToUser(state.getUserId(),
-                "캐릭터의 이름은 " + name + "입니다. 이제 성별을 선택하세요:");
+                "캐릭터의 이름은 " + trimmedName + "입니다. 이제 성별을 선택하세요:");
         sendMessageToUserPort.messageToUser(state.getUserId(),
                 "사용 가능한 성별: MALE(남성), FEMALE(여성)");
     }
