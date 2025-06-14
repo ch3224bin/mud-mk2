@@ -7,8 +7,8 @@ public record RoomInfoVariables(
         String roomName,
         String roomDescription,
         String exits,
-        List<String> npcsInRoom,
-        List<String> otherPlayersInRoom,
-        List<String> monstersInRoom
+        List<CreatureInfo> npcsInRoom,
+        List<CreatureInfo> otherPlayersInRoom,
+        List<CreatureInfo> monstersInRoom
 ) {
 }

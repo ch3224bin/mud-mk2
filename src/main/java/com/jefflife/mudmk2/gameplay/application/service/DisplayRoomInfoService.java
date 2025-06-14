@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendRoomInfoMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.RoomInfoVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,22 +40,24 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
         final Room currentRoom = gameWorldService.getRoom(character.getCurrentRoomId());
 
         // 현재 방에 있는 NPC 목록 가져오기
-        List<String> npcsInRoom = gameWorldService.getNpcsInRoom(currentRoom.getId())
+        List<CreatureInfo> npcsInRoom = gameWorldService.getNpcsInRoom(currentRoom.getId())
                 .stream()
-                .map(NonPlayerCharacter::getName)
+                .map(npc -> new CreatureInfo(npc.getName(), npc.getState()))
                 .toList();
 
         // 현재 방에 있는 다른 플레이어 캐릭터 목록 가져오기
-        List<String> otherPlayersInRoom = gameWorldService.getPlayersInRoom(currentRoom.getId())
+        List<CreatureInfo> otherPlayersInRoom = gameWorldService.getPlayersInRoom(currentRoom.getId())
                 .stream()
                 .filter(pc -> !pc.getId().equals(character.getId())) // 자신 제외
-                .map(PlayerCharacter::getNickname)
+                .map(pc -> new CreatureInfo(pc.getNickname(), pc.getState()))
                 .toList();
 
         // 현재 방에 있는 몬스터 목록 가져오기
-        List<String> monstersInRoom = gameWorldService.getMonstersInRoom(currentRoom.getId())
+        List<CreatureInfo> monstersInRoom = gameWorldService.getMonstersInRoom(currentRoom.getId())
                 .stream()
-                .map(monster -> monster.getName() + " (레벨 " + monster.getLevel() + ")")
+                .map(monster -> new CreatureInfo(
+                        monster.getName() + " (레벨 " + monster.getLevel() + ")",
+                        monster.getState()))
                 .toList();
 
         sendRoomInfoMessagePort.sendMessage(new RoomInfoVariables(
@@ -69,4 +72,3 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
         logger.info("Sent room info to user {}", userId);
     }
 }
-

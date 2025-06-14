@@ -71,6 +71,7 @@ public class BaseCharacter {
         this.hp -= hp;
         if (this.hp <= 0) {
             this.alive = false;
+            this.state = CharacterState.DEAD;
         }
     }
 }
