@@ -99,7 +99,6 @@ public class CombatService implements TickListener {
     }
 
     private void sendCombatActionMessage(Combat combat, CombatActionResult combatActionResult) {
-        List<Long> allyUserIds = combat.getAllyUserIds();
         List<PlayerCharacter> users = combat.getAllyUsers();
         for (PlayerCharacter user : users) {
             sendCombatMessagePort.sendCombatActionMessageToUser(new CombatActionVariables(user.getUserId(), user.getId(), combatActionResult));
