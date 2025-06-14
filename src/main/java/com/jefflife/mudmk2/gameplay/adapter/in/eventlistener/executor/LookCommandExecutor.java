@@ -5,7 +5,6 @@ import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand
 import com.jefflife.mudmk2.gameplay.application.port.in.LookUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,8 +15,7 @@ public class LookCommandExecutor implements CommandExecutor {
     private static final Logger logger = LoggerFactory.getLogger(LookCommandExecutor.class);
     private final LookUseCase lookUseCase;
 
-    @Autowired
-    public LookCommandExecutor(@Autowired(required = false) LookUseCase lookUseCase) {
+    public LookCommandExecutor(LookUseCase lookUseCase) {
         this.lookUseCase = lookUseCase;
     }
 
