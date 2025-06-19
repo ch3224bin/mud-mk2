@@ -10,12 +10,19 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SpeakCommandParser extends AbstractCommandParser {
-    
+
     @Override
     protected Command parseCommand(Long userId, String content) {
         if (content.endsWith(" 말")) {
-            String message = content.substring(0, content.length() - 2);
-            SpeakCommand command = new SpeakCommand(userId, message);
+            String fullMessage = content.substring(0, content.length() - 2);
+            String target = null;
+
+            String[] words = fullMessage.split(" ");
+            if (words.length > 1) {
+                target = words[0];
+            }
+
+            SpeakCommand command = new SpeakCommand(userId, target, fullMessage);
             logger.debug("Parsed SpeakCommand: {}", command);
             return command;
         }
