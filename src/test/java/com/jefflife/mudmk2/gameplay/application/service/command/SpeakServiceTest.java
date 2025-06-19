@@ -9,20 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class SpeakServiceTest {
 
     private static final Long USER_ID = 1L;
@@ -36,62 +27,56 @@ class SpeakServiceTest {
     private static final String NPC_NAME = "NPC";
     private static final String MESSAGE = "안녕하세요";
 
-    @Mock
-    private GameWorldService gameWorldService;
-
-    @Mock
-    private SendMessageToUserPort sendMessageToUserPort;
-
-    @Captor
-    private ArgumentCaptor<Long> userIdCaptor;
-
-    @Captor
-    private ArgumentCaptor<String> messageCaptor;
-
+    private FakeGameWorldService gameWorldService;
+    private FakeMessageSender messageSender;
     private SpeakService speakService;
 
     @BeforeEach
     void setUp() {
-        speakService = new SpeakService(gameWorldService, sendMessageToUserPort);
+        gameWorldService = new FakeGameWorldService();
+        messageSender = new FakeMessageSender();
+        speakService = new SpeakService(gameWorldService, messageSender);
     }
 
     @Nested
     @DisplayName("말하기 테스트")
     class SpeakTests {
 
+        @BeforeEach
+        void setUp() {
+            messageSender.clear();
+        }
+
         @Test
         @DisplayName("타겟 없이 말하면 방에 있는 모든 플레이어에게 메시지를 보낸다")
         void shouldSendMessageToAllPlayersInRoomWhenNoTarget() {
             // given
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
+            FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
+
+            gameWorldService.addPlayer(player);
+            gameWorldService.addPlayer(otherPlayer);
+
             SpeakCommand command = new SpeakCommand(USER_ID, null, MESSAGE);
-            PlayerCharacter player = mock(PlayerCharacter.class);
-            PlayerCharacter otherPlayer = mock(PlayerCharacter.class);
-            List<PlayerCharacter> playersInRoom = Arrays.asList(player, otherPlayer);
-
-            lenient().when(player.getId()).thenReturn(PLAYER_ID);
-            lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-            lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(player.getUserId()).thenReturn(USER_ID);
-
-            lenient().when(otherPlayer.getId()).thenReturn(OTHER_PLAYER_ID);
-            lenient().when(otherPlayer.getName()).thenReturn(OTHER_PLAYER_NAME);
-            lenient().when(otherPlayer.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(otherPlayer.getUserId()).thenReturn(OTHER_USER_ID);
-
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
-            lenient().when(gameWorldService.getPlayersInRoom(ROOM_ID)).thenReturn(playersInRoom);
 
             // when
             speakService.speak(command);
 
             // then
-            verify(sendMessageToUserPort, times(2)).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
-            List<Long> capturedUserIds = userIdCaptor.getAllValues();
-            List<String> capturedMessages = messageCaptor.getAllValues();
+            List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(capturedUserIds).contains(USER_ID, OTHER_USER_ID);
-            for (String message : capturedMessages) {
-                assertThat(message).isEqualTo(PLAYER_NAME + "가 \"" + MESSAGE + "\"라고 말합니다");
+            assertThat(sentMessages).hasSize(2);
+
+            // Check that messages were sent to both players
+            List<Long> userIds = sentMessages.stream()
+                    .map(msg -> msg.userId)
+                    .toList();
+            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+
+            // Check message content
+            String expectedMessage = PLAYER_NAME + "가 \"" + MESSAGE + "\"라고 말합니다";
+            for (FakeMessageSender.Message message : sentMessages) {
+                assertThat(message.content).isEqualTo(expectedMessage);
             }
         }
 
@@ -99,41 +84,34 @@ class SpeakServiceTest {
         @DisplayName("NPC를 타겟으로 말하면 방에 있는 모든 플레이어에게 타겟을 포함한 메시지를 보낸다")
         void shouldSendMessageToAllPlayersInRoomWhenTargetIsNpc() {
             // given
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
+            FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
+            FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID);
+
+            gameWorldService.addPlayer(player);
+            gameWorldService.addPlayer(otherPlayer);
+            gameWorldService.addNpc(npc);
+
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
-            PlayerCharacter player = mock(PlayerCharacter.class);
-            PlayerCharacter otherPlayer = mock(PlayerCharacter.class);
-            NonPlayerCharacter npc = mock(NonPlayerCharacter.class);
-            List<PlayerCharacter> playersInRoom = Arrays.asList(player, otherPlayer);
-
-            lenient().when(player.getId()).thenReturn(PLAYER_ID);
-            lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-            lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(player.getUserId()).thenReturn(USER_ID);
-
-            lenient().when(otherPlayer.getId()).thenReturn(OTHER_PLAYER_ID);
-            lenient().when(otherPlayer.getName()).thenReturn(OTHER_PLAYER_NAME);
-            lenient().when(otherPlayer.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(otherPlayer.getUserId()).thenReturn(OTHER_USER_ID);
-
-            lenient().when(npc.getId()).thenReturn(NPC_ID);
-            lenient().when(npc.getName()).thenReturn(NPC_NAME);
-            lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID);
-
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.getPlayersInRoom(ROOM_ID)).thenReturn(playersInRoom);
 
             // when
             speakService.speak(command);
 
             // then
-            verify(sendMessageToUserPort, times(2)).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
-            List<Long> capturedUserIds = userIdCaptor.getAllValues();
-            List<String> capturedMessages = messageCaptor.getAllValues();
+            List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(capturedUserIds).contains(USER_ID, OTHER_USER_ID);
-            for (String message : capturedMessages) {
-                assertThat(message).isEqualTo(PLAYER_NAME + "가 " + NPC_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다");
+            assertThat(sentMessages).hasSize(2);
+
+            // Check that messages were sent to both players
+            List<Long> userIds = sentMessages.stream()
+                    .map(msg -> msg.userId)
+                    .toList();
+            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+
+            // Check message content
+            String expectedMessage = PLAYER_NAME + "가 " + NPC_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다";
+            for (FakeMessageSender.Message message : sentMessages) {
+                assertThat(message.content).isEqualTo(expectedMessage);
             }
         }
 
@@ -141,36 +119,32 @@ class SpeakServiceTest {
         @DisplayName("PC를 타겟으로 말하면 방에 있는 모든 플레이어에게 타겟을 포함한 메시지를 보낸다")
         void shouldSendMessageToAllPlayersInRoomWhenTargetIsPlayer() {
             // given
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
+            FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
+
+            gameWorldService.addPlayer(player);
+            gameWorldService.addPlayer(otherPlayer);
+
             SpeakCommand command = new SpeakCommand(USER_ID, OTHER_PLAYER_NAME, MESSAGE);
-            PlayerCharacter player = mock(PlayerCharacter.class);
-            PlayerCharacter otherPlayer = mock(PlayerCharacter.class);
-            List<PlayerCharacter> playersInRoom = Arrays.asList(player, otherPlayer);
-
-            lenient().when(player.getId()).thenReturn(PLAYER_ID);
-            lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-            lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(player.getUserId()).thenReturn(USER_ID);
-
-            lenient().when(otherPlayer.getId()).thenReturn(OTHER_PLAYER_ID);
-            lenient().when(otherPlayer.getName()).thenReturn(OTHER_PLAYER_NAME);
-            lenient().when(otherPlayer.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(otherPlayer.getUserId()).thenReturn(OTHER_USER_ID);
-
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
-            lenient().when(gameWorldService.getNpcByName(OTHER_PLAYER_NAME)).thenReturn(null);
-            lenient().when(gameWorldService.getPlayersInRoom(ROOM_ID)).thenReturn(playersInRoom);
 
             // when
             speakService.speak(command);
 
             // then
-            verify(sendMessageToUserPort, times(2)).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
-            List<Long> capturedUserIds = userIdCaptor.getAllValues();
-            List<String> capturedMessages = messageCaptor.getAllValues();
+            List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(capturedUserIds).contains(USER_ID, OTHER_USER_ID);
-            for (String message : capturedMessages) {
-                assertThat(message).isEqualTo(PLAYER_NAME + "가 " + OTHER_PLAYER_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다");
+            assertThat(sentMessages).hasSize(2);
+
+            // Check that messages were sent to both players
+            List<Long> userIds = sentMessages.stream()
+                    .map(msg -> msg.userId)
+                    .toList();
+            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+
+            // Check message content
+            String expectedMessage = PLAYER_NAME + "가 " + OTHER_PLAYER_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다";
+            for (FakeMessageSender.Message message : sentMessages) {
+                assertThat(message.content).isEqualTo(expectedMessage);
             }
         }
 
@@ -179,55 +153,175 @@ class SpeakServiceTest {
         void shouldSendErrorMessageWhenTargetNotInRoom() {
             // given
             String targetName = "존재하지않는타겟";
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
+
+            gameWorldService.addPlayer(player);
+
             SpeakCommand command = new SpeakCommand(USER_ID, targetName, MESSAGE);
-            PlayerCharacter player = mock(PlayerCharacter.class);
-            List<PlayerCharacter> playersInRoom = Arrays.asList(player);
-
-            lenient().when(player.getId()).thenReturn(PLAYER_ID);
-            lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-            lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(player.getUserId()).thenReturn(USER_ID);
-
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
-            lenient().when(gameWorldService.getNpcByName(targetName)).thenReturn(null);
-            lenient().when(gameWorldService.getPlayersInRoom(ROOM_ID)).thenReturn(playersInRoom);
 
             // when
             speakService.speak(command);
 
             // then
-            verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
-            assertThat(userIdCaptor.getValue()).isEqualTo(USER_ID);
-            assertThat(messageCaptor.getValue()).isEqualTo(targetName + "은 이 방안에 없습니다.");
+            List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
+
+            assertThat(sentMessages).hasSize(1);
+            FakeMessageSender.Message message = sentMessages.getFirst();
+
+            assertThat(message.userId).isEqualTo(USER_ID);
+            assertThat(message.content).isEqualTo(targetName + "은 이 방안에 없습니다.");
         }
 
         @Test
         @DisplayName("NPC가 다른 방에 있으면 플레이어에게 오류 메시지를 보낸다")
         void shouldSendErrorMessageWhenNpcInDifferentRoom() {
             // given
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
+            FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID + 1); // 다른 방
+
+            gameWorldService.addPlayer(player);
+            gameWorldService.addNpc(npc);
+
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
-            PlayerCharacter player = mock(PlayerCharacter.class);
-            NonPlayerCharacter npc = mock(NonPlayerCharacter.class);
-
-            lenient().when(player.getId()).thenReturn(PLAYER_ID);
-            lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-            lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(player.getUserId()).thenReturn(USER_ID);
-
-            lenient().when(npc.getId()).thenReturn(NPC_ID);
-            lenient().when(npc.getName()).thenReturn(NPC_NAME);
-            lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID + 1); // 다른 방
-
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
 
             // when
             speakService.speak(command);
 
             // then
-            verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
-            assertThat(userIdCaptor.getValue()).isEqualTo(USER_ID);
-            assertThat(messageCaptor.getValue()).isEqualTo(NPC_NAME + "은 이 방안에 없습니다.");
+            List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
+
+            assertThat(sentMessages).hasSize(1);
+            FakeMessageSender.Message message = sentMessages.getFirst();
+
+            assertThat(message.userId).isEqualTo(USER_ID);
+            assertThat(message.content).isEqualTo(NPC_NAME + "은 이 방안에 없습니다.");
+        }
+    }
+
+    // Fake implementation of GameWorldService
+    static class FakeGameWorldService extends GameWorldService {
+        private final Map<Long, PlayerCharacter> playersByUserId = new HashMap<>();
+        private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
+        private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
+
+        public void addPlayer(PlayerCharacter player) {
+            playersByUserId.put(player.getUserId(), player);
+            playersByRoomId.computeIfAbsent(player.getCurrentRoomId(), k -> new ArrayList<>()).add(player);
+        }
+
+        public void addNpc(NonPlayerCharacter npc) {
+            npcsByName.put(npc.getName(), npc);
+        }
+
+        @Override
+        public PlayerCharacter getPlayerByUserId(Long userId) {
+            return playersByUserId.get(userId);
+        }
+
+        @Override
+        public NonPlayerCharacter getNpcByName(String name) {
+            return npcsByName.get(name);
+        }
+
+        @Override
+        public List<PlayerCharacter> getPlayersInRoom(Long roomId) {
+            return playersByRoomId.getOrDefault(roomId, Collections.emptyList());
+        }
+    }
+
+    // Fake implementation of SendMessageToUserPort
+    static class FakeMessageSender implements SendMessageToUserPort {
+        private final List<Message> sentMessages = new ArrayList<>();
+
+        static class Message {
+            final Long userId;
+            final String content;
+
+            Message(Long userId, String content) {
+                this.userId = userId;
+                this.content = content;
+            }
+        }
+
+        @Override
+        public void messageToUser(Long userId, String content) {
+            sentMessages.add(new Message(userId, content));
+        }
+
+        public List<Message> getSentMessages() {
+            return sentMessages;
+        }
+
+        public void clear() {
+            sentMessages.clear();
+        }
+    }
+
+    // Fake implementation of PlayerCharacter
+    static class FakePlayerCharacter extends PlayerCharacter {
+        private final UUID id;
+        private final String name;
+        private final Long userId;
+        private Long roomId;
+
+        public FakePlayerCharacter(UUID id, String name, Long userId, Long roomId) {
+            this.id = id;
+            this.name = name;
+            this.userId = userId;
+            this.roomId = roomId;
+        }
+
+        @Override
+        public UUID getId() {
+            return id;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Long getUserId() {
+            return userId;
+        }
+
+        @Override
+        public Long getCurrentRoomId() {
+            return roomId;
+        }
+
+        @Override
+        public void setCurrentRoomId(Long roomId) {
+            this.roomId = roomId;
+        }
+    }
+
+    // Fake implementation of NonPlayerCharacter
+    static class FakeNonPlayerCharacter extends NonPlayerCharacter {
+        private final UUID id;
+        private final String name;
+        private final Long roomId;
+
+        public FakeNonPlayerCharacter(UUID id, String name, Long roomId) {
+            this.id = id;
+            this.name = name;
+            this.roomId = roomId;
+        }
+
+        @Override
+        public UUID getId() {
+            return id;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Long getCurrentRoomId() {
+            return roomId;
         }
     }
 }
