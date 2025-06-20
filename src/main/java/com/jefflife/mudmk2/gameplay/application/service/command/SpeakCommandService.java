@@ -48,21 +48,26 @@ public class SpeakCommandService implements SpeakUseCase {
 
         List<PlayerCharacter> playersInRoom = gameWorldService.getPlayersInRoom(roomId);
         for (PlayerCharacter playerInRoom : playersInRoom) {
-            String message;
-            if (playerInRoom.equals(speaker)) {
-                message = String.format("당신은 \"%s\"라고 말합니다.", command.message());
-                if (speakTarget != null) {
-                    message = String.format("당신은 %s에게 \"%s\"라고 말합니다.", speakTarget.getName(), command.message());
-                }
-            } else if (playerInRoom.equals(speakTarget)) {
-                message = String.format("%s이(가) 당신에게 \"%s\"라고 말합니다.", speaker.getName(), command.message());
-            } else {
-                message = String.format("%s이(가) \"%s\"라고 말합니다", speaker.getName(), command.message());
-                if (speakTarget != null) {
-                    message = String.format("%s이(가) %s에게 \"%s\"라고 말합니다", speaker.getName(), speakTarget.getName(), command.message());
-                }
-            }
+            String message = createMessageForPlayer(command, playerInRoom, speaker, speakTarget);
             sendMessageToUser(playerInRoom.getUserId(), message);
+        }
+    }
+
+    private static String createMessageForPlayer(SpeakCommand command, PlayerCharacter playerInRoom, PlayerCharacter speaker, Statable speakTarget) {
+        if (playerInRoom.equals(speaker)) {
+            String message = String.format("당신은 \"%s\"라고 말합니다.", command.message());
+            if (speakTarget != null) {
+                message = String.format("당신은 %s에게 \"%s\"라고 말합니다.", speakTarget.getName(), command.message());
+            }
+            return message;
+        } else if (playerInRoom.equals(speakTarget)) {
+            return String.format("%s이(가) 당신에게 \"%s\"라고 말합니다.", speaker.getName(), command.message());
+        } else {
+            String message = String.format("%s이(가) \"%s\"라고 말합니다", speaker.getName(), command.message());
+            if (speakTarget != null) {
+                message = String.format("%s이(가) %s에게 \"%s\"라고 말합니다", speaker.getName(), speakTarget.getName(), command.message());
+            }
+            return message;
         }
     }
 
