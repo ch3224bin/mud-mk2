@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -283,5 +284,12 @@ public class GameWorldService {
                 .stream()
                 .filter(party -> party.contains(playerId))
                 .findFirst();
+    }
+
+    public PlayerCharacter getPlayerByName(String name) {
+        return activePlayers.values().stream()
+                .filter(playerCharacter -> StringUtils.equalsIgnoreCase(playerCharacter.getName(), name))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -14,7 +14,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SpeakServiceTest {
+class SpeakCommandServiceTest {
 
     private static final Long USER_ID = 1L;
     private static final Long OTHER_USER_ID = 2L;
@@ -29,13 +29,13 @@ class SpeakServiceTest {
 
     private FakeGameWorldService gameWorldService;
     private FakeMessageSender messageSender;
-    private SpeakService speakService;
+    private SpeakCommandService speakCommandService;
 
     @BeforeEach
     void setUp() {
         gameWorldService = new FakeGameWorldService();
         messageSender = new FakeMessageSender();
-        speakService = new SpeakService(gameWorldService, messageSender);
+        speakCommandService = new SpeakCommandService(gameWorldService, messageSender);
     }
 
     @Nested
@@ -60,7 +60,7 @@ class SpeakServiceTest {
             SpeakCommand command = new SpeakCommand(USER_ID, null, MESSAGE);
 
             // when
-            speakService.speak(command);
+            speakCommandService.speak(command);
 
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
@@ -95,7 +95,7 @@ class SpeakServiceTest {
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
 
             // when
-            speakService.speak(command);
+            speakCommandService.speak(command);
 
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
@@ -128,7 +128,7 @@ class SpeakServiceTest {
             SpeakCommand command = new SpeakCommand(USER_ID, OTHER_PLAYER_NAME, MESSAGE);
 
             // when
-            speakService.speak(command);
+            speakCommandService.speak(command);
 
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
@@ -160,7 +160,7 @@ class SpeakServiceTest {
             SpeakCommand command = new SpeakCommand(USER_ID, targetName, MESSAGE);
 
             // when
-            speakService.speak(command);
+            speakCommandService.speak(command);
 
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
@@ -185,7 +185,7 @@ class SpeakServiceTest {
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
 
             // when
-            speakService.speak(command);
+            speakCommandService.speak(command);
 
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();

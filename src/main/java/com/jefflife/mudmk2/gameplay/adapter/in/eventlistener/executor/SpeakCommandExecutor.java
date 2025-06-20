@@ -17,7 +17,7 @@ public class SpeakCommandExecutor implements CommandExecutor {
     private final SpeakUseCase speakUseCase;
 
     @Autowired
-    public SpeakCommandExecutor(@Autowired(required = false) SpeakUseCase speakUseCase) {
+    public SpeakCommandExecutor(SpeakUseCase speakUseCase) {
         this.speakUseCase = speakUseCase;
     }
 
