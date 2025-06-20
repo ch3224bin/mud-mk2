@@ -9,6 +9,7 @@ import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class SpeakCommandService implements SpeakUseCase {
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
+    @Async("taskExecutor")
     @Override
     public void speak(final SpeakCommand command) {
         PlayerCharacter speaker = getSpeaker(command.userId());
