@@ -65,19 +65,19 @@ class SpeakCommandServiceTest {
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(sentMessages).hasSize(2);
-
-            // Check that messages were sent to both players
-            List<Long> userIds = sentMessages.stream()
-                    .map(msg -> msg.userId)
+            // 화자에게는 "당신은 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> speakerMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(USER_ID))
                     .toList();
-            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+            assertThat(speakerMessages).hasSize(1);
+            assertThat(speakerMessages.getFirst().content).isEqualTo(String.format("당신은 \"%s\"라고 말합니다.", MESSAGE));
 
-            // Check message content
-            String expectedMessage = PLAYER_NAME + "가 \"" + MESSAGE + "\"라고 말합니다";
-            for (FakeMessageSender.Message message : sentMessages) {
-                assertThat(message.content).isEqualTo(expectedMessage);
-            }
+            // 다른 플레이어에게는 "플레이어가 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> otherPlayerMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(OTHER_USER_ID))
+                    .toList();
+            assertThat(otherPlayerMessages).hasSize(1);
+            assertThat(otherPlayerMessages.getFirst().content).isEqualTo(String.format("%s이(가) \"%s\"라고 말합니다", PLAYER_NAME, MESSAGE));
         }
 
         @Test
@@ -100,19 +100,19 @@ class SpeakCommandServiceTest {
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(sentMessages).hasSize(2);
-
-            // Check that messages were sent to both players
-            List<Long> userIds = sentMessages.stream()
-                    .map(msg -> msg.userId)
+            // 화자에게는 "당신은 NPC에게 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> speakerMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(USER_ID))
                     .toList();
-            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+            assertThat(speakerMessages).hasSize(1);
+            assertThat(speakerMessages.getFirst().content).isEqualTo(String.format("당신은 %s에게 \"%s\"라고 말합니다.", NPC_NAME, MESSAGE));
 
-            // Check message content
-            String expectedMessage = PLAYER_NAME + "가 " + NPC_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다";
-            for (FakeMessageSender.Message message : sentMessages) {
-                assertThat(message.content).isEqualTo(expectedMessage);
-            }
+            // 다른 플레이어에게는 "플레이어가 NPC에게 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> otherPlayerMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(OTHER_USER_ID))
+                    .toList();
+            assertThat(otherPlayerMessages).hasSize(1);
+            assertThat(otherPlayerMessages.getFirst().content).isEqualTo(String.format("%s이(가) %s에게 \"%s\"라고 말합니다", PLAYER_NAME, NPC_NAME, MESSAGE));
         }
 
         @Test
@@ -133,19 +133,19 @@ class SpeakCommandServiceTest {
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(sentMessages).hasSize(2);
-
-            // Check that messages were sent to both players
-            List<Long> userIds = sentMessages.stream()
-                    .map(msg -> msg.userId)
+            // 화자에게는 "당신은 타겟에게 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> speakerMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(USER_ID))
                     .toList();
-            assertThat(userIds).contains(USER_ID, OTHER_USER_ID);
+            assertThat(speakerMessages).hasSize(1);
+            assertThat(speakerMessages.getFirst().content).isEqualTo(String.format("당신은 %s에게 \"%s\"라고 말합니다.", OTHER_PLAYER_NAME, MESSAGE));
 
-            // Check message content
-            String expectedMessage = PLAYER_NAME + "가 " + OTHER_PLAYER_NAME + "에게 \"" + MESSAGE + "\"라고 말합니다";
-            for (FakeMessageSender.Message message : sentMessages) {
-                assertThat(message.content).isEqualTo(expectedMessage);
-            }
+            // 타겟 플레이어에게는 "플레이어가 당신에게 ~라고 말합니다" 메시지가 전송됨
+            List<FakeMessageSender.Message> targetMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(OTHER_USER_ID))
+                    .toList();
+            assertThat(targetMessages).hasSize(1);
+            assertThat(targetMessages.getFirst().content).isEqualTo(String.format("%s이(가) 당신에게 \"%s\"라고 말합니다.", PLAYER_NAME, MESSAGE));
         }
 
         @Test
@@ -165,11 +165,11 @@ class SpeakCommandServiceTest {
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(sentMessages).hasSize(1);
-            FakeMessageSender.Message message = sentMessages.getFirst();
-
-            assertThat(message.userId).isEqualTo(USER_ID);
-            assertThat(message.content).isEqualTo(targetName + "은 이 방안에 없습니다.");
+            // 화자에게 오류 메시지가 전송됨
+            List<FakeMessageSender.Message> errorMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(USER_ID) && msg.content.equals(targetName + "은(는) 이 방안에 없습니다."))
+                    .toList();
+            assertThat(errorMessages).hasSize(1);
         }
 
         @Test
@@ -190,11 +190,11 @@ class SpeakCommandServiceTest {
             // then
             List<FakeMessageSender.Message> sentMessages = messageSender.getSentMessages();
 
-            assertThat(sentMessages).hasSize(1);
-            FakeMessageSender.Message message = sentMessages.getFirst();
-
-            assertThat(message.userId).isEqualTo(USER_ID);
-            assertThat(message.content).isEqualTo(NPC_NAME + "은 이 방안에 없습니다.");
+            // 화자에게 오류 메시지가 전송됨
+            List<FakeMessageSender.Message> errorMessages = sentMessages.stream()
+                    .filter(msg -> msg.userId.equals(USER_ID) && msg.content.equals(NPC_NAME + "은(는) 이 방안에 없습니다."))
+                    .toList();
+            assertThat(errorMessages).hasSize(1);
         }
     }
 
@@ -203,10 +203,12 @@ class SpeakCommandServiceTest {
         private final Map<Long, PlayerCharacter> playersByUserId = new HashMap<>();
         private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
         private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
+        private final Map<String, PlayerCharacter> playersByName = new HashMap<>();
 
         public void addPlayer(PlayerCharacter player) {
             playersByUserId.put(player.getUserId(), player);
             playersByRoomId.computeIfAbsent(player.getCurrentRoomId(), k -> new ArrayList<>()).add(player);
+            playersByName.put(player.getName(), player);
         }
 
         public void addNpc(NonPlayerCharacter npc) {
@@ -216,6 +218,11 @@ class SpeakCommandServiceTest {
         @Override
         public PlayerCharacter getPlayerByUserId(Long userId) {
             return playersByUserId.get(userId);
+        }
+
+        @Override
+        public PlayerCharacter getPlayerByName(String name) {
+            return playersByName.get(name);
         }
 
         @Override

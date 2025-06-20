@@ -42,6 +42,7 @@ public class SpeakCommandService implements SpeakUseCase {
             speakTarget = findTarget(command.target(), roomId);
             if (speakTarget == null) {
                 sendMessageToUser(command.userId(), String.format("%s은(는) 이 방안에 없습니다.", command.target()));
+                return;
             }
         }
 
@@ -53,10 +54,8 @@ public class SpeakCommandService implements SpeakUseCase {
                 if (speakTarget != null) {
                     message = String.format("당신은 %s에게 \"%s\"라고 말합니다.", speakTarget.getName(), command.message());
                 }
-                sendMessageToUser(playerInRoom.getUserId(), message);
             } else if (playerInRoom.equals(speakTarget)) {
                 message = String.format("%s이(가) 당신에게 \"%s\"라고 말합니다.", speaker.getName(), command.message());
-                sendMessageToUser(playerInRoom.getUserId(), message);
             } else {
                 message = String.format("%s이(가) \"%s\"라고 말합니다", speaker.getName(), command.message());
                 if (speakTarget != null) {
