@@ -15,14 +15,14 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class AttackService implements AttackUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(AttackService.class);
+public class AttackCommandService implements AttackUseCase {
+    private static final Logger logger = LoggerFactory.getLogger(AttackCommandService.class);
 
     private final GameWorldService gameWorldService;
     private final CombatService combatService;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public AttackService(final GameWorldService gameWorldService, final CombatService combatService, final SendMessageToUserPort sendMessageToUserPort) {
+    public AttackCommandService(final GameWorldService gameWorldService, final CombatService combatService, final SendMessageToUserPort sendMessageToUserPort) {
         this.gameWorldService = gameWorldService;
         this.combatService = combatService;
         this.sendMessageToUserPort = sendMessageToUserPort;
