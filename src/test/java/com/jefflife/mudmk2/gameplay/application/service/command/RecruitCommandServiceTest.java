@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RecruitServiceTest {
+class RecruitCommandServiceTest {
 
     @Mock
     private GameWorldService gameWorldService;
@@ -37,7 +37,7 @@ class RecruitServiceTest {
     @Captor
     private ArgumentCaptor<Long> userIdCaptor;
 
-    private RecruitService recruitService;
+    private RecruitCommandService recruitCommandService;
 
     private static final Long USER_ID = 1L;
     private static final UUID PLAYER_ID = UUID.randomUUID();
@@ -47,7 +47,7 @@ class RecruitServiceTest {
 
     @BeforeEach
     void setUp() {
-        recruitService = new RecruitService(gameWorldService, sendMessageToUserPort);
+        recruitCommandService = new RecruitCommandService(gameWorldService, sendMessageToUserPort);
     }
 
     @Nested
@@ -74,7 +74,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(null);
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -100,7 +100,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -127,7 +127,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(true); // 이미 파티에 속해 있음
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -157,7 +157,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -188,7 +188,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -219,7 +219,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -250,7 +250,7 @@ class RecruitServiceTest {
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
-            recruitService.recruit(command);
+            recruitCommandService.recruit(command);
 
             // then
             verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
@@ -285,7 +285,7 @@ class RecruitServiceTest {
                 partyMockedStatic.when(() -> Party.createParty(PLAYER_ID)).thenReturn(newParty);
 
                 // when
-                recruitService.recruit(command);
+                recruitCommandService.recruit(command);
 
                 // then
                 verify(gameWorldService).addParty(newParty);

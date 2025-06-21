@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class RecruitService implements RecruitUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(RecruitService.class);
+public class RecruitCommandService implements RecruitUseCase {
+    private static final Logger logger = LoggerFactory.getLogger(RecruitCommandService.class);
 
     private final GameWorldService gameWorldService;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public RecruitService(
+    public RecruitCommandService(
             final GameWorldService gameWorldService,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
