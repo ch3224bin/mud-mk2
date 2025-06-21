@@ -13,13 +13,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MoveService implements MoveUseCase {
+public class MoveCommandService implements MoveUseCase {
     private final GameWorldService gameWorldService;
     private final DisplayRoomInfoUseCase displayRoomInfoUseCase;
     private final SendMessageToUserPort sendMessageToUserPort;
     private final ApplicationEventPublisher eventPublisher;
 
-    public MoveService(
+    public MoveCommandService(
             final GameWorldService gameWorldService,
             final DisplayRoomInfoUseCase displayRoomInfoUseCase,
             final SendMessageToUserPort sendMessageToUserPort,
