@@ -1,0 +1,210 @@
+<div th:fragment="statusDetails" class="status-info font-terminal">
+    <!-- ASCII Art Header -->
+    <div class="ascii-header text-primary my-2">
+        <pre>
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              캐릭터 상태창                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+        </pre>
+    </div>
+
+    <!-- 캐릭터 기본 정보 -->
+    <div class="character-info-section mb-3">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 기본 정보 <span class="text-primary">===</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">이름:</span>
+            <span class="info-value text-highlight" th:text="${playerName}">플레이어명</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">직업:</span>
+            <span class="info-value text-success" th:text="${characterClass}">직업</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">성별:</span>
+            <span class="info-value text-info" th:text="${gender == T(com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender).MALE ? '남성' : '여성'}">성별</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">레벨:</span>
+            <span class="info-value text-warning font-bold" th:text="${level}">1</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">상태:</span>
+            <span class="info-value text-success" th:text="${state.description()}">상태</span>
+        </div>
+        <div class="info-line">
+            <span class="info-label text-secondary">현재 위치:</span>
+            <span class="info-value text-npc" th:text="${roomName}">방 이름</span>
+        </div>
+    </div>
+
+    <!-- 생명력/마나/경험치 -->
+    <div class="vitals-section mb-3">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 생명력 상태 <span class="text-primary">===</span>
+        </div>
+        <div class="progress-line">
+            <span class="progress-label text-danger">체력 (HP):</span>
+            <span class="progress-text">
+                <span class="text-danger font-bold" th:text="${hp}">100</span> / <span th:text="${maxHp}">100</span>
+                <span class="progress-bar-ascii text-danger" th:with="hpPercent=${hp * 100 / maxHp}">
+                    <span th:if="${hpPercent >= 90}"> [████████████████████] (</span>
+                    <span th:if="${hpPercent >= 80 and hpPercent < 90}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 70 and hpPercent < 80}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 60 and hpPercent < 70}"> [██████████████▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 50 and hpPercent < 60}"> [████████████▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 40 and hpPercent < 50}"> [██████████▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 30 and hpPercent < 40}"> [████████▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 20 and hpPercent < 30}"> [██████▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent >= 10 and hpPercent < 20}"> [████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${hpPercent < 10}"> [██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:text="${#numbers.formatInteger(hpPercent, 0)}">100</span>%)
+                </span>
+            </span>
+        </div>
+        <div class="progress-line">
+            <span class="progress-label text-primary">마나 (MP):</span>
+            <span class="progress-text">
+                <span class="text-primary font-bold" th:text="${mp}">50</span> / <span th:text="${maxMp}">50</span>
+                <span class="progress-bar-ascii text-primary" th:with="mpPercent=${mp * 100 / maxMp}">
+                    <span th:if="${mpPercent >= 90}"> [████████████████████] (</span>
+                    <span th:if="${mpPercent >= 80 and mpPercent < 90}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 70 and mpPercent < 80}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 60 and mpPercent < 70}"> [██████████████▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 50 and mpPercent < 60}"> [████████████▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 40 and mpPercent < 50}"> [██████████▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 30 and mpPercent < 40}"> [████████▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 20 and mpPercent < 30}"> [██████▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent >= 10 and mpPercent < 20}"> [████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${mpPercent < 10}"> [██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:text="${#numbers.formatInteger(mpPercent, 0)}">100</span>%)
+                </span>
+            </span>
+        </div>
+        <div class="progress-line">
+            <span class="progress-label text-success">경험치:</span>
+            <span class="progress-text">
+                <span class="text-success font-bold" th:text="${experience}">0</span> / <span th:text="${nextLevelExp}">100</span>
+                <span class="progress-bar-ascii text-success" th:with="expPercent=${experience * 100 / nextLevelExp}">
+                    <span th:if="${expPercent >= 90}"> [████████████████████] (</span>
+                    <span th:if="${expPercent >= 80 and expPercent < 90}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 70 and expPercent < 80}"> [████████████████▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 60 and expPercent < 70}"> [██████████████▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 50 and expPercent < 60}"> [████████████▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 40 and expPercent < 50}"> [██████████▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 30 and expPercent < 40}"> [████████▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 20 and expPercent < 30}"> [██████▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent >= 10 and expPercent < 20}"> [████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:if="${expPercent < 10}"> [██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] (</span>
+                    <span th:text="${#numbers.formatInteger(expPercent, 0)}">0</span>%)
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <!-- 기본 능력치 -->
+    <div class="stats-section mb-3">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 기본 능력치 <span class="text-primary">===</span>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-line">
+                <span class="stat-label text-secondary">힘 (STR):</span>
+                <span class="stat-value text-success font-bold" th:text="${str}">10</span>
+                <span class="stat-modifier text-item" th:if="${str >= 13}" th:text="'(+' + ${(str - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${str < 10}" th:text="'(' + ${(str - 10) / 2} + ')'"></span>
+            </div>
+            <div class="stat-line">
+                <span class="stat-label text-secondary">민첩 (DEX):</span>
+                <span class="stat-value text-success font-bold" th:text="${dex}">10</span>
+                <span class="stat-modifier text-item" th:if="${dex >= 13}" th:text="'(+' + ${(dex - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${dex < 10}" th:text="'(' + ${(dex - 10) / 2} + ')'"></span>
+            </div>
+            <div class="stat-line">
+                <span class="stat-label text-secondary">체력 (CON):</span>
+                <span class="stat-value text-success font-bold" th:text="${con}">10</span>
+                <span class="stat-modifier text-item" th:if="${con >= 13}" th:text="'(+' + ${(con - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${con < 10}" th:text="'(' + ${(con - 10) / 2} + ')'"></span>
+            </div>
+            <div class="stat-line">
+                <span class="stat-label text-secondary">지능 (INT):</span>
+                <span class="stat-value text-success font-bold" th:text="${intelligence}">10</span>
+                <span class="stat-modifier text-item" th:if="${intelligence >= 13}" th:text="'(+' + ${(intelligence - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${intelligence < 10}" th:text="'(' + ${(intelligence - 10) / 2} + ')'"></span>
+            </div>
+            <div class="stat-line">
+                <span class="stat-label text-secondary">마력 (POW):</span>
+                <span class="stat-value text-success font-bold" th:text="${pow}">10</span>
+                <span class="stat-modifier text-item" th:if="${pow >= 13}" th:text="'(+' + ${(pow - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${pow < 10}" th:text="'(' + ${(pow - 10) / 2} + ')'"></span>
+            </div>
+            <div class="stat-line">
+                <span class="stat-label text-secondary">매력 (CHA):</span>
+                <span class="stat-value text-success font-bold" th:text="${cha}">10</span>
+                <span class="stat-modifier text-item" th:if="${cha >= 13}" th:text="'(+' + ${(cha - 10) / 2} + ')'"></span>
+                <span class="stat-modifier text-danger" th:if="${cha < 10}" th:text="'(' + ${(cha - 10) / 2} + ')'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전투 능력치 (추가) -->
+    <div class="combat-section mb-3" th:if="${attackPower != null or armorClass != null}">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 전투 능력치 <span class="text-primary">===</span>
+        </div>
+        <div class="combat-stats">
+            <div class="stat-line" th:if="${attackPower != null}">
+                <span class="stat-label text-secondary">공격력:</span>
+                <span class="stat-value text-danger font-bold" th:text="${attackPower}">0</span>
+            </div>
+            <div class="stat-line" th:if="${armorClass != null}">
+                <span class="stat-label text-secondary">방어력 (AC):</span>
+                <span class="stat-value text-info font-bold" th:text="${armorClass}">10</span>
+            </div>
+            <div class="stat-line" th:if="${hitBonus != null}">
+                <span class="stat-label text-secondary">명중 보너스:</span>
+                <span class="stat-value text-success font-bold" th:text="${hitBonus}">+0</span>
+            </div>
+            <div class="stat-line" th:if="${dodgeBonus != null}">
+                <span class="stat-label text-secondary">회피 보너스:</span>
+                <span class="stat-value text-success font-bold" th:text="${dodgeBonus}">+0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 장착 장비 (추가) -->
+    <div class="equipment-section mb-3" th:if="${weapon != null or armor != null}">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 장착 장비 <span class="text-primary">===</span>
+        </div>
+        <div class="equipment-list">
+            <div class="equipment-line" th:if="${weapon != null}">
+                <span class="equipment-slot text-secondary">주무기:</span>
+                <span class="equipment-item text-item" th:text="${weapon}">무기 없음</span>
+            </div>
+            <div class="equipment-line" th:if="${armor != null}">
+                <span class="equipment-slot text-secondary">갑옷:</span>
+                <span class="equipment-item text-item" th:text="${armor}">갑옷 없음</span>
+            </div>
+            <div class="equipment-line" th:if="${shield != null}">
+                <span class="equipment-slot text-secondary">방패:</span>
+                <span class="equipment-item text-item" th:text="${shield}">방패 없음</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스킬 정보 (추가) -->
+    <div class="skills-section mb-3" th:if="${skills != null and !skills.isEmpty()}">
+        <div class="section-title text-warning">
+            <span class="text-primary">===</span> 보유 스킬 <span class="text-primary">===</span>
+        </div>
+        <div class="skills-list">
+            <div class="skill-line" th:each="skill : ${skills}">
+                <span class="skill-name text-player" th:text="${skill.name}">스킬명</span>
+                <span class="skill-dots text-secondary">................</span>
+                <span class="skill-level text-warning font-bold" th:text="'Lv ' + ${skill.level}">Lv 1</span>
+            </div>
+        </div>
+    </div>
+</div>

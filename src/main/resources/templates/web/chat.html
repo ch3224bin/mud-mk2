@@ -748,6 +748,99 @@
             content: "✨";
             color: #5c6bc0;
         }
+
+        /* 상태창 */
+        /* Text MUD 스타일 추가 CSS */
+        .ascii-header, .ascii-footer {
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin: 15px 0 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-line, .stat-line, .equipment-line, .skill-line {
+            display: flex;
+            margin: 4px 0;
+            align-items: center;
+        }
+
+        .info-label, .stat-label, .equipment-slot {
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .progress-line {
+            margin: 6px 0;
+            display: block;
+        }
+
+        .progress-label {
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .progress-text {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .progress-bar-ascii {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+
+        .stat-modifier {
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .skill-name {
+            min-width: 200px;
+        }
+
+        .skill-dots {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .skill-level {
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .equipment-item {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .ascii-header, .ascii-footer {
+                font-size: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-label, .stat-label, .equipment-slot {
+                min-width: 100px;
+            }
+
+            .skill-name {
+                min-width: 150px;
+            }
+        }
     </style>
 </head>
 <body>
