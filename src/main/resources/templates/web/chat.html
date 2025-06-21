@@ -812,9 +812,19 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
 
+        // Set focus on messageInput when page loads
+        if (messageInput) {
+            messageInput.focus();
+        }
+
         // Get username from Thymeleaf
         const username = /*[[${userName}]]*/ 'default-user';
         const userPicture = /*[[${userPicture}]]*/ '';
+
+        // Message history functionality
+        const messageHistory = [];
+        let historyIndex = -1;
+        const MAX_HISTORY_SIZE = 50;
 
         let stompClient = null;
 
@@ -911,6 +921,20 @@
                 // Store the command for processing
                 lastUserCommand = message;
 
+                // Add to message history if it's not the same as the last entry
+                if (messageHistory.length === 0 || messageHistory[messageHistory.length - 1] !== message) {
+                    // Add to history
+                    messageHistory.push(message);
+
+                    // Keep history size limited
+                    if (messageHistory.length > MAX_HISTORY_SIZE) {
+                        messageHistory.shift(); // Remove oldest entry
+                    }
+                }
+
+                // Reset history index
+                historyIndex = -1;
+
                 const chatMessage = {
                     sender: username,
                     content: message,
@@ -943,6 +967,35 @@
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
+            }
+        });
+
+        // Add keyboard navigation for message history
+        messageInput.addEventListener('keydown', function(e) {
+            // Up arrow key - navigate to previous command in history
+            if (e.key === 'ArrowUp') {
+                e.preventDefault(); // Prevent cursor from moving to start of input
+
+                if (messageHistory.length > 0) {
+                    // If we're at the beginning or haven't started navigating yet
+                    if (historyIndex < messageHistory.length - 1) {
+                        historyIndex++;
+                        messageInput.value = messageHistory[messageHistory.length - 1 - historyIndex];
+                    }
+                }
+            } 
+            // Down arrow key - navigate to next command in history
+            else if (e.key === 'ArrowDown') {
+                e.preventDefault(); // Prevent cursor from moving to end of input
+
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    messageInput.value = messageHistory[messageHistory.length - 1 - historyIndex];
+                } else if (historyIndex === 0) {
+                    // If we've reached the most recent command, clear the input
+                    historyIndex = -1;
+                    messageInput.value = '';
+                }
             }
         });
 
