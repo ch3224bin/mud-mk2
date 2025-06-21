@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
  * Handles look commands in the game.
  */
 @Service
-public class LookService implements LookUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(LookService.class);
+public class LookCommandService implements LookUseCase {
+    private static final Logger logger = LoggerFactory.getLogger(LookCommandService.class);
     
     private final DisplayRoomInfoUseCase displayRoomInfoUseCase;
     
-    public LookService(DisplayRoomInfoUseCase displayRoomInfoUseCase) {
+    public LookCommandService(DisplayRoomInfoUseCase displayRoomInfoUseCase) {
         this.displayRoomInfoUseCase = displayRoomInfoUseCase;
     }
     

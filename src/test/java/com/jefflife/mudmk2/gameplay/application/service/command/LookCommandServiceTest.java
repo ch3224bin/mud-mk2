@@ -13,16 +13,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class LookServiceTest {
+class LookCommandServiceTest {
 
     @Mock
     private DisplayRoomInfoUseCase displayRoomInfoUseCase;
 
-    private LookService lookService;
+    private LookCommandService lookCommandService;
 
     @BeforeEach
     void setUp() {
-        lookService = new LookService(displayRoomInfoUseCase);
+        lookCommandService = new LookCommandService(displayRoomInfoUseCase);
     }
 
     @Nested
@@ -38,7 +38,7 @@ class LookServiceTest {
             LookCommand command = new LookCommand(userId, null);
 
             // When
-            lookService.look(command);
+            lookCommandService.look(command);
 
             // Then
             verify(displayRoomInfoUseCase).displayRoomInfo(userId);
@@ -51,7 +51,7 @@ class LookServiceTest {
             LookCommand command = new LookCommand(userId, "");
 
             // When
-            lookService.look(command);
+            lookCommandService.look(command);
 
             // Then
             verify(displayRoomInfoUseCase).displayRoomInfo(userId);
@@ -64,7 +64,7 @@ class LookServiceTest {
             LookCommand command = new LookCommand(userId, "도토리");
 
             // When
-            lookService.look(command);
+            lookCommandService.look(command);
 
             // Then
             verify(displayRoomInfoUseCase, never()).displayRoomInfo(any());
