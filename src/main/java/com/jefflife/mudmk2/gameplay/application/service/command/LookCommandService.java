@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
+import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.port.in.LookUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 public class LookCommandService implements LookUseCase {
     private static final Logger logger = LoggerFactory.getLogger(LookCommandService.class);
     
-    private final DisplayRoomInfoUseCase displayRoomInfoUseCase;
+    private final RoomDescriber roomDescriber;
     
-    public LookCommandService(DisplayRoomInfoUseCase displayRoomInfoUseCase) {
-        this.displayRoomInfoUseCase = displayRoomInfoUseCase;
+    public LookCommandService(RoomDescriber roomDescriber) {
+        this.roomDescriber = roomDescriber;
     }
     
     @Override
@@ -28,7 +28,7 @@ public class LookCommandService implements LookUseCase {
         // If target is null or empty, display room info
         if (command.target() == null || command.target().isEmpty()) {
             logger.debug("No target specified, displaying room info for user: {}", command.userId());
-            displayRoomInfoUseCase.displayRoomInfo(command.userId());
+            roomDescriber.describe(command.userId());
             return;
         }
         

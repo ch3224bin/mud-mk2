@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
+import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,13 +16,13 @@ import static org.mockito.Mockito.*;
 class LookCommandServiceTest {
 
     @Mock
-    private DisplayRoomInfoUseCase displayRoomInfoUseCase;
+    private RoomDescriber roomDescriber;
 
     private LookCommandService lookCommandService;
 
     @BeforeEach
     void setUp() {
-        lookCommandService = new LookCommandService(displayRoomInfoUseCase);
+        lookCommandService = new LookCommandService(roomDescriber);
     }
 
     @Nested
@@ -41,7 +41,7 @@ class LookCommandServiceTest {
             lookCommandService.look(command);
 
             // Then
-            verify(displayRoomInfoUseCase).displayRoomInfo(userId);
+            verify(roomDescriber).describe(userId);
         }
 
         @Test
@@ -54,7 +54,7 @@ class LookCommandServiceTest {
             lookCommandService.look(command);
 
             // Then
-            verify(displayRoomInfoUseCase).displayRoomInfo(userId);
+            verify(roomDescriber).describe(userId);
         }
 
         @Test
@@ -67,7 +67,7 @@ class LookCommandServiceTest {
             lookCommandService.look(command);
 
             // Then
-            verify(displayRoomInfoUseCase, never()).displayRoomInfo(any());
+            verify(roomDescriber, never()).describe(any());
         }
     }
 }

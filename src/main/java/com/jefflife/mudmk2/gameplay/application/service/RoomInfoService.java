@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
+import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.RoomInfoVariables;
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(DisplayRoomInfoService.class);
+public class RoomInfoService implements RoomDescriber {
+    private static final Logger logger = LoggerFactory.getLogger(RoomInfoService.class);
 
     private final GameWorldService gameWorldService;
     private final SendRoomInfoMessagePort sendRoomInfoMessagePort;
 
-    public DisplayRoomInfoService(
+    public RoomInfoService(
             final GameWorldService gameWorldService,
             final SendRoomInfoMessagePort sendRoomInfoMessagePort
     ) {
@@ -28,7 +28,7 @@ public class DisplayRoomInfoService implements DisplayRoomInfoUseCase {
     }
 
     @Override
-    public void displayRoomInfo(Long userId) {
+    public void describe(Long userId) {
         final PlayerCharacter character = gameWorldService.getPlayerByUserId(userId);
 
         if (character == null) {

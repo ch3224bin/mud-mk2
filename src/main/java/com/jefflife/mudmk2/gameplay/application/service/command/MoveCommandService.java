@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.event.PlayerMoveEvent;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.MoveCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.DisplayRoomInfoUseCase;
+import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.port.in.MoveUseCase;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class MoveCommandService implements MoveUseCase {
     private final GameWorldService gameWorldService;
-    private final DisplayRoomInfoUseCase displayRoomInfoUseCase;
+    private final RoomDescriber roomDescriber;
     private final SendMessageToUserPort sendMessageToUserPort;
     private final ApplicationEventPublisher eventPublisher;
 
     public MoveCommandService(
             final GameWorldService gameWorldService,
-            final DisplayRoomInfoUseCase displayRoomInfoUseCase,
+            final RoomDescriber roomDescriber,
             final SendMessageToUserPort sendMessageToUserPort,
             final ApplicationEventPublisher eventPublisher
     ) {
         this.gameWorldService = gameWorldService;
-        this.displayRoomInfoUseCase = displayRoomInfoUseCase;
+        this.roomDescriber = roomDescriber;
         this.sendMessageToUserPort = sendMessageToUserPort;
         this.eventPublisher = eventPublisher;
     }
@@ -41,7 +41,7 @@ public class MoveCommandService implements MoveUseCase {
         switch (moveResult) {
             case SUCCESS:
                 sendMessageToUserPort.messageToUser(command.userId(), String.format("당신은 %s쪽으로 이동 합니다.", direction.getName()));
-                displayRoomInfoUseCase.displayRoomInfo(command.userId());
+                roomDescriber.describe(command.userId());
                 eventPublisher.publishEvent(new PlayerMoveEvent(player.getId(), fromRoomId, player.getCurrentRoomId()));
                 break;
             case NO_WAY, FAILED:
