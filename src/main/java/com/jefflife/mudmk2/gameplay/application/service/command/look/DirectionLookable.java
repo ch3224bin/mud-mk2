@@ -8,11 +8,18 @@ import java.util.Map;
 public record DirectionLookable(Direction direction, Room room) implements Lookable {
     @Override
     public String getName() {
-        return "";
+        return room.getName();
+    }
+
+    @Override
+    public LookableType getType() {
+        return LookableType.DIRECTION;
     }
 
     @Override
     public Map<String, Object> getProperties() {
-        return Map.of();
+        return Map.of(
+                "summary", room.getSummary()
+        );
     }
 }

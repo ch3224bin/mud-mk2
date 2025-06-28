@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand;
 import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.LookTargetProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,11 +19,14 @@ class LookCommandServiceTest {
     @Mock
     private RoomDescriber roomDescriber;
 
+    @Mock
+    private LookTargetProcessor lookTargetProcessor;
+
     private LookCommandService lookCommandService;
 
     @BeforeEach
     void setUp() {
-        lookCommandService = new LookCommandService(roomDescriber);
+        lookCommandService = new LookCommandService(roomDescriber, lookTargetProcessor);
     }
 
     @Nested

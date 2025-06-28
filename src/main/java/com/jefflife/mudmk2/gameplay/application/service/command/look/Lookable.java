@@ -15,6 +15,14 @@ public interface Lookable {
     String getName();
 
     /**
+     * 대상의 유형(LookableType)을 반환합니다.
+     * Lookable 인터페이스를 구현한 객체의 구체적인 유형을 나타냅니다.
+     *
+     * @return 대상의 유형을 나타내는 LookableType 열거형 값
+     */
+    LookableType getType();
+
+    /**
      * 대상의 속성 정보를 조회합니다.
      * 반환된 속성 정보는 키-값 쌍으로 구성된 맵 형태이며, 각 키는 속성의 이름,
      * 값은 해당 속성의 구체적인 정보를 나타냅니다.

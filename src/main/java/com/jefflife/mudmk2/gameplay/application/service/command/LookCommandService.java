@@ -3,6 +3,8 @@ package com.jefflife.mudmk2.gameplay.application.service.command;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand;
 import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.port.in.LookUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.LookTargetProcessor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,15 +13,13 @@ import org.springframework.stereotype.Service;
  * Service implementation for the LookUseCase.
  * Handles look commands in the game.
  */
+@RequiredArgsConstructor
 @Service
 public class LookCommandService implements LookUseCase {
     private static final Logger logger = LoggerFactory.getLogger(LookCommandService.class);
     
     private final RoomDescriber roomDescriber;
-    
-    public LookCommandService(RoomDescriber roomDescriber) {
-        this.roomDescriber = roomDescriber;
-    }
+    private final LookTargetProcessor lookTargetProcessor;
     
     @Override
     public void look(LookCommand command) {
@@ -31,8 +31,7 @@ public class LookCommandService implements LookUseCase {
             roomDescriber.describe(command.userId());
             return;
         }
-        
-        // For future implementation: handle specific targets like "도토리 봐", "사냥꾼 봐"
-        logger.info("Look at target '{}' not implemented yet", command.target());
+
+        lookTargetProcessor.processLookTarget(command.userId(), command.target());
     }
 }
