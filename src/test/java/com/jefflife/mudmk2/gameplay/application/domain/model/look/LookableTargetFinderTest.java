@@ -1,5 +1,8 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.look;
 
+import com.jefflife.mudmk2.gameplay.application.service.command.look.DirectionLookable;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.Lookable;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.LookableTargetFinder;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

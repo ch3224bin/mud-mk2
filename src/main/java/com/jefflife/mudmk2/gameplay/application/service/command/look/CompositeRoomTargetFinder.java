@@ -1,8 +1,5 @@
-package com.jefflife.mudmk2.gameplay.application.service.command;
+package com.jefflife.mudmk2.gameplay.application.service.command.look;
 
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.Lookable;
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.LookableTargetFinder;
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.TargetSearchStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;

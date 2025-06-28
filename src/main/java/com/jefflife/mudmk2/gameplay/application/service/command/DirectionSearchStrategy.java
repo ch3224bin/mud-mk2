@@ -1,11 +1,11 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.DirectionLookable;
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.Lookable;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.DirectionLookable;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.Lookable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gameplay.application.domain.model.look.TargetSearchStrategy;
+import com.jefflife.mudmk2.gameplay.application.service.command.look.TargetSearchStrategy;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.springframework.stereotype.Component;
 

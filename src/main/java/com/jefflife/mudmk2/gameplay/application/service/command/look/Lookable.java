@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gameplay.application.domain.model.look;
+package com.jefflife.mudmk2.gameplay.application.service.command.look;
 
 import java.util.Map;
 
