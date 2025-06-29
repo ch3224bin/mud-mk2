@@ -1,3 +1,32 @@
+<div th:fragment="roomInfo" class="room-info font-terminal">
+    <div class="line section-title" th:text="${'=== ' + roomName + '==='}">=== Room Name ===</div>
+    <div class="line text-gray" th:utext="${roomDescription}">Room description goes here.</div>
+    <div class="line-spacer"></div>
+
+    <div class="line text-orange">🚪 출구:
+        <span th:if="${not #lists.isEmpty(exits)}">
+            <span th:each="exit, iter : ${exits}">
+                <span class="text-green" th:text="${exit}">North</span><span th:if="${!iter.last}">, </span>
+            </span>
+        </span>
+        <span th:if="${#lists.isEmpty(exits)}" class="text-green">없음</span>
+    </div>
+    <div class="line-spacer"></div>
+
+    <div class="line section-title"  th:if="${not #lists.isEmpty(npcsInRoom)}">=== 이곳의 인물들 ===</div>
+    <div class="line text-npc" th:each="npc : ${npcsInRoom}">
+        👤 <span th:text="${npc.description}"></span>
+    </div>
+    <div class="line-spacer"></div>
+
+    <div class="line section-title" th:if="${not #lists.isEmpty(monstersInRoom)}">=== 몬스터 ===</div>
+    <div class="line text-npc" th:each="monster : ${monstersInRoom}">
+        🗡️ <span th:text="${monster.description}"></span>
+    </div>
+    <div class="line-spacer"></div>
+</div>
+
+
 <div th:fragment="roomDetails" class="room-info font-terminal">
     <div class="room-header">
         <h2 class="room-name text-success text-shadow-lg" th:text="${roomName}">Room Name</h2>

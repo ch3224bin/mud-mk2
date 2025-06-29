@@ -841,6 +841,394 @@
                 min-width: 150px;
             }
         }
+
+        /* ========================================
+           NEW CSS Style
+           ======================================== */
+        .line {
+            margin: 4px 0;
+        }
+
+        .line-spacer {
+            margin: 8px 0;
+        }
+
+        .line-large-spacer {
+            margin: 16px 0;
+        }
+
+        /* 색상 클래스 */
+        .text-green { color: #00ff00; }
+        .text-yellow { color: #ffff00; }
+        .text-red { color: #ff6666; }
+        .text-blue { color: #60a5fa; }
+        .text-cyan { color: #00ffff; }
+        .text-orange { color: #ffaa00; }
+        .text-white { color: #ffffff; }
+        .text-gray { color: #888888; }
+        .text-npc { color: #ff9900; }
+        .text-monster { color: #ff5252; }
+
+        /* ASCII 아트를 위한 스타일 */
+        .ascii-art {
+            font-size: 12px;
+            line-height: 1.2;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .separator {
+            color: #00ff00;
+            margin: 8px 0;
+        }
+
+        .section-title {
+            color: #ffaa00;
+            font-weight: bold;
+            margin: 15px 0 8px 0;
+        }
+
+        .info-label {
+            color: #888888;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .indent {
+            margin-left: 20px;
+        }
+
+        /* ========================================
+           MUD 게임 색상 표준 CSS
+           ======================================== */
+
+        /* ========================================
+           기본 색상
+           ======================================== */
+
+        /* 1. 배경색 - 모든 화면의 기본 배경 */
+        .bg-primary {
+            background-color: #000000;
+        }
+
+        /* 2. 기본 텍스트 - 일반적인 게임 텍스트, 명령어, 기본 정보 */
+        .text-basic,
+        .text-default {
+            color: #00ff00;
+        }
+
+        /* 3. 구분선/테두리 - ASCII 아트, 구분선(──), 테두리 */
+        .text-separator,
+        .text-border {
+            color: #00ff00;
+        }
+
+        /* ========================================
+           정보 카테고리별 색상
+           ======================================== */
+
+        /* 4. 일반적인 설명 - 방 설명, 아이템 설명, 부가 설명 */
+        .text-description,
+        .text-detail {
+            color: #888888;
+        }
+
+        /* 5. 시간/날짜 - 게임 시간, 실제 시간 */
+        .text-time,
+        .text-date {
+            color: #ffff00;
+        }
+
+        /* 6. 캐릭터 이름 - 플레이어 자신의 이름 */
+        .text-character,
+        .text-self {
+            color: #00ff00;
+        }
+
+        /* 7. 다른 플레이어 - 다른 유저들 */
+        .text-player,
+        .text-user {
+            color: #60a5fa;
+        }
+
+        /* 8. NPC 이름 - 상인, 경비병 등 NPC */
+        .text-npc {
+            color: #ff9900;
+        }
+
+        /* 9. 몬스터 - 적대적 존재들 */
+        .text-monster,
+        .text-enemy {
+            color: #ff5252;
+        }
+
+        /* ========================================
+           상태/수치 관련
+           ======================================== */
+
+        /* 10. HP/생명력 - 체력 관련 모든 정보 */
+        .text-hp,
+        .text-health {
+            color: #ff6666;
+        }
+
+        /* 11. MP/마나 - 마법력 관련 */
+        .text-mp,
+        .text-mana {
+            color: #00ffff;
+        }
+
+        /* 12. 경험치 - 레벨업 관련 정보 */
+        .text-exp,
+        .text-experience {
+            color: #00ff00;
+        }
+
+        /* 13. 능력치 수치 - STR, DEX, ATK, DEF 등 */
+        .text-stat,
+        .text-ability {
+            color: #ffaa00;
+        }
+
+        /* 14. 소지금/재화 - 골드, 돈 관련 */
+        .text-money,
+        .text-gold {
+            color: #ffaa00;
+        }
+
+        /* ========================================
+           상태 표시
+           ======================================== */
+
+        /* 15. 긍정적 상태 - 정상, 건강, 성공 */
+        .text-positive,
+        .text-success {
+            color: #00ff00;
+        }
+
+        /* 16. 부정적 상태 - 위험, 경고, 실패 */
+        .text-negative,
+        .text-danger {
+            color: #ff6666;
+        }
+
+        /* 17. 중립적 상태 - 없음, 기본값 */
+        .text-neutral,
+        .text-none {
+            color: #888888;
+        }
+
+        /* ========================================
+           아이템/장비
+           ======================================== */
+
+        /* 18. 아이템 이름 - 무기, 갑옷, 소지품 */
+        .text-item,
+        .text-equipment {
+            color: #ffaa00;
+        }
+
+        /* 19. 아이템 설명 - 아이템의 상세 설명 */
+        .text-item-desc {
+            color: #888888;
+        }
+
+        /* ========================================
+           위치/환경
+           ======================================== */
+
+        /* 20. 지역명 - 현재 위치, 방 이름 */
+        .text-location,
+        .text-room {
+            color: #00ff00;
+        }
+
+        /* 21. 출구/이동 - 북쪽, 남쪽 등 이동 방향 */
+        .text-exit,
+        .text-direction {
+            color: #00ff00;
+        }
+
+        /* 22. 환경 정보 - 날씨, 온도, 분위기 */
+        .text-environment,
+        .text-weather {
+            color: #ffaa00;
+        }
+
+        /* ========================================
+           시스템/UI
+           ======================================== */
+
+        /* 23. 섹션 제목 - === 제목 === */
+        .text-section,
+        .text-title {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        /* 24. 라벨/레이블 - "이름:", "위치:" 등 항목명 */
+        .text-label,
+        .text-field {
+            color: #888888;
+        }
+
+        /* 25. 힌트/도움말 - 사용법, 명령어 안내 */
+        .text-hint,
+        .text-help {
+            color: #888888;
+            font-style: italic;
+        }
+
+        /* 26. 아이콘 - 각 컨텍스트에 맞는 색상 */
+        .icon-basic { color: #00ff00; }      /* 🏹 기본 아이콘 */
+        .icon-health { color: #ff6666; }     /* ❤️ 생명력 아이콘 */
+        .icon-item { color: #ffaa00; }       /* 🎒 아이템 아이콘 */
+        .icon-time { color: #ffff00; }       /* 🔮 시간 아이콘 */
+        .icon-quest { color: #00ffff; }      /* ❗ 퀘스트 아이콘 */
+
+        /* ========================================
+           특수 상황
+           ======================================== */
+
+        /* 27. 강조 텍스트 - 중요한 메시지, 목표 */
+        .text-emphasis,
+        .text-important {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* 28. 시스템 메시지 - 서버 공지, 시스템 알림 */
+        .text-system,
+        .text-announce {
+            color: #ffff00;
+            font-style: italic;
+        }
+
+        /* 29. 진행바 (채워진 부분) - HP는 빨강, MP는 파랑 */
+        .progress-filled-hp { color: #ff6666; }
+        .progress-filled-mp { color: #00ffff; }
+        .progress-filled-exp { color: #00ff00; }
+        .progress-filled-stat { color: #ffaa00; }
+
+        /* 30. 진행바 (빈 부분) - □ 빈 칸 */
+        .progress-empty {
+            color: #888888;
+        }
+
+        /* ========================================
+           대화/커뮤니케이션
+           ======================================== */
+
+        /* 31. 말풍선/대화 - NPC나 플레이어 대화 내용 */
+        .text-dialogue,
+        .text-speech {
+            color: #ffffff;
+        }
+
+        /* 32. 속마음/생각 - 캐릭터의 내적 독백 */
+        .text-thought,
+        .text-inner {
+            color: #888888;
+            font-style: italic;
+        }
+
+        /* ========================================
+           추가 유틸리티 클래스
+           ======================================== */
+
+        /* 폰트 관련 */
+        .font-terminal {
+            font-family: 'Courier New', monospace;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .font-italic {
+            font-style: italic;
+        }
+
+        /* 크기 관련 */
+        .text-small {
+            font-size: 12px;
+        }
+
+        .text-normal {
+            font-size: 14px;
+        }
+
+        .text-large {
+            font-size: 16px;
+        }
+
+        /* 간격 관련 */
+        .line-spacing {
+            line-height: 1.6;
+        }
+
+        .margin-small {
+            margin: 4px 0;
+        }
+
+        .margin-normal {
+            margin: 8px 0;
+        }
+
+        .margin-large {
+            margin: 16px 0;
+        }
+
+        /* 텍스트 효과 */
+        .text-shadow-glow {
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        .text-blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ========================================
+           조합 클래스 (자주 사용되는 조합)
+           ======================================== */
+
+        /* 캐릭터 정보 라인 */
+        .character-info-line {
+            color: #888888; /* 라벨 */
+        }
+
+        .character-info-line .value {
+            color: #00ff00; /* 값 */
+        }
+
+        /* 상태 바 전체 */
+        .status-bar {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* 섹션 구분자 */
+        .section-divider {
+            color: #00ff00;
+            margin: 8px 0;
+        }
+
+        /* ASCII 아트 전용 */
+        .ascii-art {
+            color: #00ff00;
+            font-size: 12px;
+            line-height: 1.2;
+            white-space: pre;
+        }
     </style>
 </head>
 <body>
