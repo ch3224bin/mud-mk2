@@ -1,20 +1,22 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.repository.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.port.in.*;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateRoomRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Service
-public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoomUseCase, DeleteRoomUseCase, LinkedRoomUseCase {
+public class RoomService implements GetRoomUseCase, RoomUpdater, RoomRegister, DeleteRoomUseCase, LinkedRoomUseCase {
 
 	private final RoomRepository roomRepository;
 
@@ -39,18 +41,18 @@ public class RoomService implements GetRoomUseCase, UpdateRoomUseCase, CreateRoo
 
 	@Transactional
 	@Override
-	public RoomResponse updateRoom(final long id, final UpdateRoomRequest updateRoomRequest) {
-		final Room room = roomRepository.findById(id)
+	public RoomResponse update(long id, RoomUpdateRequest roomUpdateRequest) {
+		Room room = roomRepository.findById(id)
 				.orElseThrow(IllegalArgumentException::new);
-		room.update(updateRoomRequest.name(), updateRoomRequest.summary(), updateRoomRequest.description());
+		room.update(roomUpdateRequest);
 		roomRepository.save(room);
 		return RoomResponse.of(room);
 	}
 
 	@Transactional
 	@Override
-	public RoomResponse createRoom(final CreateRoomRequest createRoomRequest) {
-		return RoomResponse.of(roomRepository.save(createRoomRequest.toDomain()));
+	public RoomResponse register(final RoomRegisterRequest roomRegisterRequest) {
+		return RoomResponse.of(roomRepository.save(roomRegisterRequest.toDomain()));
 	}
 
 	@Override

@@ -1,9 +1,9 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
 import com.jefflife.mudmk2.gamedata.application.port.in.*;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateRoomRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateRoomRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import org.springframework.data.domain.Page;
@@ -18,21 +18,21 @@ import java.net.URI;
 public class RoomController {
     public static final String BASE_PATH = "/api/v1/rooms";
 
-    private final CreateRoomUseCase createRoomUseCase;
-    private final UpdateRoomUseCase updateRoomUseCase;
+    private final RoomRegister roomRegister;
+    private final RoomUpdater roomUpdater;
     private final GetRoomUseCase getRoomUseCase;
     private final DeleteRoomUseCase deleteRoomUseCase;
     private final LinkedRoomUseCase linkedRoomUseCase;
 
     public RoomController(
-            final CreateRoomUseCase createRoomUseCase,
-            final UpdateRoomUseCase updateRoomUseCase,
+            final RoomRegister roomRegister,
+            final RoomUpdater roomUpdater,
             final GetRoomUseCase getRoomUseCase,
             final DeleteRoomUseCase deleteRoomUseCase,
             final LinkedRoomUseCase linkedRoomUseCase
     ) {
-        this.createRoomUseCase = createRoomUseCase;
-        this.updateRoomUseCase = updateRoomUseCase;
+        this.roomRegister = roomRegister;
+        this.roomUpdater = roomUpdater;
         this.getRoomUseCase = getRoomUseCase;
         this.deleteRoomUseCase = deleteRoomUseCase;
         this.linkedRoomUseCase = linkedRoomUseCase;
@@ -40,9 +40,9 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(
-            @RequestBody final CreateRoomRequest createRoomRequest
+            @RequestBody final RoomRegisterRequest roomRegisterRequest
     ) {
-        RoomResponse roomResponse = createRoomUseCase.createRoom(createRoomRequest);
+        RoomResponse roomResponse = roomRegister.register(roomRegisterRequest);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, roomResponse.id())))
                 .body(roomResponse);
@@ -51,9 +51,9 @@ public class RoomController {
     @PatchMapping("/{id}")
     public ResponseEntity<RoomResponse> updateRoom(
             @PathVariable final Long id,
-            @RequestBody final UpdateRoomRequest updateRoomRequest
+            @RequestBody final RoomUpdateRequest roomUpdateRequest
     ) {
-        RoomResponse roomResponse = updateRoomUseCase.updateRoom(id, updateRoomRequest);
+        RoomResponse roomResponse = roomUpdater.update(id, roomUpdateRequest);
         return ResponseEntity.ok(roomResponse);
     }
 

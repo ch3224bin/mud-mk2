@@ -3,9 +3,9 @@ package com.jefflife.mudmk2.gamedata.adapter.in;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateRoomRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateRoomRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -269,7 +269,7 @@ public class RoomControllerSystemTest {
     }
 
     private String createRoomJson(long areaId, String name, String summary, String description) throws Exception {
-        CreateRoomRequest request = new CreateRoomRequest(areaId, name, summary, description);
+        RoomRegisterRequest request = new RoomRegisterRequest(areaId, name, summary, description);
         return objectMapper.writeValueAsString(request);
     }
 
@@ -281,7 +281,7 @@ public class RoomControllerSystemTest {
     }
 
     private String updateRoomJson(String name, String summary, String description) throws Exception {
-        UpdateRoomRequest request = new UpdateRoomRequest(name, summary, description);
+        RoomUpdateRequest request = new RoomUpdateRequest(name, summary, description);
         return objectMapper.writeValueAsString(request);
     }
 

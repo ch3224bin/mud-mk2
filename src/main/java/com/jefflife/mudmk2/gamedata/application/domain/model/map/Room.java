@@ -73,10 +73,10 @@ public class Room {
 		Door.setup(wayOut, anotherWayOut);
 	}
 
-	public void update(String name, String summary, String description) {
-		this.name = name;
-		this.summary = summary;
-		this.description = description;
+	public void update(RoomUpdateRequest request) {
+		this.name = request.name();
+		this.summary = request.summary();
+		this.description = request.description();
 	}
 
 	public String getName() {
