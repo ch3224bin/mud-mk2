@@ -53,7 +53,7 @@ public class RoomController {
             @PathVariable final Long id,
             @RequestBody final RoomUpdateRequest roomUpdateRequest
     ) {
-        RoomResponse roomResponse = roomUpdater.update(id, roomUpdateRequest);
+        RoomResponse roomResponse = RoomResponse.of(roomUpdater.update(id, roomUpdateRequest));
         return ResponseEntity.ok(roomResponse);
     }
 

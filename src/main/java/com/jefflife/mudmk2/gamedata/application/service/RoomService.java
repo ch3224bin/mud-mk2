@@ -41,12 +41,11 @@ public class RoomService implements GetRoomUseCase, RoomUpdater, RoomRegister, D
 
 	@Transactional
 	@Override
-	public RoomResponse update(long id, RoomUpdateRequest roomUpdateRequest) {
+	public Room update(long id, RoomUpdateRequest roomUpdateRequest) {
 		Room room = roomRepository.findById(id)
 				.orElseThrow(IllegalArgumentException::new);
 		room.update(roomUpdateRequest);
-		roomRepository.save(room);
-		return RoomResponse.of(room);
+		return roomRepository.save(room);
 	}
 
 	@Transactional
