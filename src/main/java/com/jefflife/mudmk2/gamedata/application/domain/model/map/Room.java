@@ -13,7 +13,7 @@ import java.util.Optional;
 public class Room {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -25,13 +25,13 @@ public class Room {
 	private String description;
 
 	@Column(name = "area_id", nullable = false)
-	private long areaId;
+	private Long areaId;
 
 	@Embedded
 	private WayOuts wayOuts = new WayOuts();
 
 	@Builder
-	public Room(final long id, final long areaId, final String name, final String summary, final String description, final WayOuts wayOuts) {
+	public Room(final Long id, final Long areaId, final String name, final String summary, final String description, final WayOuts wayOuts) {
 		this.id = id;
 		this.areaId = areaId;
 		this.name = name;

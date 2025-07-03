@@ -3,7 +3,6 @@ package com.jefflife.mudmk2.gamedata.application.port.in;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -18,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 record RoomUpdaterTest(RoomRegister roomRegister, RoomUpdater roomUpdater, EntityManager entityManager) {
     @Test
     void updateSuccess() {
-        RoomResponse room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
+        Room room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
         entityManager.flush();
         entityManager.clear();
 
         RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest("방2", "summary2", "description2");
-        Room updated = roomUpdater.update(room.id(), roomUpdateRequest);
+        Room updated = roomUpdater.update(room.getId(), roomUpdateRequest);
 
         assertThat(updated.getName()).isEqualTo(roomUpdateRequest.name());
         assertThat(updated.getSummary()).isEqualTo(roomUpdateRequest.summary());
@@ -32,17 +31,17 @@ record RoomUpdaterTest(RoomRegister roomRegister, RoomUpdater roomUpdater, Entit
 
     @Test
     void updateFail() {
-        RoomResponse room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
+        Room room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
         entityManager.flush();
         entityManager.clear();
 
-        assertThatThrownBy(() -> roomUpdater.update(room.id(), new RoomUpdateRequest("", "summary2", "description2")))
+        assertThatThrownBy(() -> roomUpdater.update(room.getId(), new RoomUpdateRequest("", "summary2", "description2")))
             .isInstanceOf(ConstraintViolationException.class);
 
-        assertThatThrownBy(() -> roomUpdater.update(room.id(), new RoomUpdateRequest("name", "", "description2")))
+        assertThatThrownBy(() -> roomUpdater.update(room.getId(), new RoomUpdateRequest("name", "", "description2")))
                 .isInstanceOf(ConstraintViolationException.class);
 
-        assertThatThrownBy(() -> roomUpdater.update(room.id(), new RoomUpdateRequest("name", "summary2", "")))
+        assertThatThrownBy(() -> roomUpdater.update(room.getId(), new RoomUpdateRequest("name", "summary2", "")))
                 .isInstanceOf(ConstraintViolationException.class);
     }
 }

@@ -1,9 +1,9 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
-import com.jefflife.mudmk2.gamedata.application.port.in.*;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
+import com.jefflife.mudmk2.gamedata.application.port.in.*;
+import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import org.springframework.data.domain.Page;
@@ -42,7 +42,7 @@ public class RoomController {
     public ResponseEntity<RoomResponse> createRoom(
             @RequestBody final RoomRegisterRequest roomRegisterRequest
     ) {
-        RoomResponse roomResponse = roomRegister.register(roomRegisterRequest);
+        RoomResponse roomResponse = RoomResponse.of(roomRegister.register(roomRegisterRequest));
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, roomResponse.id())))
                 .body(roomResponse);
@@ -63,7 +63,7 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable, @RequestParam(value = "areaId", required = true) final long areaId) {
+    public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable, @RequestParam(value = "areaId") final Long areaId) {
         return ResponseEntity.ok(getRoomUseCase.getPagedRooms(pageable, areaId));
     }
 

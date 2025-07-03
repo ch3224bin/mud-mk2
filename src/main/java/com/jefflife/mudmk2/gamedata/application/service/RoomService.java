@@ -50,8 +50,8 @@ public class RoomService implements GetRoomUseCase, RoomUpdater, RoomRegister, D
 
 	@Transactional
 	@Override
-	public RoomResponse register(final RoomRegisterRequest roomRegisterRequest) {
-		return RoomResponse.of(roomRepository.save(roomRegisterRequest.toDomain()));
+	public Room register(final RoomRegisterRequest roomRegisterRequest) {
+		return roomRepository.save(roomRegisterRequest.toDomain());
 	}
 
 	@Override
