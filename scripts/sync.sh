@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 # 설정 변수 - 여기서 data repo URL을 설정하세요
 DATA_REPO_URL="git@github.com:ch3224bin/mud-mk2-db-data.git"  # 여기를 수정하세요
 DATA_REPO_DIR="mysql-data-repo"
-CONTAINER_NAME="mysql"
+CONTAINER_NAME="mud-mk2-mysql"
 
 echo "📂 Working directory: $(pwd)"
 
