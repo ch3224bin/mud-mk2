@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.adapter.in;
+package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.jefflife.mudmk2.gamedata.application.service.CharacterClassService;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;

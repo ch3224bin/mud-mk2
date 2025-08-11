@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.adapter.in;
+package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;

@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.adapter.in;
+package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;

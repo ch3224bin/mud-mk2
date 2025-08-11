@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.adapter.in;
+package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.jefflife.mudmk2.gamedata.application.service.provided.CreateNonPlayerCharacterUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteNonPlayerCharacterUseCase;
