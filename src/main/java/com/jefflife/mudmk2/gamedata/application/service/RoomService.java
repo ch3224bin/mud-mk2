@@ -2,8 +2,8 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
+import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
-import com.jefflife.mudmk2.gamedata.application.port.in.*;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;

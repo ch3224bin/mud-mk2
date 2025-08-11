@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.instance.InstanceScenario;
-import com.jefflife.mudmk2.gamedata.application.port.in.InstanceScenarioUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.InstanceScenarioUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.required.InstanceScenarioRepository;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateInstanceScenarioRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateInstanceScenarioRequest;

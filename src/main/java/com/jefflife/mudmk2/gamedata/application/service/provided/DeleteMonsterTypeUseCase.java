@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.application.port.in;
+package com.jefflife.mudmk2.gamedata.application.service.provided;
 
 public interface DeleteMonsterTypeUseCase {
     void deleteMonsterType(Long id);

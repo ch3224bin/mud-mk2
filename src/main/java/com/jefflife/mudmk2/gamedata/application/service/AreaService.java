@@ -2,10 +2,10 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 import com.jefflife.mudmk2.gamedata.application.service.required.AreaRepository;
-import com.jefflife.mudmk2.gamedata.application.port.in.CreateAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.DeleteAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.GetAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.UpdateAreaUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.CreateAreaUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteAreaUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.GetAreaUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateAreaUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.AreaResponse;

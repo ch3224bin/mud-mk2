@@ -1,10 +1,10 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
-import com.jefflife.mudmk2.gamedata.application.port.in.*;
 import com.jefflife.mudmk2.gamedata.application.service.CharacterClassService;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateCharacterClassRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

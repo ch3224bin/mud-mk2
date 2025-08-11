@@ -1,9 +1,9 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
-import com.jefflife.mudmk2.gamedata.application.port.in.CreateMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.DeleteMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.GetMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.port.in.UpdateMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.CreateMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.GetMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateMonsterTypeUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;

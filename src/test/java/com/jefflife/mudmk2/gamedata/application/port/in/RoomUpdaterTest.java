@@ -3,6 +3,8 @@ package com.jefflife.mudmk2.gamedata.application.port.in;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
+import com.jefflife.mudmk2.gamedata.application.service.provided.RoomRegister;
+import com.jefflife.mudmk2.gamedata.application.service.provided.RoomUpdater;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,10 @@
 package com.jefflife.mudmk2.gamedata.adapter.in;
 
-import com.jefflife.mudmk2.gamedata.application.port.in.InstanceScenarioUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.InstanceScenarioUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateInstanceScenarioRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateInstanceScenarioRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.InstanceScenarioResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

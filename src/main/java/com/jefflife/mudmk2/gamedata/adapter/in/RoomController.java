@@ -2,10 +2,10 @@ package com.jefflife.mudmk2.gamedata.adapter.in;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
-import com.jefflife.mudmk2.gamedata.application.port.in.*;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
+import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
