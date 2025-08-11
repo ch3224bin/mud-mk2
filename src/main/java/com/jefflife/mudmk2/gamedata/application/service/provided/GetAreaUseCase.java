@@ -1,10 +1,10 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
-import com.jefflife.mudmk2.gamedata.application.service.model.response.AreaResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 
 import java.util.List;
 
 public interface GetAreaUseCase {
-    AreaResponse getArea(Long id);
-    List<AreaResponse> getAreas();
+    Area getArea(Long id);
+    List<Area> getAreas();
 }

@@ -1,16 +1,18 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 import com.jefflife.mudmk2.gamedata.application.service.provided.CreateAreaUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteAreaUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.provided.GetAreaUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateAreaUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.AreaResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.AreaResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(AreaController.BASE_PATH)
@@ -38,7 +40,8 @@ public class AreaController {
     public ResponseEntity<AreaResponse> createArea(
             @RequestBody final CreateAreaRequest createAreaRequest
     ) {
-        AreaResponse areaResponse = createAreaUseCase.createArea(createAreaRequest);
+        Area area = createAreaUseCase.createArea(createAreaRequest);
+        AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, areaResponse.getId())))
                 .body(areaResponse);
@@ -49,18 +52,24 @@ public class AreaController {
             @PathVariable final Long id,
             @RequestBody final UpdateAreaRequest updateAreaRequest
     ) {
-        AreaResponse areaResponse = updateAreaUseCase.updateArea(id, updateAreaRequest);
+        Area area = updateAreaUseCase.updateArea(id, updateAreaRequest);
+        AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity.ok(areaResponse);
     }
 
     @GetMapping
     public ResponseEntity<Iterable<AreaResponse>> getAreas() {
-        return ResponseEntity.ok(getAreaUseCase.getAreas());
+        List<AreaResponse> areas = getAreaUseCase.getAreas()
+                .stream()
+                .map(AreaResponse::of)
+                .toList();
+        return ResponseEntity.ok(areas);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AreaResponse> getArea(@PathVariable final Long id) {
-        return ResponseEntity.ok(getAreaUseCase.getArea(id));
+        Area area = getAreaUseCase.getArea(id);
+        return ResponseEntity.ok(AreaResponse.of(area));
     }
 
     @DeleteMapping("/{id}")
