@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.CharacterClassRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.CharacterClassRepository;
 import com.jefflife.mudmk2.gamedata.application.port.in.*;
 import com.jefflife.mudmk2.gamedata.application.service.exception.CharacterClassNotFoundException;
 import com.jefflife.mudmk2.gamedata.application.service.exception.DuplicateCharacterClassException;

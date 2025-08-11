@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.NonPlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.port.in.CreateNonPlayerCharacterUseCase;
 import com.jefflife.mudmk2.gamedata.application.port.in.DeleteNonPlayerCharacterUseCase;
 import com.jefflife.mudmk2.gamedata.application.port.in.GetNonPlayerCharacterUseCase;

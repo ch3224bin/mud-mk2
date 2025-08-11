@@ -6,10 +6,10 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawn
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.MonsterTypeRepository;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.NonPlayerCharacterRepository;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.RoomRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

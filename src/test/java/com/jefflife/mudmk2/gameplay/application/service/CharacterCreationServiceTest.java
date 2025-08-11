@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.PlayerCharacterService;
 import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
 import org.junit.jupiter.api.BeforeEach;

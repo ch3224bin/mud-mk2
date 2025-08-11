@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gamedata.application.domain.repository;
+package com.jefflife.mudmk2.gamedata.application.service.required;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import org.springframework.data.domain.Page;

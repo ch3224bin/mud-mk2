@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.MonsterTypeRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
 import com.jefflife.mudmk2.gamedata.application.port.in.CreateMonsterTypeUseCase;
 import com.jefflife.mudmk2.gamedata.application.port.in.DeleteMonsterTypeUseCase;
 import com.jefflife.mudmk2.gamedata.application.port.in.GetMonsterTypeUseCase;

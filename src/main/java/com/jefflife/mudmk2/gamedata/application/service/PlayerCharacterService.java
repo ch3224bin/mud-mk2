@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterCla
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gamedata.application.domain.repository.PlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
