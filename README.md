@@ -199,8 +199,8 @@ MUD 게임에서는 관리자 화면을 통해 게임 세계를 구성하는 여
 #### 게임 데이터 관련
 - `com.jefflife.mudmk2.gamedata.application`: 게임 데이터 비즈니스 로직
   - `domain.model`: 게임 도메인 모델 (Area, Room, NPC, MonsterType 등)
-  - `port.in`: 입력 포트 인터페이스 (UseCase)
-  - `port.out`: 출력 포트 인터페이스 (Repository)
+  - `service.provided`: 입력 포트 인터페이스 (UseCase)
+  - `service.required`: 출력 포트 인터페이스 (Repository)
   - `service`: 비즈니스 서비스 구현체
 
 - `com.jefflife.mudmk2.gamedata.adapter`: 포트 어댑터

@@ -13,18 +13,16 @@ com.jefflife.mudmk2
 │   └── auth             # 인증 관련 설정
 ├── gamedata             # 게임 데이터 관련 기능
 │   ├── adapter          # 어댑터 계층
-│   │   ├── in           # 입력 어댑터 (컨트롤러 등)
-│   │   └── out          # 출력 어댑터 (저장소 구현체 등)
+│   │   ├── webapi       # 웹 API 어댑터
+│   │   │   └── response # 응답 DTO
+│   │   └── persistence  # 저장소 어댑터 (저장소 구현체 등)
 │   ├── application      # 응용 계층
 │   │   ├── domain       # 도메인 모델
-│   │   │   └── model    # 도메인 엔티티 및 값 객체
-│   │   ├── port         # 포트 계층
-│   │   │   ├── in       # 입력 포트 (유스케이스)
-│   │   │   └── out      # 출력 포트 (저장소 인터페이스)
+│   │   │   ├── model    # 도메인 엔티티 및 값 객체
+│   │   │   └── request  # 요청 DTO (도메인 모델에 포함)
 │   │   └── service      # 비즈니스 로직 구현체
-│   │       ├── model    # 서비스 모델 (DTO)
-│   │       │   ├── request   # 요청 DTO
-│   │       │   └── response  # 응답 DTO
+│   │       ├── provided # 제공 서비스 (입력 포트/유스케이스)
+│   │       └── required # 필요 서비스 (출력 포트/저장소 인터페이스)
 ├── gameplay             # 게임 플레이 관련 기능
 ├── user                 # 사용자 관련 기능
 ```
@@ -129,8 +127,8 @@ com.jefflife.mudmk2
 - DTO와 도메인 모델 간의 변환은 서비스 계층에서 처리합니다.
 
 ### 5.2 Request/Response DTO
-- **Request DTO**: `[동작][도메인명]Request` (예: `CreateAreaRequest`, `UpdateRoomRequest`)
-- **Response DTO**: `[도메인명]Response` (예: `AreaResponse`, `RoomResponse`)
+- **Request DTO**: `[동작][도메인명]Request` (예: `CreateAreaRequest`, `UpdateRoomRequest`) - 도메인 모델 패키지에 위치
+- **Response DTO**: `[도메인명]Response` (예: `AreaResponse`, `RoomResponse`) - adapter.webapi.response 패키지에 위치
 
 ### 5.3 Record 사용
 - 단순 데이터 전달 목적의 DTO는 Java의 Record 타입을 활용합니다.
