@@ -1,17 +1,16 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
-import com.jefflife.mudmk2.gamedata.application.service.provided.*;
-import com.jefflife.mudmk2.gamedata.application.service.required.CharacterClassRepository;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.exception.CharacterClassNotFoundException;
 import com.jefflife.mudmk2.gamedata.application.service.exception.DuplicateCharacterClassException;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import com.jefflife.mudmk2.gamedata.application.service.provided.*;
+import com.jefflife.mudmk2.gamedata.application.service.required.CharacterClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.Collectors;
