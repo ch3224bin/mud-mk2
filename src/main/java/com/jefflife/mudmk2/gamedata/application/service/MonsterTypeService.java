@@ -3,10 +3,10 @@ package com.jefflife.mudmk2.gamedata.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
-import com.jefflife.mudmk2.gamedata.application.service.provided.CreateMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.GetMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeCreator;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeRemover;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeFinder;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.MonsterSpawnRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
@@ -19,8 +19,8 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
-public class MonsterTypeService implements CreateMonsterTypeUseCase, GetMonsterTypeUseCase,
-                                           UpdateMonsterTypeUseCase, DeleteMonsterTypeUseCase {
+public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder,
+        MonsterTypeModifier, MonsterTypeRemover {
 
     private final MonsterTypeRepository monsterTypeRepository;
 

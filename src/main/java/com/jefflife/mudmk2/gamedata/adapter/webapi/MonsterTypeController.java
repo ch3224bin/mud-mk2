@@ -1,9 +1,9 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
-import com.jefflife.mudmk2.gamedata.application.service.provided.CreateMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.GetMonsterTypeUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateMonsterTypeUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeCreator;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeRemover;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeFinder;
+import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;
@@ -19,28 +19,28 @@ import java.util.NoSuchElementException;
 public class MonsterTypeController {
     public static final String BASE_PATH = "/api/v1/monster-types";
 
-    private final CreateMonsterTypeUseCase createMonsterTypeUseCase;
-    private final GetMonsterTypeUseCase getMonsterTypeUseCase;
-    private final UpdateMonsterTypeUseCase updateMonsterTypeUseCase;
-    private final DeleteMonsterTypeUseCase deleteMonsterTypeUseCase;
+    private final MonsterTypeCreator monsterTypeCreator;
+    private final MonsterTypeFinder monsterTypeFinder;
+    private final MonsterTypeModifier monsterTypeModifier;
+    private final MonsterTypeRemover monsterTypeRemover;
 
     public MonsterTypeController(
-            final CreateMonsterTypeUseCase createMonsterTypeUseCase,
-            final GetMonsterTypeUseCase getMonsterTypeUseCase,
-            final UpdateMonsterTypeUseCase updateMonsterTypeUseCase,
-            final DeleteMonsterTypeUseCase deleteMonsterTypeUseCase
+            final MonsterTypeCreator monsterTypeCreator,
+            final MonsterTypeFinder monsterTypeFinder,
+            final MonsterTypeModifier monsterTypeModifier,
+            final MonsterTypeRemover monsterTypeRemover
     ) {
-        this.createMonsterTypeUseCase = createMonsterTypeUseCase;
-        this.getMonsterTypeUseCase = getMonsterTypeUseCase;
-        this.updateMonsterTypeUseCase = updateMonsterTypeUseCase;
-        this.deleteMonsterTypeUseCase = deleteMonsterTypeUseCase;
+        this.monsterTypeCreator = monsterTypeCreator;
+        this.monsterTypeFinder = monsterTypeFinder;
+        this.monsterTypeModifier = monsterTypeModifier;
+        this.monsterTypeRemover = monsterTypeRemover;
     }
 
     @PostMapping
     public ResponseEntity<MonsterTypeResponse> createMonsterType(
             @RequestBody final CreateMonsterTypeRequest createMonsterTypeRequest
     ) {
-        final MonsterTypeResponse monsterTypeResponse = createMonsterTypeUseCase.createMonsterType(createMonsterTypeRequest);
+        final MonsterTypeResponse monsterTypeResponse = monsterTypeCreator.createMonsterType(createMonsterTypeRequest);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, monsterTypeResponse.id())))
                 .body(monsterTypeResponse);
@@ -49,7 +49,7 @@ public class MonsterTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<MonsterTypeResponse> getMonsterType(@PathVariable final Long id) {
         try {
-            final MonsterTypeResponse monsterTypeResponse = getMonsterTypeUseCase.getMonsterType(id);
+            final MonsterTypeResponse monsterTypeResponse = monsterTypeFinder.getMonsterType(id);
             return ResponseEntity.ok(monsterTypeResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -58,7 +58,7 @@ public class MonsterTypeController {
 
     @GetMapping
     public ResponseEntity<List<MonsterTypeResponse>> getAllMonsterTypes() {
-        final List<MonsterTypeResponse> monsterTypeResponses = getMonsterTypeUseCase.getAllMonsterTypes();
+        final List<MonsterTypeResponse> monsterTypeResponses = monsterTypeFinder.getAllMonsterTypes();
         return ResponseEntity.ok(monsterTypeResponses);
     }
 
@@ -68,7 +68,7 @@ public class MonsterTypeController {
             @RequestBody final UpdateMonsterTypeRequest updateMonsterTypeRequest
     ) {
         try {
-            final MonsterTypeResponse monsterTypeResponse = updateMonsterTypeUseCase.updateMonsterType(id, updateMonsterTypeRequest);
+            final MonsterTypeResponse monsterTypeResponse = monsterTypeModifier.updateMonsterType(id, updateMonsterTypeRequest);
             return ResponseEntity.ok(monsterTypeResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -78,7 +78,7 @@ public class MonsterTypeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMonsterType(@PathVariable final Long id) {
         try {
-            deleteMonsterTypeUseCase.deleteMonsterType(id);
+            monsterTypeRemover.deleteMonsterType(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();

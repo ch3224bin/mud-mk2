@@ -4,7 +4,7 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTy
 
 import java.util.List;
 
-public interface GetMonsterTypeUseCase {
+public interface MonsterTypeFinder {
     MonsterTypeResponse getMonsterType(Long id);
     List<MonsterTypeResponse> getAllMonsterTypes();
 }
