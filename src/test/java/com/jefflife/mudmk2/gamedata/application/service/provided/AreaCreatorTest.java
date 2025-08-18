@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.service.provided;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.CreateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.InvalidAreaNameException;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.text.RandomStringGenerator;
@@ -39,10 +40,29 @@ record AreaCreatorTest(AreaCreator areaCreator, EntityManager entityManager) {
         Area area = areaCreator.createArea(request);
 
         assertThat(area.getId()).isNotNull();
+        assertThat(area.getName()).isEqualTo(request.name());
+        assertThat(area.getType()).isEqualTo(request.type());
+    }
+
+    @Test
+    void createFailWhenInputWrongWordName() {
+        checkAreaNameValidation(new CreateAreaRequest("하 이", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest(" 하이", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("하이 ", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("하&이", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("하-이", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("하.이", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("하이.", AreaType.OPEN_MAP));
+        checkAreaNameValidation(new CreateAreaRequest("*하이", AreaType.OPEN_MAP));
     }
 
     private void checkValidation(CreateAreaRequest request) {
         assertThatThrownBy(() -> areaCreator.createArea(request))
                 .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    private void checkAreaNameValidation(CreateAreaRequest request) {
+        assertThatThrownBy(() -> areaCreator.createArea(request))
+                .isInstanceOf(InvalidAreaNameException.class);
     }
 }

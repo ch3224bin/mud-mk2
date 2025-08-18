@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,8 +16,8 @@ public class Area {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-    @Column(nullable = false)
-	private String name;
+    @Embedded
+	private AreaName name;
 
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -26,14 +25,17 @@ public class Area {
 
     public static Area create(CreateAreaRequest createAreaRequest) {
         Area area = new Area();
-        area.name = requireNonNull(createAreaRequest.name());
+        area.name = AreaName.of(createAreaRequest.name());
         area.type = requireNonNull(createAreaRequest.type());
 
         return area;
     }
 
     public void changeName(String name) {
-		Assert.hasText(name, "Area name cannot be null or empty");
-		this.name = name;
+		this.name = AreaName.of(name);
 	}
+
+    public String getName() {
+        return this.name.getName();
+    }
 }
