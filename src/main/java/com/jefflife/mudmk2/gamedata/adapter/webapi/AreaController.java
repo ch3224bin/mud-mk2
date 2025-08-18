@@ -1,10 +1,10 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
-import com.jefflife.mudmk2.gamedata.application.service.provided.CreateAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.GetAreaUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateAreaUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
+import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
+import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
+import com.jefflife.mudmk2.gamedata.application.service.provided.AreaModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.AreaResponse;
@@ -19,28 +19,28 @@ import java.util.List;
 public class AreaController {
     public static final String BASE_PATH = "/api/v1/areas";
 
-    private final CreateAreaUseCase createAreaUseCase;
-    private final UpdateAreaUseCase updateAreaUseCase;
-    private final GetAreaUseCase getAreaUseCase;
-    private final DeleteAreaUseCase deleteAreaUseCase;
+    private final AreaCreator areaCreator;
+    private final AreaModifier areaModifier;
+    private final AreaFinder areaFinder;
+    private final AreaRemover areaRemover;
 
     public AreaController(
-            final CreateAreaUseCase createAreaUseCase,
-            final UpdateAreaUseCase updateAreaUseCase,
-            final GetAreaUseCase getAreaUseCase,
-            final DeleteAreaUseCase deleteAreaUseCase
+            final AreaCreator areaCreator,
+            final AreaModifier areaModifier,
+            final AreaFinder areaFinder,
+            final AreaRemover areaRemover
     ) {
-        this.createAreaUseCase = createAreaUseCase;
-        this.updateAreaUseCase = updateAreaUseCase;
-        this.getAreaUseCase = getAreaUseCase;
-        this.deleteAreaUseCase = deleteAreaUseCase;
+        this.areaCreator = areaCreator;
+        this.areaModifier = areaModifier;
+        this.areaFinder = areaFinder;
+        this.areaRemover = areaRemover;
     }
 
     @PostMapping
     public ResponseEntity<AreaResponse> createArea(
             @RequestBody final CreateAreaRequest createAreaRequest
     ) {
-        Area area = createAreaUseCase.createArea(createAreaRequest);
+        Area area = areaCreator.createArea(createAreaRequest);
         AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, areaResponse.getId())))
@@ -52,14 +52,14 @@ public class AreaController {
             @PathVariable final Long id,
             @RequestBody final UpdateAreaRequest updateAreaRequest
     ) {
-        Area area = updateAreaUseCase.updateArea(id, updateAreaRequest);
+        Area area = areaModifier.updateArea(id, updateAreaRequest);
         AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity.ok(areaResponse);
     }
 
     @GetMapping
     public ResponseEntity<Iterable<AreaResponse>> getAreas() {
-        List<AreaResponse> areas = getAreaUseCase.getAreas()
+        List<AreaResponse> areas = areaFinder.getAreas()
                 .stream()
                 .map(AreaResponse::of)
                 .toList();
@@ -68,13 +68,13 @@ public class AreaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AreaResponse> getArea(@PathVariable final Long id) {
-        Area area = getAreaUseCase.getArea(id);
+        Area area = areaFinder.getArea(id);
         return ResponseEntity.ok(AreaResponse.of(area));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArea(@PathVariable final Long id) {
-        deleteAreaUseCase.deleteArea(id);
+        areaRemover.deleteArea(id);
         return ResponseEntity.noContent().build();
     }
 }
