@@ -6,7 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaModifier;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaCreateRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaModifyRequest;
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.AreaResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +50,9 @@ public class AreaController {
     @PatchMapping("/{id}")
     public ResponseEntity<AreaResponse> updateArea(
             @PathVariable final Long id,
-            @RequestBody final UpdateAreaRequest updateAreaRequest
+            @RequestBody final AreaModifyRequest areaModifyRequest
     ) {
-        Area area = areaModifier.updateArea(id, updateAreaRequest);
+        Area area = areaModifier.updateArea(id, areaModifyRequest);
         AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity.ok(areaResponse);
     }

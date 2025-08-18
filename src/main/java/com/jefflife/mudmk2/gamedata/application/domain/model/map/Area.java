@@ -31,8 +31,8 @@ public class Area {
         return area;
     }
 
-    public void changeName(String name) {
-		this.name = AreaName.of(name);
+    public void changeName(AreaModifyRequest areaModifyRequest) {
+		this.name = AreaName.of(areaModifyRequest.name());
 	}
 
     public String getName() {

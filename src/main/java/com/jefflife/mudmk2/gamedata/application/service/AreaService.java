@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaCreateRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
@@ -41,10 +41,10 @@ public class AreaService implements AreaCreator, AreaModifier, AreaFinder, AreaR
     }
 
     @Override
-    public Area updateArea(Long id, UpdateAreaRequest updateAreaRequest) {
+    public Area updateArea(Long id, AreaModifyRequest areaModifyRequest) {
         Area area = areaRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
-        area.changeName(updateAreaRequest.getName());
+        area.changeName(areaModifyRequest);
         return areaRepository.save(area);
     }
 
