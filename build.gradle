@@ -48,6 +48,8 @@ dependencies {
     // AI & Machine Learning
     implementation('org.springframework.ai:spring-ai-starter-model-anthropic') {
         exclude group: 'javax.validation', module: 'validation-api'
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+        exclude group: 'io.rest-assured', module: 'json-path'
     }
     
     // Database Drivers
@@ -60,7 +62,11 @@ dependencies {
     
     // Development Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
+
+    // Apache Utils
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'org.apache.commons:commons-text:1.14.0'
+
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

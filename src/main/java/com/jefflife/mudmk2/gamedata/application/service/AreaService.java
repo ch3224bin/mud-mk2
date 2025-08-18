@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.CreateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
@@ -9,10 +9,12 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaModifier;
 import com.jefflife.mudmk2.gamedata.application.service.required.AreaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+@Validated
 @Service
 public class AreaService implements AreaCreator, AreaModifier, AreaFinder, AreaRemover {
     private final AreaRepository areaRepository;
@@ -22,8 +24,8 @@ public class AreaService implements AreaCreator, AreaModifier, AreaFinder, AreaR
     }
 
     @Override
-    public Area createArea(final CreateAreaRequest createAreaRequest) {
-        return areaRepository.save(createAreaRequest.toDomain());
+    public Area createArea(CreateAreaRequest createAreaRequest) {
+        return areaRepository.save(Area.create(createAreaRequest));
     }
 
     @Override

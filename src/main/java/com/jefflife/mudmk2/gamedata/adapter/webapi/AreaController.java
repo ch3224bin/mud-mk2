@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaModifier;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.CreateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.AreaResponse;
 import org.springframework.http.ResponseEntity;
