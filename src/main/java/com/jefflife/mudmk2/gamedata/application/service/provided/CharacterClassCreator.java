@@ -6,7 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.Character
 /**
  * 캐릭터 직업 생성을 위한 유스케이스 인터페이스
  */
-public interface CreateCharacterClassUseCase {
+public interface CharacterClassCreator {
     /**
      * 새로운 캐릭터 직업을 생성합니다.
      *

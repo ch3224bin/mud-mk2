@@ -6,7 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.Character
 /**
  * 캐릭터 직업 수정을 위한 유스케이스 인터페이스
  */
-public interface UpdateCharacterClassUseCase {
+public interface CharacterClassModifier {
     /**
      * 기존 캐릭터 직업을 수정합니다.
      *

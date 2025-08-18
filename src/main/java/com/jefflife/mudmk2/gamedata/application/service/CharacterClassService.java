@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class CharacterClassService implements
-        CreateCharacterClassUseCase,
-        GetCharacterClassUseCase,
-        GetAllCharacterClassesUseCase,
-        UpdateCharacterClassUseCase,
-        DeleteCharacterClassUseCase {
+        CharacterClassCreator,
+        CharacterClassFinder,
+        CharacterClassesRetriever,
+        CharacterClassModifier,
+        CharacterClassRemover {
 
     private final CharacterClassRepository characterClassRepository;
 

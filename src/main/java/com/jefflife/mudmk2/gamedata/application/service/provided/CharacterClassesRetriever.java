@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 모든 캐릭터 직업 조회를 위한 유스케이스 인터페이스
  */
-public interface GetAllCharacterClassesUseCase {
+public interface CharacterClassesRetriever {
     /**
      * 모든 캐릭터 직업을 조회합니다.
      *

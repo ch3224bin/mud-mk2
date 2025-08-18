@@ -21,11 +21,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CharacterClassController {
 
-    private final CreateCharacterClassUseCase createCharacterClassUseCase;
-    private final GetCharacterClassUseCase getCharacterClassUseCase;
-    private final GetAllCharacterClassesUseCase getAllCharacterClassesUseCase;
-    private final UpdateCharacterClassUseCase updateCharacterClassUseCase;
-    private final DeleteCharacterClassUseCase deleteCharacterClassUseCase;
+    private final CharacterClassCreator characterClassCreator;
+    private final CharacterClassFinder characterClassFinder;
+    private final CharacterClassesRetriever characterClassesRetriever;
+    private final CharacterClassModifier characterClassModifier;
+    private final CharacterClassRemover characterClassRemover;
     private final CharacterClassService characterClassService; // 추가 기능을 위해 서비스 직접 주입
 
     /**
@@ -37,7 +37,7 @@ public class CharacterClassController {
     @PostMapping
     public ResponseEntity<CharacterClassResponse> createCharacterClass(
             @Valid @RequestBody CreateCharacterClassRequest request) {
-        CharacterClassResponse response = createCharacterClassUseCase.createCharacterClass(request);
+        CharacterClassResponse response = characterClassCreator.createCharacterClass(request);
         return ResponseEntity
                 .created(URI.create(String.format("/api/character-classes/%s", response.getId())))
                 .body(response);
@@ -50,7 +50,7 @@ public class CharacterClassController {
      */
     @GetMapping
     public ResponseEntity<List<CharacterClassResponse>> getAllCharacterClasses() {
-        List<CharacterClassResponse> responses = getAllCharacterClassesUseCase.getAllCharacterClasses();
+        List<CharacterClassResponse> responses = characterClassesRetriever.getAllCharacterClasses();
         return ResponseEntity.ok(responses);
     }
 
@@ -62,7 +62,7 @@ public class CharacterClassController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CharacterClassResponse> getCharacterClassById(@PathVariable Long id) {
-        CharacterClassResponse response = getCharacterClassUseCase.getCharacterClassById(id);
+        CharacterClassResponse response = characterClassFinder.getCharacterClassById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -74,7 +74,7 @@ public class CharacterClassController {
      */
     @GetMapping("/code/{code}")
     public ResponseEntity<CharacterClassResponse> getCharacterClassByCode(@PathVariable String code) {
-        CharacterClassResponse response = getCharacterClassUseCase.getCharacterClassByCode(code);
+        CharacterClassResponse response = characterClassFinder.getCharacterClassByCode(code);
         return ResponseEntity.ok(response);
     }
 
@@ -88,7 +88,7 @@ public class CharacterClassController {
     @PutMapping("/{id}")
     public ResponseEntity<CharacterClassResponse> updateCharacterClass(
             @PathVariable Long id, @Valid @RequestBody UpdateCharacterClassRequest request) {
-        CharacterClassResponse response = updateCharacterClassUseCase.updateCharacterClass(id, request);
+        CharacterClassResponse response = characterClassModifier.updateCharacterClass(id, request);
         return ResponseEntity.ok(response);
     }
 
@@ -100,7 +100,7 @@ public class CharacterClassController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCharacterClass(@PathVariable Long id) {
-        deleteCharacterClassUseCase.deleteCharacterClass(id);
+        characterClassRemover.deleteCharacterClass(id);
         return ResponseEntity.noContent().build();
     }
 

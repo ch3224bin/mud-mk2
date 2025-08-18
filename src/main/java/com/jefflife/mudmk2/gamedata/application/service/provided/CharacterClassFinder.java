@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.Character
 /**
  * 단일 캐릭터 직업 조회를 위한 유스케이스 인터페이스
  */
-public interface GetCharacterClassUseCase {
+public interface CharacterClassFinder {
     /**
      * ID로 캐릭터 직업을 조회합니다.
      *
