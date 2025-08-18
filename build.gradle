@@ -46,7 +46,9 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     
     // AI & Machine Learning
-    implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
+    implementation('org.springframework.ai:spring-ai-starter-model-anthropic') {
+        exclude group: 'javax.validation', module: 'validation-api'
+    }
     
     // Database Drivers
     runtimeOnly 'com.h2database:h2'
