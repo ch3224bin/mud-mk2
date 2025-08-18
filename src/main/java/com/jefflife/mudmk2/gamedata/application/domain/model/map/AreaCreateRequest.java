@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record CreateAreaRequest(
+public record AreaCreateRequest(
         @NotBlank @Size(min = 1, max = 255) String name,
         @NotNull AreaType type) {
 }

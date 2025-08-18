@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.CreateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaCreateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
@@ -24,8 +24,8 @@ public class AreaService implements AreaCreator, AreaModifier, AreaFinder, AreaR
     }
 
     @Override
-    public Area createArea(CreateAreaRequest createAreaRequest) {
-        return areaRepository.save(Area.create(createAreaRequest));
+    public Area createArea(AreaCreateRequest areaCreateRequest) {
+        return areaRepository.save(Area.create(areaCreateRequest));
     }
 
     @Override

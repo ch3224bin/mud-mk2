@@ -23,10 +23,10 @@ public class Area {
     @Column(nullable = false)
 	private AreaType type;
 
-    public static Area create(CreateAreaRequest createAreaRequest) {
+    public static Area create(AreaCreateRequest areaCreateRequest) {
         Area area = new Area();
-        area.name = AreaName.of(createAreaRequest.name());
-        area.type = requireNonNull(createAreaRequest.type());
+        area.name = AreaName.of(areaCreateRequest.name());
+        area.type = requireNonNull(areaCreateRequest.type());
 
         return area;
     }

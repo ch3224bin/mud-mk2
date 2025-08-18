@@ -59,7 +59,7 @@ com.jefflife.mudmk2
 
 ### 2.4 변수 명명 규칙
 - **클래스 멤버 변수**: 카멜 케이스, 명확한 명사 사용 (예: `private final AreaRepository areaRepository;`)
-- **메소드 매개변수**: 카멜 케이스 (예: `createArea(CreateAreaRequest createAreaRequest)`)
+- **메소드 매개변수**: 카멜 케이스 (예: `createArea(CreateAreaRequest areaCreateRequest)`)
 - **지역 변수**: 카멜 케이스, 간결하지만 의미를 명확하게 (예: `Area area = new Area();`)
 
 ### 2.5 패키지 명명 규칙

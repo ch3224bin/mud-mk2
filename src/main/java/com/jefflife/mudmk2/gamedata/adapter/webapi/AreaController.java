@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.AreaCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaRemover;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.AreaModifier;
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.CreateAreaRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaCreateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateAreaRequest;
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.AreaResponse;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +38,9 @@ public class AreaController {
 
     @PostMapping
     public ResponseEntity<AreaResponse> createArea(
-            @RequestBody final CreateAreaRequest createAreaRequest
+            @RequestBody final AreaCreateRequest areaCreateRequest
     ) {
-        Area area = areaCreator.createArea(createAreaRequest);
+        Area area = areaCreator.createArea(areaCreateRequest);
         AreaResponse areaResponse = AreaResponse.of(area);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, areaResponse.getId())))
