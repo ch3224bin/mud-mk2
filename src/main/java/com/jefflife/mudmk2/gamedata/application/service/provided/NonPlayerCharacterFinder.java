@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayer
 import java.util.List;
 import java.util.UUID;
 
-public interface GetNonPlayerCharacterUseCase {
+public interface NonPlayerCharacterFinder {
     NonPlayerCharacterResponse getNonPlayerCharacter(UUID id);
     List<NonPlayerCharacterResponse> getAllNonPlayerCharacters();
 }

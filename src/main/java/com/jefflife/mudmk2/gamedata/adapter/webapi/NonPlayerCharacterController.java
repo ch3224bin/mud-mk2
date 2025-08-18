@@ -1,9 +1,9 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
-import com.jefflife.mudmk2.gamedata.application.service.provided.CreateNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.GetNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateNonPlayerCharacterUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterCreator;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterRemover;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterFinder;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayerCharacterResponse;
@@ -20,28 +20,28 @@ import java.util.UUID;
 public class NonPlayerCharacterController {
     public static final String BASE_PATH = "/api/v1/npcs";
 
-    private final CreateNonPlayerCharacterUseCase createNonPlayerCharacterUseCase;
-    private final GetNonPlayerCharacterUseCase getNonPlayerCharacterUseCase;
-    private final UpdateNonPlayerCharacterUseCase updateNonPlayerCharacterUseCase;
-    private final DeleteNonPlayerCharacterUseCase deleteNonPlayerCharacterUseCase;
+    private final NonPlayerCharacterCreator nonPlayerCharacterCreator;
+    private final NonPlayerCharacterFinder nonPlayerCharacterFinder;
+    private final NonPlayerCharacterModifier nonPlayerCharacterModifier;
+    private final NonPlayerCharacterRemover nonPlayerCharacterRemover;
 
     public NonPlayerCharacterController(
-            final CreateNonPlayerCharacterUseCase createNonPlayerCharacterUseCase,
-            final GetNonPlayerCharacterUseCase getNonPlayerCharacterUseCase,
-            final UpdateNonPlayerCharacterUseCase updateNonPlayerCharacterUseCase,
-            final DeleteNonPlayerCharacterUseCase deleteNonPlayerCharacterUseCase
+            final NonPlayerCharacterCreator nonPlayerCharacterCreator,
+            final NonPlayerCharacterFinder nonPlayerCharacterFinder,
+            final NonPlayerCharacterModifier nonPlayerCharacterModifier,
+            final NonPlayerCharacterRemover nonPlayerCharacterRemover
     ) {
-        this.createNonPlayerCharacterUseCase = createNonPlayerCharacterUseCase;
-        this.getNonPlayerCharacterUseCase = getNonPlayerCharacterUseCase;
-        this.updateNonPlayerCharacterUseCase = updateNonPlayerCharacterUseCase;
-        this.deleteNonPlayerCharacterUseCase = deleteNonPlayerCharacterUseCase;
+        this.nonPlayerCharacterCreator = nonPlayerCharacterCreator;
+        this.nonPlayerCharacterFinder = nonPlayerCharacterFinder;
+        this.nonPlayerCharacterModifier = nonPlayerCharacterModifier;
+        this.nonPlayerCharacterRemover = nonPlayerCharacterRemover;
     }
 
     @PostMapping
     public ResponseEntity<NonPlayerCharacterResponse> createNonPlayerCharacter(
             @RequestBody final CreateNonPlayerCharacterRequest createNonPlayerCharacterRequest
     ) {
-        final NonPlayerCharacterResponse nonPlayerCharacterResponse = createNonPlayerCharacterUseCase.createNonPlayerCharacter(createNonPlayerCharacterRequest);
+        final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterCreator.createNonPlayerCharacter(createNonPlayerCharacterRequest);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, nonPlayerCharacterResponse.id())))
                 .body(nonPlayerCharacterResponse);
@@ -50,7 +50,7 @@ public class NonPlayerCharacterController {
     @GetMapping("/{id}")
     public ResponseEntity<NonPlayerCharacterResponse> getNonPlayerCharacter(@PathVariable final UUID id) {
         try {
-            final NonPlayerCharacterResponse nonPlayerCharacterResponse = getNonPlayerCharacterUseCase.getNonPlayerCharacter(id);
+            final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterFinder.getNonPlayerCharacter(id);
             return ResponseEntity.ok(nonPlayerCharacterResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -59,7 +59,7 @@ public class NonPlayerCharacterController {
 
     @GetMapping
     public ResponseEntity<List<NonPlayerCharacterResponse>> getAllNonPlayerCharacters() {
-        final List<NonPlayerCharacterResponse> nonPlayerCharacterResponses = getNonPlayerCharacterUseCase.getAllNonPlayerCharacters();
+        final List<NonPlayerCharacterResponse> nonPlayerCharacterResponses = nonPlayerCharacterFinder.getAllNonPlayerCharacters();
         return ResponseEntity.ok(nonPlayerCharacterResponses);
     }
 
@@ -69,7 +69,7 @@ public class NonPlayerCharacterController {
             @RequestBody final UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest
     ) {
         try {
-            final NonPlayerCharacterResponse nonPlayerCharacterResponse = updateNonPlayerCharacterUseCase.updateNonPlayerCharacter(id, updateNonPlayerCharacterRequest);
+            final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterModifier.updateNonPlayerCharacter(id, updateNonPlayerCharacterRequest);
             return ResponseEntity.ok(nonPlayerCharacterResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -79,7 +79,7 @@ public class NonPlayerCharacterController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNonPlayerCharacter(@PathVariable final UUID id) {
         try {
-            deleteNonPlayerCharacterUseCase.deleteNonPlayerCharacter(id);
+            nonPlayerCharacterRemover.deleteNonPlayerCharacter(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();

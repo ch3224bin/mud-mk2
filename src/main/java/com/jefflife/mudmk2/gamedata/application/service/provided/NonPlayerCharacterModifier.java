@@ -5,6 +5,6 @@ import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayer
 
 import java.util.UUID;
 
-public interface UpdateNonPlayerCharacterUseCase {
+public interface NonPlayerCharacterModifier {
     NonPlayerCharacterResponse updateNonPlayerCharacter(UUID id, UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest);
 }

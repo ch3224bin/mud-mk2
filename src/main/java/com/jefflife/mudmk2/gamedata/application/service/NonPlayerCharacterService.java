@@ -2,10 +2,10 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
-import com.jefflife.mudmk2.gamedata.application.service.provided.CreateNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.DeleteNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.GetNonPlayerCharacterUseCase;
-import com.jefflife.mudmk2.gamedata.application.service.provided.UpdateNonPlayerCharacterUseCase;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterCreator;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterRemover;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterFinder;
+import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayerCharacterResponse;
@@ -18,11 +18,11 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-public class NonPlayerCharacterService implements 
-        CreateNonPlayerCharacterUseCase, 
-        GetNonPlayerCharacterUseCase, 
-        UpdateNonPlayerCharacterUseCase, 
-        DeleteNonPlayerCharacterUseCase {
+public class NonPlayerCharacterService implements
+        NonPlayerCharacterCreator,
+        NonPlayerCharacterFinder,
+        NonPlayerCharacterModifier,
+        NonPlayerCharacterRemover {
 
     private final NonPlayerCharacterRepository nonPlayerCharacterRepository;
 
