@@ -18,31 +18,31 @@ import java.net.URI;
 public class RoomController {
     public static final String BASE_PATH = "/api/v1/rooms";
 
-    private final RoomRegister roomRegister;
+    private final RoomCreator roomCreator;
     private final RoomUpdater roomUpdater;
-    private final GetRoomUseCase getRoomUseCase;
-    private final DeleteRoomUseCase deleteRoomUseCase;
-    private final LinkedRoomUseCase linkedRoomUseCase;
+    private final RoomFinder roomFinder;
+    private final RoomRemover roomRemover;
+    private final RoomLinker roomLinker;
 
     public RoomController(
-            final RoomRegister roomRegister,
+            final RoomCreator roomCreator,
             final RoomUpdater roomUpdater,
-            final GetRoomUseCase getRoomUseCase,
-            final DeleteRoomUseCase deleteRoomUseCase,
-            final LinkedRoomUseCase linkedRoomUseCase
+            final RoomFinder roomFinder,
+            final RoomRemover roomRemover,
+            final RoomLinker roomLinker
     ) {
-        this.roomRegister = roomRegister;
+        this.roomCreator = roomCreator;
         this.roomUpdater = roomUpdater;
-        this.getRoomUseCase = getRoomUseCase;
-        this.deleteRoomUseCase = deleteRoomUseCase;
-        this.linkedRoomUseCase = linkedRoomUseCase;
+        this.roomFinder = roomFinder;
+        this.roomRemover = roomRemover;
+        this.roomLinker = roomLinker;
     }
 
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(
             @RequestBody final RoomRegisterRequest roomRegisterRequest
     ) {
-        RoomResponse roomResponse = RoomResponse.of(roomRegister.register(roomRegisterRequest));
+        RoomResponse roomResponse = RoomResponse.of(roomCreator.register(roomRegisterRequest));
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, roomResponse.id())))
                 .body(roomResponse);
@@ -59,17 +59,17 @@ public class RoomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getRoom(@PathVariable final Long id) {
-        return ResponseEntity.ok(getRoomUseCase.getRoom(id));
+        return ResponseEntity.ok(roomFinder.getRoom(id));
     }
 
     @GetMapping
     public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable, @RequestParam(value = "areaId") final Long areaId) {
-        return ResponseEntity.ok(getRoomUseCase.getPagedRooms(pageable, areaId));
+        return ResponseEntity.ok(roomFinder.getPagedRooms(pageable, areaId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable final Long id) {
-        deleteRoomUseCase.deleteRoom(id);
+        roomRemover.deleteRoom(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -77,7 +77,7 @@ public class RoomController {
     public ResponseEntity<LinkedRoomResponse> linkRooms(
             @RequestBody final LinkRoomRequest linkRoomRequest
     ) {
-        LinkedRoomResponse linkedRoomResponse = linkedRoomUseCase.linkAnotherRoom(linkRoomRequest);
+        LinkedRoomResponse linkedRoomResponse = roomLinker.linkAnotherRoom(linkRoomRequest);
         return ResponseEntity.ok(linkedRoomResponse);
     }
 

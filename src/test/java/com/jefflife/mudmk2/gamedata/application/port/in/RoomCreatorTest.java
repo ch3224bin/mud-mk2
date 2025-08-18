@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.port.in;
 import com.jefflife.mudmk2.common.fixture.RoomFixture;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
-import com.jefflife.mudmk2.gamedata.application.service.provided.RoomRegister;
+import com.jefflife.mudmk2.gamedata.application.service.provided.RoomCreator;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -14,12 +14,12 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-record RoomRegisterTest(RoomRegister roomRegister, EntityManager entityManager) {
+record RoomCreatorTest(RoomCreator roomCreator, EntityManager entityManager) {
     @Test
     void registerSuccess() {
         RoomRegisterRequest registerRequest = RoomFixture.createRoomRegisterRequest();
 
-        Room room = roomRegister.register(registerRequest);
+        Room room = roomCreator.register(registerRequest);
         entityManager.flush();
         entityManager.clear();
 
@@ -31,16 +31,16 @@ record RoomRegisterTest(RoomRegister roomRegister, EntityManager entityManager) 
 
     @Test
     void registerFail() {
-        assertThatThrownBy(() -> roomRegister.register(new RoomRegisterRequest(null, "name", "summary", "description")))
+        assertThatThrownBy(() -> roomCreator.register(new RoomRegisterRequest(null, "name", "summary", "description")))
                 .isInstanceOf(ConstraintViolationException.class);
 
-        assertThatThrownBy(() -> roomRegister.register(new RoomRegisterRequest(1L, null, "summary", "description")))
+        assertThatThrownBy(() -> roomCreator.register(new RoomRegisterRequest(1L, null, "summary", "description")))
                 .isInstanceOf(ConstraintViolationException.class);
 
-        assertThatThrownBy(() -> roomRegister.register(new RoomRegisterRequest(1L, "name", null, "description")))
+        assertThatThrownBy(() -> roomCreator.register(new RoomRegisterRequest(1L, "name", null, "description")))
                 .isInstanceOf(ConstraintViolationException.class);
 
-        assertThatThrownBy(() -> roomRegister.register(new RoomRegisterRequest(1L, "name", "summary", null)))
+        assertThatThrownBy(() -> roomCreator.register(new RoomRegisterRequest(1L, "name", "summary", null)))
                 .isInstanceOf(ConstraintViolationException.class);
     }
 }

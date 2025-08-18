@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @Service
-public class RoomService implements GetRoomUseCase, RoomUpdater, RoomRegister, DeleteRoomUseCase, LinkedRoomUseCase {
+public class RoomService implements RoomFinder, RoomUpdater, RoomCreator, RoomRemover, RoomLinker {
 
 	private final RoomRepository roomRepository;
 

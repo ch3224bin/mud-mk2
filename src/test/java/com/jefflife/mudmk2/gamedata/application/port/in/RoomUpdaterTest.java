@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.port.in;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
-import com.jefflife.mudmk2.gamedata.application.service.provided.RoomRegister;
+import com.jefflife.mudmk2.gamedata.application.service.provided.RoomCreator;
 import com.jefflife.mudmk2.gamedata.application.service.provided.RoomUpdater;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
-record RoomUpdaterTest(RoomRegister roomRegister, RoomUpdater roomUpdater, EntityManager entityManager) {
+record RoomUpdaterTest(RoomCreator roomCreator, RoomUpdater roomUpdater, EntityManager entityManager) {
     @Test
     void updateSuccess() {
-        Room room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
+        Room room = roomCreator.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
         entityManager.flush();
         entityManager.clear();
 
@@ -33,7 +33,7 @@ record RoomUpdaterTest(RoomRegister roomRegister, RoomUpdater roomUpdater, Entit
 
     @Test
     void updateFail() {
-        Room room = roomRegister.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
+        Room room = roomCreator.register(new RoomRegisterRequest(1L, "방1", "summary", "description"));
         entityManager.flush();
         entityManager.clear();
 
