@@ -1,7 +1,8 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import jakarta.validation.Valid;
 
 /**
  * 캐릭터 직업 생성을 위한 유스케이스 인터페이스
@@ -13,5 +14,5 @@ public interface CharacterClassCreator {
      * @param request 직업 생성 요청 DTO
      * @return 생성된 캐릭터 직업 응답 DTO
      */
-    CharacterClassResponse createCharacterClass(CreateCharacterClassRequest request);
+    CharacterClassResponse createCharacterClass(@Valid CharacterClassCreateRequest request);
 }

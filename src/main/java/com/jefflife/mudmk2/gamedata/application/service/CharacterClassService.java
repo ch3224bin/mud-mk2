@@ -5,12 +5,13 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import com.jefflife.mudmk2.gamedata.application.service.required.CharacterClassRepository;
 import com.jefflife.mudmk2.gamedata.application.service.exception.CharacterClassNotFoundException;
 import com.jefflife.mudmk2.gamedata.application.service.exception.DuplicateCharacterClassException;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateCharacterClassRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,23 +39,23 @@ public class CharacterClassService implements
      * @throws DuplicateCharacterClassException 동일한 코드를 가진 직업이 이미 존재하는 경우
      */
     @Override
-    public CharacterClassResponse createCharacterClass(CreateCharacterClassRequest request) {
-        if (characterClassRepository.existsByCode(request.getCode())) {
-            throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.getCode());
+    public CharacterClassResponse createCharacterClass(CharacterClassCreateRequest request) {
+        if (characterClassRepository.existsByCode(request.code())) {
+            throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.code());
         }
 
         CharacterClassEntity entity = CharacterClassEntity.builder()
-                .code(request.getCode())
-                .name(request.getName())
-                .description(request.getDescription())
-                .baseHp(request.getBaseHp())
-                .baseMp(request.getBaseMp())
-                .baseStr(request.getBaseStr())
-                .baseDex(request.getBaseDex())
-                .baseCon(request.getBaseCon())
-                .baseIntelligence(request.getBaseIntelligence())
-                .basePow(request.getBasePow())
-                .baseCha(request.getBaseCha())
+                .code(request.code())
+                .name(request.name())
+                .description(request.description())
+                .baseHp(request.baseHp())
+                .baseMp(request.baseMp())
+                .baseStr(request.baseStr())
+                .baseDex(request.baseDex())
+                .baseCon(request.baseCon())
+                .baseIntelligence(request.baseIntelligence())
+                .basePow(request.basePow())
+                .baseCha(request.baseCha())
                 .build();
 
         CharacterClassEntity savedEntity = characterClassRepository.save(entity);
@@ -112,28 +113,28 @@ public class CharacterClassService implements
      * @throws CharacterClassNotFoundException 해당 ID의 직업이 존재하지 않는 경우
      */
     @Override
-    public CharacterClassResponse updateCharacterClass(Long id, UpdateCharacterClassRequest request) {
+    public CharacterClassResponse updateCharacterClass(Long id, CharacterClassModifyRequest request) {
         CharacterClassEntity entity = characterClassRepository.findById(id)
                 .orElseThrow(() -> new CharacterClassNotFoundException("존재하지 않는 직업 ID: " + id));
 
         // 코드가 변경되었고, 새 코드가 이미 존재하는 경우 예외 발생
-        if (!entity.getCode().equals(request.getCode()) && characterClassRepository.existsByCode(request.getCode())) {
-            throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.getCode());
+        if (request.code() != null && !entity.getCode().equals(request.code()) && characterClassRepository.existsByCode(request.code())) {
+            throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.code());
         }
 
         CharacterClassEntity updatedEntity = CharacterClassEntity.builder()
                 .id(entity.getId())
-                .code(request.getCode())
-                .name(request.getName())
-                .description(request.getDescription())
-                .baseHp(request.getBaseHp())
-                .baseMp(request.getBaseMp())
-                .baseStr(request.getBaseStr())
-                .baseDex(request.getBaseDex())
-                .baseCon(request.getBaseCon())
-                .baseIntelligence(request.getBaseIntelligence())
-                .basePow(request.getBasePow())
-                .baseCha(request.getBaseCha())
+                .code(request.code() != null ? request.code() : entity.getCode())
+                .name(request.name() != null ? request.name() : entity.getName())
+                .description(request.description() != null ? request.description() : entity.getDescription())
+                .baseHp(request.baseHp() != null ? request.baseHp() : entity.getBaseHp())
+                .baseMp(request.baseMp() != null ? request.baseMp() : entity.getBaseMp())
+                .baseStr(request.baseStr() != null ? request.baseStr() : entity.getBaseStr())
+                .baseDex(request.baseDex() != null ? request.baseDex() : entity.getBaseDex())
+                .baseCon(request.baseCon() != null ? request.baseCon() : entity.getBaseCon())
+                .baseIntelligence(request.baseIntelligence() != null ? request.baseIntelligence() : entity.getBaseIntelligence())
+                .basePow(request.basePow() != null ? request.basePow() : entity.getBasePow())
+                .baseCha(request.baseCha() != null ? request.baseCha() : entity.getBaseCha())
                 .build();
 
         CharacterClassEntity savedEntity = characterClassRepository.save(updatedEntity);

@@ -1,8 +1,8 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
 import com.jefflife.mudmk2.gamedata.application.service.CharacterClassService;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateCharacterClassRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateCharacterClassRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
 import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class CharacterClassController {
      */
     @PostMapping
     public ResponseEntity<CharacterClassResponse> createCharacterClass(
-            @Valid @RequestBody CreateCharacterClassRequest request) {
+            @Valid @RequestBody CharacterClassCreateRequest request) {
         CharacterClassResponse response = characterClassCreator.createCharacterClass(request);
         return ResponseEntity
                 .created(URI.create(String.format("/api/character-classes/%s", response.getId())))
@@ -85,9 +85,9 @@ public class CharacterClassController {
      * @param request 업데이트할 캐릭터 직업 정보
      * @return 업데이트된 캐릭터 직업 정보와 API 응답
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<CharacterClassResponse> updateCharacterClass(
-            @PathVariable Long id, @Valid @RequestBody UpdateCharacterClassRequest request) {
+            @PathVariable Long id, @Valid @RequestBody CharacterClassModifyRequest request) {
         CharacterClassResponse response = characterClassModifier.updateCharacterClass(id, request);
         return ResponseEntity.ok(response);
     }
