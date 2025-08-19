@@ -1,11 +1,11 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
-import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayerCharacterResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface NonPlayerCharacterFinder {
-    NonPlayerCharacterResponse getNonPlayerCharacter(UUID id);
-    List<NonPlayerCharacterResponse> getAllNonPlayerCharacters();
+    NonPlayerCharacter getNonPlayerCharacter(UUID id);
+    List<NonPlayerCharacter> getAllNonPlayerCharacters();
 }

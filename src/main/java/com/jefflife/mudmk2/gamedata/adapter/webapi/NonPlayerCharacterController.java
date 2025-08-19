@@ -6,7 +6,8 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharac
 import com.jefflife.mudmk2.gamedata.application.service.provided.NonPlayerCharacterModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateNonPlayerCharacterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateNonPlayerCharacterRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.NonPlayerCharacterResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.NonPlayerCharacterResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,8 @@ public class NonPlayerCharacterController {
     public ResponseEntity<NonPlayerCharacterResponse> createNonPlayerCharacter(
             @RequestBody final CreateNonPlayerCharacterRequest createNonPlayerCharacterRequest
     ) {
-        final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterCreator.createNonPlayerCharacter(createNonPlayerCharacterRequest);
+        final NonPlayerCharacter nonPlayerCharacter = nonPlayerCharacterCreator.createNonPlayerCharacter(createNonPlayerCharacterRequest);
+        final NonPlayerCharacterResponse nonPlayerCharacterResponse = NonPlayerCharacterResponse.of(nonPlayerCharacter);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, nonPlayerCharacterResponse.id())))
                 .body(nonPlayerCharacterResponse);
@@ -50,7 +52,8 @@ public class NonPlayerCharacterController {
     @GetMapping("/{id}")
     public ResponseEntity<NonPlayerCharacterResponse> getNonPlayerCharacter(@PathVariable final UUID id) {
         try {
-            final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterFinder.getNonPlayerCharacter(id);
+            final NonPlayerCharacter nonPlayerCharacter = nonPlayerCharacterFinder.getNonPlayerCharacter(id);
+            final NonPlayerCharacterResponse nonPlayerCharacterResponse = NonPlayerCharacterResponse.of(nonPlayerCharacter);
             return ResponseEntity.ok(nonPlayerCharacterResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -59,7 +62,10 @@ public class NonPlayerCharacterController {
 
     @GetMapping
     public ResponseEntity<List<NonPlayerCharacterResponse>> getAllNonPlayerCharacters() {
-        final List<NonPlayerCharacterResponse> nonPlayerCharacterResponses = nonPlayerCharacterFinder.getAllNonPlayerCharacters();
+        final List<NonPlayerCharacter> nonPlayerCharacters = nonPlayerCharacterFinder.getAllNonPlayerCharacters();
+        final List<NonPlayerCharacterResponse> nonPlayerCharacterResponses = nonPlayerCharacters.stream()
+                .map(NonPlayerCharacterResponse::of)
+                .toList();
         return ResponseEntity.ok(nonPlayerCharacterResponses);
     }
 
@@ -69,7 +75,8 @@ public class NonPlayerCharacterController {
             @RequestBody final UpdateNonPlayerCharacterRequest updateNonPlayerCharacterRequest
     ) {
         try {
-            final NonPlayerCharacterResponse nonPlayerCharacterResponse = nonPlayerCharacterModifier.updateNonPlayerCharacter(id, updateNonPlayerCharacterRequest);
+            final NonPlayerCharacter nonPlayerCharacter = nonPlayerCharacterModifier.updateNonPlayerCharacter(id, updateNonPlayerCharacterRequest);
+            final NonPlayerCharacterResponse nonPlayerCharacterResponse = NonPlayerCharacterResponse.of(nonPlayerCharacter);
             return ResponseEntity.ok(nonPlayerCharacterResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
