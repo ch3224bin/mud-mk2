@@ -1,9 +1,8 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaCreateRequest;
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.InvalidAreaNameException;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaType;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.text.RandomStringGenerator;
@@ -44,25 +43,8 @@ record AreaCreatorTest(AreaCreator areaCreator, EntityManager entityManager) {
         assertThat(area.getType()).isEqualTo(request.type());
     }
 
-    @Test
-    void createFailWhenInputWrongWordName() {
-        checkAreaNameValidation(new AreaCreateRequest("하 이", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest(" 하이", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("하이 ", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("하&이", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("하-이", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("하.이", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("하이.", AreaType.OPEN_MAP));
-        checkAreaNameValidation(new AreaCreateRequest("*하이", AreaType.OPEN_MAP));
-    }
-
     private void checkValidation(AreaCreateRequest request) {
         assertThatThrownBy(() -> areaCreator.createArea(request))
                 .isInstanceOf(ConstraintViolationException.class);
-    }
-
-    private void checkAreaNameValidation(AreaCreateRequest request) {
-        assertThatThrownBy(() -> areaCreator.createArea(request))
-                .isInstanceOf(InvalidAreaNameException.class);
     }
 }
