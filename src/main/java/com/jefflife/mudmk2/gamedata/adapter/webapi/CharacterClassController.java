@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gamedata.adapter.webapi;
 import com.jefflife.mudmk2.gamedata.application.service.CharacterClassService;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.CharacterClassResponse;
 import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class CharacterClassController {
     @PostMapping
     public ResponseEntity<CharacterClassResponse> createCharacterClass(
             @Valid @RequestBody CharacterClassCreateRequest request) {
-        CharacterClassResponse response = characterClassCreator.createCharacterClass(request);
+        CharacterClassResponse response = CharacterClassResponse.fromEntity(characterClassCreator.createCharacterClass(request));
         return ResponseEntity
                 .created(URI.create(String.format("/api/character-classes/%s", response.getId())))
                 .body(response);
@@ -50,7 +50,7 @@ public class CharacterClassController {
      */
     @GetMapping
     public ResponseEntity<List<CharacterClassResponse>> getAllCharacterClasses() {
-        List<CharacterClassResponse> responses = characterClassesRetriever.getAllCharacterClasses();
+        List<CharacterClassResponse> responses = CharacterClassResponse.fromEntities(characterClassesRetriever.getAllCharacterClasses());
         return ResponseEntity.ok(responses);
     }
 
@@ -62,7 +62,7 @@ public class CharacterClassController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CharacterClassResponse> getCharacterClassById(@PathVariable Long id) {
-        CharacterClassResponse response = characterClassFinder.getCharacterClassById(id);
+        CharacterClassResponse response = CharacterClassResponse.fromEntity(characterClassFinder.getCharacterClassById(id));
         return ResponseEntity.ok(response);
     }
 
@@ -74,7 +74,7 @@ public class CharacterClassController {
      */
     @GetMapping("/code/{code}")
     public ResponseEntity<CharacterClassResponse> getCharacterClassByCode(@PathVariable String code) {
-        CharacterClassResponse response = characterClassFinder.getCharacterClassByCode(code);
+        CharacterClassResponse response = CharacterClassResponse.fromEntity(characterClassFinder.getCharacterClassByCode(code));
         return ResponseEntity.ok(response);
     }
 
@@ -88,7 +88,7 @@ public class CharacterClassController {
     @PatchMapping("/{id}")
     public ResponseEntity<CharacterClassResponse> updateCharacterClass(
             @PathVariable Long id, @Valid @RequestBody CharacterClassModifyRequest request) {
-        CharacterClassResponse response = characterClassModifier.updateCharacterClass(id, request);
+        CharacterClassResponse response = CharacterClassResponse.fromEntity(characterClassModifier.updateCharacterClass(id, request));
         return ResponseEntity.ok(response);
     }
 

@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ public interface CharacterClassesRetriever {
      *
      * @return 모든 캐릭터 직업 엔티티 목록
      */
-    List<CharacterClassResponse> getAllCharacterClasses();
+    List<CharacterClassEntity> getAllCharacterClasses();
 }

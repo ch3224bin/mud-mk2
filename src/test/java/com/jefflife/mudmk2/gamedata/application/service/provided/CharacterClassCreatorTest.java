@@ -1,8 +1,8 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
 import com.jefflife.mudmk2.gamedata.application.service.exception.DuplicateCharacterClassException;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,7 @@ record CharacterClassCreatorTest(CharacterClassCreator characterClassCreator, En
             100, 20, 12, 8, 10, 5, 6, 7
         );
 
-        CharacterClassResponse response = characterClassCreator.createCharacterClass(request);
+        CharacterClassEntity response = characterClassCreator.createCharacterClass(request);
 
         assertThat(response.getId()).isNotNull();
         assertThat(response.getCode()).isEqualTo(request.code());

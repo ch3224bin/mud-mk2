@@ -5,7 +5,6 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterCla
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
 import com.jefflife.mudmk2.gamedata.application.service.exception.CharacterClassNotFoundException;
 import com.jefflife.mudmk2.gamedata.application.service.exception.DuplicateCharacterClassException;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
 import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import com.jefflife.mudmk2.gamedata.application.service.required.CharacterClassRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 캐릭터 직업 관련 비즈니스 로직을 처리하는 서비스
@@ -34,61 +32,57 @@ public class CharacterClassService implements
      * 새로운 캐릭터 직업을 생성합니다.
      *
      * @param request 생성할 캐릭터 직업 정보
-     * @return 생성된 캐릭터 직업 응답 DTO
+     * @return 생성된 캐릭터 직업 엔티티
      * @throws DuplicateCharacterClassException 동일한 코드를 가진 직업이 이미 존재하는 경우
      */
     @Override
-    public CharacterClassResponse createCharacterClass(CharacterClassCreateRequest request) {
+    public CharacterClassEntity createCharacterClass(CharacterClassCreateRequest request) {
         if (characterClassRepository.existsByCode(request.code())) {
             throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.code());
         }
 
         CharacterClassEntity entity = CharacterClassEntity.create(request);
 
-        CharacterClassEntity savedEntity = characterClassRepository.save(entity);
-        return toResponse(savedEntity);
+        return characterClassRepository.save(entity);
     }
 
     /**
      * ID로 캐릭터 직업을 조회합니다.
      *
      * @param id 조회할 캐릭터 직업 ID
-     * @return 조회된 캐릭터 직업 응답 DTO
+     * @return 조회된 캐릭터 직업 엔티티
      * @throws CharacterClassNotFoundException 해당 ID의 직업이 존재하지 않는 경우
      */
     @Override
     @Transactional(readOnly = true)
-    public CharacterClassResponse getCharacterClassById(Long id) {
-        CharacterClassEntity entity = characterClassRepository.findById(id)
+    public CharacterClassEntity getCharacterClassById(Long id) {
+        return characterClassRepository.findById(id)
                 .orElseThrow(() -> new CharacterClassNotFoundException("존재하지 않는 직업 ID: " + id));
-        return toResponse(entity);
     }
 
     /**
      * 코드로 캐릭터 직업을 조회합니다.
      *
      * @param code 조회할 캐릭터 직업 코드
-     * @return 조회된 캐릭터 직업 응답 DTO
+     * @return 조회된 캐릭터 직업 엔티티
      * @throws CharacterClassNotFoundException 해당 코드의 직업이 존재하지 않는 경우
      */
     @Override
     @Transactional(readOnly = true)
-    public CharacterClassResponse getCharacterClassByCode(String code) {
-        CharacterClassEntity entity = characterClassRepository.findByCode(code)
+    public CharacterClassEntity getCharacterClassByCode(String code) {
+        return characterClassRepository.findByCode(code)
                 .orElseThrow(() -> new CharacterClassNotFoundException("존재하지 않는 직업 코드: " + code));
-        return toResponse(entity);
     }
 
     /**
      * 모든 캐릭터 직업을 조회합니다.
      *
-     * @return 모든 캐릭터 직업 응답 DTO 목록
+     * @return 모든 캐릭터 직업 엔티티 목록
      */
     @Override
     @Transactional(readOnly = true)
-    public List<CharacterClassResponse> getAllCharacterClasses() {
-        List<CharacterClassEntity> entities = characterClassRepository.findAll();
-        return toResponseList(entities);
+    public List<CharacterClassEntity> getAllCharacterClasses() {
+        return characterClassRepository.findAll();
     }
 
     /**
@@ -96,11 +90,11 @@ public class CharacterClassService implements
      *
      * @param id      업데이트할 캐릭터 직업 ID
      * @param request 업데이트할 캐릭터 직업 정보
-     * @return 업데이트된 캐릭터 직업 응답 DTO
+     * @return 업데이트된 캐릭터 직업 엔티티
      * @throws CharacterClassNotFoundException 해당 ID의 직업이 존재하지 않는 경우
      */
     @Override
-    public CharacterClassResponse updateCharacterClass(Long id, CharacterClassModifyRequest request) {
+    public CharacterClassEntity updateCharacterClass(Long id, CharacterClassModifyRequest request) {
         CharacterClassEntity entity = characterClassRepository.findById(id)
                 .orElseThrow(() -> new CharacterClassNotFoundException("존재하지 않는 직업 ID: " + id));
 
@@ -124,8 +118,7 @@ public class CharacterClassService implements
                 .baseCha(request.baseCha() != null ? request.baseCha() : entity.getBaseCha())
                 .build();
 
-        CharacterClassEntity savedEntity = characterClassRepository.save(updatedEntity);
-        return toResponse(savedEntity);
+        return characterClassRepository.save(updatedEntity);
     }
 
     /**
@@ -194,40 +187,5 @@ public class CharacterClassService implements
 
             characterClassRepository.save(entity);
         }
-    }
-
-    /**
-     * CharacterClassEntity를 CharacterClassResponse로 변환합니다.
-     *
-     * @param entity 변환할 엔티티
-     * @return 변환된 응답 DTO
-     */
-    public CharacterClassResponse toResponse(CharacterClassEntity entity) {
-        return CharacterClassResponse.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .name(entity.getName())
-                .description(entity.getDescription())
-                .baseHp(entity.getBaseHp())
-                .baseMp(entity.getBaseMp())
-                .baseStr(entity.getBaseStr())
-                .baseDex(entity.getBaseDex())
-                .baseCon(entity.getBaseCon())
-                .baseIntelligence(entity.getBaseIntelligence())
-                .basePow(entity.getBasePow())
-                .baseCha(entity.getBaseCha())
-                .build();
-    }
-
-    /**
-     * 엔티티 리스트를 응답 DTO 리스트로 변환합니다.
-     *
-     * @param entities 변환할 엔티티 리스트
-     * @return 변환된 응답 DTO 리스트
-     */
-    public List<CharacterClassResponse> toResponseList(List<CharacterClassEntity> entities) {
-        return entities.stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
     }
 }

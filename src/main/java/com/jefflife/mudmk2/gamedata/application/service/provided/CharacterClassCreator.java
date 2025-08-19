@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassCreateRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
 import jakarta.validation.Valid;
 
 /**
@@ -12,7 +12,7 @@ public interface CharacterClassCreator {
      * 새로운 캐릭터 직업을 생성합니다.
      *
      * @param request 직업 생성 요청 DTO
-     * @return 생성된 캐릭터 직업 응답 DTO
+     * @return 생성된 캐릭터 직업 엔티티
      */
-    CharacterClassResponse createCharacterClass(@Valid CharacterClassCreateRequest request);
+    CharacterClassEntity createCharacterClass(@Valid CharacterClassCreateRequest request);
 }

@@ -1,10 +1,13 @@
-package com.jefflife.mudmk2.gamedata.application.service.model.response;
+package com.jefflife.mudmk2.gamedata.adapter.webapi.response;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 캐릭터 직업 응답 DTO
@@ -48,5 +51,11 @@ public class CharacterClassResponse {
                 .basePow(entity.getBasePow())
                 .baseCha(entity.getBaseCha())
                 .build();
+    }
+
+    public static List<CharacterClassResponse> fromEntities(List<CharacterClassEntity> entities) {
+        return entities.stream()
+                .map(CharacterClassResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 }

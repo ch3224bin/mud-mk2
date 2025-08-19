@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service.provided;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassEntity;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClassModifyRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.CharacterClassResponse;
 import jakarta.validation.Valid;
 
 /**
@@ -15,5 +15,5 @@ public interface CharacterClassModifier {
      * @param request 직업 수정 요청 DTO
      * @return 수정된 캐릭터 직업 엔티티
      */
-    CharacterClassResponse updateCharacterClass(Long id, @Valid CharacterClassModifyRequest request);
+    CharacterClassEntity updateCharacterClass(Long id, @Valid CharacterClassModifyRequest request);
 }
