@@ -1,15 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 /**
  * 캐릭터 직업 엔티티
@@ -20,9 +12,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "character_classes")
-@EntityListeners(AuditingEntityListener.class)
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class CharacterClassEntity {
@@ -48,12 +39,21 @@ public class CharacterClassEntity {
     private int basePow;
     private int baseCha;
 
-    // 생성/수정 시간
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    public static CharacterClassEntity create(CharacterClassCreateRequest request) {
+        CharacterClassEntity entity = new CharacterClassEntity();
+        entity.code =  request.code();
+        entity.name =  request.name();
+        entity.description =  request.description();
+        entity.baseHp = request.baseHp();
+        entity.baseMp = request.baseMp();
+        entity.baseStr = request.baseStr();
+        entity.baseDex = request.baseDex();
+        entity.baseCon = request.baseCon();
+        entity.baseIntelligence = request.baseIntelligence();
+        entity.basePow = request.basePow();
+        entity.baseCha = request.baseCha();
+        return entity;
+    }
 
     /**
      * 주어진 코드로 이 직업이 특정 기존 enum 값과 일치하는지 확인합니다.
