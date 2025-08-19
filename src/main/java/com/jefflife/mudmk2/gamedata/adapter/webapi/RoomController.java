@@ -1,20 +1,24 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.LinkedRoomResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.RoomResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import com.jefflife.mudmk2.gamedata.application.service.provided.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(RoomController.BASE_PATH)
+@RequiredArgsConstructor
 public class RoomController {
     public static final String BASE_PATH = "/api/v1/rooms";
 
@@ -23,20 +27,6 @@ public class RoomController {
     private final RoomFinder roomFinder;
     private final RoomRemover roomRemover;
     private final RoomLinker roomLinker;
-
-    public RoomController(
-            final RoomCreator roomCreator,
-            final RoomUpdater roomUpdater,
-            final RoomFinder roomFinder,
-            final RoomRemover roomRemover,
-            final RoomLinker roomLinker
-    ) {
-        this.roomCreator = roomCreator;
-        this.roomUpdater = roomUpdater;
-        this.roomFinder = roomFinder;
-        this.roomRemover = roomRemover;
-        this.roomLinker = roomLinker;
-    }
 
     @PostMapping
     public ResponseEntity<RoomResponse> createRoom(
@@ -59,12 +49,14 @@ public class RoomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getRoom(@PathVariable final Long id) {
-        return ResponseEntity.ok(roomFinder.getRoom(id));
+        Room room = roomFinder.getRoom(id);
+        return ResponseEntity.ok(RoomResponse.of(room));
     }
 
     @GetMapping
     public ResponseEntity<Page<RoomResponse>> getRooms(final Pageable pageable, @RequestParam(value = "areaId") final Long areaId) {
-        return ResponseEntity.ok(roomFinder.getPagedRooms(pageable, areaId));
+        Page<Room> roomsPage = roomFinder.getPagedRooms(pageable, areaId);
+        return ResponseEntity.ok(roomsPage.map(RoomResponse::of));
     }
 
     @DeleteMapping("/{id}")
@@ -77,7 +69,8 @@ public class RoomController {
     public ResponseEntity<LinkedRoomResponse> linkRooms(
             @RequestBody final LinkRoomRequest linkRoomRequest
     ) {
-        LinkedRoomResponse linkedRoomResponse = roomLinker.linkAnotherRoom(linkRoomRequest);
+        List<Room> linkedRooms = roomLinker.linkAnotherRoom(linkRoomRequest);
+        LinkedRoomResponse linkedRoomResponse = LinkedRoomResponse.of(linkedRooms.get(0), linkedRooms.get(1));
         return ResponseEntity.ok(linkedRoomResponse);
     }
 

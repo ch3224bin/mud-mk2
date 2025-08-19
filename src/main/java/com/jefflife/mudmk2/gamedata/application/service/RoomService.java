@@ -6,9 +6,8 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.*;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.LinkedRoomResponse;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.RoomResponse;
 import org.springframework.data.domain.Page;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,17 +25,15 @@ public class RoomService implements RoomFinder, RoomUpdater, RoomCreator, RoomRe
 
 	@Transactional(readOnly = true)
 	@Override
-	public RoomResponse getRoom(final long id) {
-		final Room room = roomRepository.findById(id)
+	public Room getRoom(final long id) {
+		return roomRepository.findById(id)
 				.orElseThrow(IllegalArgumentException::new);
-		return RoomResponse.of(room);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public Page<RoomResponse> getPagedRooms(final Pageable pageable, final long areaId) {
-		return roomRepository.findByAreaId(pageable, areaId)
-				.map(RoomResponse::of);
+	public Page<Room> getPagedRooms(final Pageable pageable, final long areaId) {
+		return roomRepository.findByAreaId(pageable, areaId);
 	}
 
 	@Transactional
@@ -63,12 +60,12 @@ public class RoomService implements RoomFinder, RoomUpdater, RoomCreator, RoomRe
 
 	@Transactional
 	@Override
-	public LinkedRoomResponse linkAnotherRoom(LinkRoomRequest linkRoomRequest) {
+	public List<Room> linkAnotherRoom(LinkRoomRequest linkRoomRequest) {
 		final Room room1 = roomRepository.findById(linkRoomRequest.sourceRoomId())
 				.orElseThrow(IllegalArgumentException::new);
 		final Room room2 = roomRepository.findById(linkRoomRequest.destinationRoomId())
 				.orElseThrow(IllegalArgumentException::new);
 		room1.linkAnotherRoom(room2, linkRoomRequest.sourceDir(), linkRoomRequest.destinationDir());
-		return LinkedRoomResponse.of(room1, room2);
+		return List.of(room1, room2);
 	}
 }
