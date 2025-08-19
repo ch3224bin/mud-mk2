@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder,
         MonsterTypeModifier, MonsterTypeRemover {
@@ -28,7 +29,6 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
     }
 
     @Override
-    @Transactional
     public MonsterType createMonsterType(final CreateMonsterTypeRequest request) {
         MonsterType monsterType = request.toDomain();
 
@@ -61,7 +61,6 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
     }
 
     @Override
-    @Transactional
     public MonsterType updateMonsterType(Long id, UpdateMonsterTypeRequest request) {
         MonsterType monsterType = monsterTypeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("MonsterType not found with id: " + id));
@@ -85,7 +84,6 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
     }
 
     @Override
-    @Transactional
     public void deleteMonsterType(Long id) {
         if (!monsterTypeRepository.existsById(id)) {
             throw new NoSuchElementException("MonsterType not found with id: " + id);
