@@ -10,7 +10,6 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeModi
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.MonsterSpawnRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,7 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
 
     @Override
     @Transactional
-    public MonsterTypeResponse createMonsterType(final CreateMonsterTypeRequest request) {
+    public MonsterType createMonsterType(final CreateMonsterTypeRequest request) {
         MonsterType monsterType = request.toDomain();
 
         // 스폰 룸 정보 추가
@@ -45,29 +44,25 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
             }
         }
 
-        final MonsterType savedMonsterType = monsterTypeRepository.save(monsterType);
-        return MonsterTypeResponse.from(savedMonsterType);
+        return monsterTypeRepository.save(monsterType);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MonsterTypeResponse getMonsterType(Long id) {
-        MonsterType monsterType = monsterTypeRepository.findById(id)
+    public MonsterType getMonsterType(Long id) {
+        return monsterTypeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("MonsterType not found with id: " + id));
-        return MonsterTypeResponse.from(monsterType);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MonsterTypeResponse> getAllMonsterTypes() {
-        return monsterTypeRepository.findAll().stream()
-                .map(MonsterTypeResponse::from)
-                .toList();
+    public List<MonsterType> getAllMonsterTypes() {
+        return monsterTypeRepository.findAll();
     }
 
     @Override
     @Transactional
-    public MonsterTypeResponse updateMonsterType(Long id, UpdateMonsterTypeRequest request) {
+    public MonsterType updateMonsterType(Long id, UpdateMonsterTypeRequest request) {
         MonsterType monsterType = monsterTypeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("MonsterType not found with id: " + id));
 
@@ -86,8 +81,7 @@ public class MonsterTypeService implements MonsterTypeCreator, MonsterTypeFinder
             monsterType.clearAndAddAll(newSpawnRooms);
         }
 
-        MonsterType updatedMonsterType = monsterTypeRepository.save(monsterType);
-        return MonsterTypeResponse.from(updatedMonsterType);
+        return monsterTypeRepository.save(monsterType);
     }
 
     @Override

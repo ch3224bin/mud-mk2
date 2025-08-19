@@ -6,7 +6,8 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeFind
 import com.jefflife.mudmk2.gamedata.application.service.provided.MonsterTypeModifier;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.MonsterTypeResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,8 @@ public class MonsterTypeController {
     public ResponseEntity<MonsterTypeResponse> createMonsterType(
             @RequestBody final CreateMonsterTypeRequest createMonsterTypeRequest
     ) {
-        final MonsterTypeResponse monsterTypeResponse = monsterTypeCreator.createMonsterType(createMonsterTypeRequest);
+        final MonsterType monsterType = monsterTypeCreator.createMonsterType(createMonsterTypeRequest);
+        final MonsterTypeResponse monsterTypeResponse = MonsterTypeResponse.from(monsterType);
         return ResponseEntity
                 .created(URI.create(String.format("%s/%s", BASE_PATH, monsterTypeResponse.id())))
                 .body(monsterTypeResponse);
@@ -49,7 +51,8 @@ public class MonsterTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<MonsterTypeResponse> getMonsterType(@PathVariable final Long id) {
         try {
-            final MonsterTypeResponse monsterTypeResponse = monsterTypeFinder.getMonsterType(id);
+            final MonsterType monsterType = monsterTypeFinder.getMonsterType(id);
+            final MonsterTypeResponse monsterTypeResponse = MonsterTypeResponse.from(monsterType);
             return ResponseEntity.ok(monsterTypeResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -58,7 +61,10 @@ public class MonsterTypeController {
 
     @GetMapping
     public ResponseEntity<List<MonsterTypeResponse>> getAllMonsterTypes() {
-        final List<MonsterTypeResponse> monsterTypeResponses = monsterTypeFinder.getAllMonsterTypes();
+        final List<MonsterType> monsterTypes = monsterTypeFinder.getAllMonsterTypes();
+        final List<MonsterTypeResponse> monsterTypeResponses = monsterTypes.stream()
+                .map(MonsterTypeResponse::from)
+                .toList();
         return ResponseEntity.ok(monsterTypeResponses);
     }
 
@@ -68,7 +74,8 @@ public class MonsterTypeController {
             @RequestBody final UpdateMonsterTypeRequest updateMonsterTypeRequest
     ) {
         try {
-            final MonsterTypeResponse monsterTypeResponse = monsterTypeModifier.updateMonsterType(id, updateMonsterTypeRequest);
+            final MonsterType monsterType = monsterTypeModifier.updateMonsterType(id, updateMonsterTypeRequest);
+            final MonsterTypeResponse monsterTypeResponse = MonsterTypeResponse.from(monsterType);
             return ResponseEntity.ok(monsterTypeResponse);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();

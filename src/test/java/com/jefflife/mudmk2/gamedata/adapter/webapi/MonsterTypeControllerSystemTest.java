@@ -6,7 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateMonsterTypeRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.MonsterSpawnRoomRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateMonsterTypeRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.MonsterTypeResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.MonsterTypeResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
