@@ -3,6 +3,8 @@ package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+
 /**
  * 캐릭터 직업 엔티티
  * <p>
@@ -53,6 +55,20 @@ public class CharacterClassEntity {
         entity.basePow = request.basePow();
         entity.baseCha = request.baseCha();
         return entity;
+    }
+
+    public void update(CharacterClassModifyRequest request) {
+        this.code = defaultIfBlank(request.code(), this.code);
+        this.name = defaultIfBlank(request.name(), this.name);
+        this.description = defaultIfBlank(request.description(), this.description);
+        this.baseHp = request.baseHp() != null ? request.baseHp() : this.baseHp;
+        this.baseMp = request.baseMp() != null ? request.baseMp() : this.baseMp;
+        this.baseStr = request.baseStr() != null ? request.baseStr() : this.baseStr;
+        this.baseDex = request.baseDex() != null ? request.baseDex() : this.baseDex;
+        this.baseCon = request.baseCon() != null ? request.baseCon() : this.baseCon;
+        this.baseIntelligence = request.baseIntelligence() != null ? request.baseIntelligence() :   this.baseIntelligence;
+        this.basePow = request.basePow() != null ? request.basePow() : this.basePow;
+        this.baseCha = request.baseCha() != null ? request.baseCha() : this.baseCha;
     }
 
     /**

@@ -103,22 +103,9 @@ public class CharacterClassService implements
             throw new DuplicateCharacterClassException("이미 존재하는 직업 코드입니다: " + request.code());
         }
 
-        CharacterClassEntity updatedEntity = CharacterClassEntity.builder()
-                .id(entity.getId())
-                .code(request.code() != null ? request.code() : entity.getCode())
-                .name(request.name() != null ? request.name() : entity.getName())
-                .description(request.description() != null ? request.description() : entity.getDescription())
-                .baseHp(request.baseHp() != null ? request.baseHp() : entity.getBaseHp())
-                .baseMp(request.baseMp() != null ? request.baseMp() : entity.getBaseMp())
-                .baseStr(request.baseStr() != null ? request.baseStr() : entity.getBaseStr())
-                .baseDex(request.baseDex() != null ? request.baseDex() : entity.getBaseDex())
-                .baseCon(request.baseCon() != null ? request.baseCon() : entity.getBaseCon())
-                .baseIntelligence(request.baseIntelligence() != null ? request.baseIntelligence() : entity.getBaseIntelligence())
-                .basePow(request.basePow() != null ? request.basePow() : entity.getBasePow())
-                .baseCha(request.baseCha() != null ? request.baseCha() : entity.getBaseCha())
-                .build();
+        entity.update(request);
 
-        return characterClassRepository.save(updatedEntity);
+        return characterClassRepository.save(entity);
     }
 
     /**
