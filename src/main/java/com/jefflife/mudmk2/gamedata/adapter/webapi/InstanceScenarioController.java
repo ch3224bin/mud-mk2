@@ -3,7 +3,8 @@ package com.jefflife.mudmk2.gamedata.adapter.webapi;
 import com.jefflife.mudmk2.gamedata.application.service.provided.InstanceScenarioUseCase;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateInstanceScenarioRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateInstanceScenarioRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.InstanceScenarioResponse;
+import com.jefflife.mudmk2.gamedata.adapter.webapi.response.InstanceScenarioResponse;
+import com.jefflife.mudmk2.gamedata.application.domain.model.instance.InstanceScenario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,8 @@ public class InstanceScenarioController {
 
     @PostMapping
     public ResponseEntity<InstanceScenarioResponse> createInstanceScenario(@RequestBody CreateInstanceScenarioRequest request) {
-        InstanceScenarioResponse response = createUseCase.createInstanceScenario(request);
+        InstanceScenario instanceScenario = createUseCase.createInstanceScenario(request);
+        InstanceScenarioResponse response = InstanceScenarioResponse.of(instanceScenario);
         return ResponseEntity
                 .created(java.net.URI.create("/api/v1/instance-scenarios/" + response.id()))
                 .body(response);
@@ -30,24 +32,31 @@ public class InstanceScenarioController {
 
     @GetMapping
     public ResponseEntity<List<InstanceScenarioResponse>> getAllInstanceScenarios() {
-        return ResponseEntity.ok(getUseCase.getAllInstanceScenarios());
+        List<InstanceScenario> scenarios = getUseCase.getAllInstanceScenarios();
+        List<InstanceScenarioResponse> responses = scenarios.stream()
+                .map(InstanceScenarioResponse::of)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<InstanceScenarioResponse> getInstanceScenario(@PathVariable long id) {
-        return ResponseEntity.ok(getUseCase.getInstanceScenario(id));
+        InstanceScenario instanceScenario = getUseCase.getInstanceScenario(id);
+        return ResponseEntity.ok(InstanceScenarioResponse.of(instanceScenario));
     }
 
     @GetMapping("/title/{title}")
     public ResponseEntity<InstanceScenarioResponse> getInstanceScenarioByTitle(@PathVariable String title) {
-        return ResponseEntity.ok(getUseCase.getInstanceScenarioByTitle(title));
+        InstanceScenario instanceScenario = getUseCase.getInstanceScenarioByTitle(title);
+        return ResponseEntity.ok(InstanceScenarioResponse.of(instanceScenario));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<InstanceScenarioResponse> updateInstanceScenario(
             @PathVariable long id,
             @RequestBody UpdateInstanceScenarioRequest request) {
-        return ResponseEntity.ok(updateUseCase.updateInstanceScenario(id, request));
+        InstanceScenario instanceScenario = updateUseCase.updateInstanceScenario(id, request);
+        return ResponseEntity.ok(InstanceScenarioResponse.of(instanceScenario));
     }
 
     @DeleteMapping("/{id}")

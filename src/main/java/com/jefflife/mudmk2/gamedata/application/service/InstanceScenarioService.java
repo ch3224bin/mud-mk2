@@ -5,14 +5,12 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.InstanceScenari
 import com.jefflife.mudmk2.gamedata.application.service.required.InstanceScenarioRepository;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.CreateInstanceScenarioRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.UpdateInstanceScenarioRequest;
-import com.jefflife.mudmk2.gamedata.application.service.model.response.InstanceScenarioResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -26,14 +24,13 @@ public class InstanceScenarioService implements
     private final InstanceScenarioRepository instanceScenarioRepository;
 
     @Override
-    public InstanceScenarioResponse createInstanceScenario(CreateInstanceScenarioRequest request) {
+    public InstanceScenario createInstanceScenario(CreateInstanceScenarioRequest request) {
         InstanceScenario instanceScenario = request.toDomain();
-        InstanceScenario savedScenario = instanceScenarioRepository.save(instanceScenario);
-        return InstanceScenarioResponse.of(savedScenario);
+        return instanceScenarioRepository.save(instanceScenario);
     }
 
     @Override
-    public InstanceScenarioResponse updateInstanceScenario(long id, UpdateInstanceScenarioRequest request) {
+    public InstanceScenario updateInstanceScenario(long id, UpdateInstanceScenarioRequest request) {
         InstanceScenario instanceScenario = instanceScenarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("인스턴스 시나리오를 찾을 수 없습니다. ID: " + id));
 
@@ -44,30 +41,26 @@ public class InstanceScenarioService implements
                 request.entranceRoomId()
         );
 
-        return InstanceScenarioResponse.of(instanceScenarioRepository.save(instanceScenario));
+        return instanceScenarioRepository.save(instanceScenario);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public InstanceScenarioResponse getInstanceScenario(long id) {
+    public InstanceScenario getInstanceScenario(long id) {
         return instanceScenarioRepository.findById(id)
-                .map(InstanceScenarioResponse::of)
                 .orElseThrow(() -> new EntityNotFoundException("인스턴스 시나리오를 찾을 수 없습니다. ID: " + id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<InstanceScenarioResponse> getAllInstanceScenarios() {
-        return instanceScenarioRepository.findAll().stream()
-                .map(InstanceScenarioResponse::of)
-                .collect(Collectors.toList());
+    public List<InstanceScenario> getAllInstanceScenarios() {
+        return instanceScenarioRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public InstanceScenarioResponse getInstanceScenarioByTitle(String title) {
+    public InstanceScenario getInstanceScenarioByTitle(String title) {
         return instanceScenarioRepository.findByTitle(title)
-                .map(InstanceScenarioResponse::of)
                 .orElseThrow(() -> new EntityNotFoundException("인스턴스 시나리오를 찾을 수 없습니다. 제목: " + title));
     }
 
