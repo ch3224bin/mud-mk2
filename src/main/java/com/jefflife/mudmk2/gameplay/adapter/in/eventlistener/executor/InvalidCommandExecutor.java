@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.InvalidCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.InvalidCommandUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.InvalidCommandUseCase;
 import org.springframework.stereotype.Component;
 
 /**

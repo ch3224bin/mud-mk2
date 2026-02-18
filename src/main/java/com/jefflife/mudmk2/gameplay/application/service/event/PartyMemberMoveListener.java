@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service.event;
 import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.event.PlayerMoveEvent;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

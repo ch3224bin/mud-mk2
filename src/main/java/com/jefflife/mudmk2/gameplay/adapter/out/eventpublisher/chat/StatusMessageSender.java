@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gameplay.adapter.out.eventpublisher.chat;
 
-import com.jefflife.mudmk2.gameplay.application.port.out.SendStatusMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendStatusMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;

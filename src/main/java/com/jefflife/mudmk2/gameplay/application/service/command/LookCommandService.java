@@ -1,8 +1,8 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.LookCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
-import com.jefflife.mudmk2.gameplay.application.port.in.LookUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.provided.LookUseCase;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.LookTargetProcessor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

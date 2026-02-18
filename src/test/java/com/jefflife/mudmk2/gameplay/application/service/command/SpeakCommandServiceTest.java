@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service.command;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

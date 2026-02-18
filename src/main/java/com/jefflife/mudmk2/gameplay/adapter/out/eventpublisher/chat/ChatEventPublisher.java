@@ -2,8 +2,8 @@ package com.jefflife.mudmk2.gameplay.adapter.out.eventpublisher.chat;
 
 import com.jefflife.mudmk2.chat.event.ConvertAndSendToUserEvent;
 import com.jefflife.mudmk2.chat.event.SystemNoticeMessageEvent;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendSystemMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendSystemMessagePort;
 import com.jefflife.mudmk2.user.service.UserSessionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

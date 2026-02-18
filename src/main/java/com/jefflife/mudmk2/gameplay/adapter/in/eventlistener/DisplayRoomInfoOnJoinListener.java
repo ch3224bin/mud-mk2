@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener;
 
 import com.jefflife.mudmk2.chat.event.JoinUserEvent;
-import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
 import com.jefflife.mudmk2.user.service.UserSessionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

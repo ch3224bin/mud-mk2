@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
-import com.jefflife.mudmk2.gameplay.application.port.in.InvalidCommandUseCase;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.provided.InvalidCommandUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.springframework.stereotype.Service;
 
 @Service

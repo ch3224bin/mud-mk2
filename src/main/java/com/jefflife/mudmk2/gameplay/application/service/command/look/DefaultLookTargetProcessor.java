@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.service.command.look;
 
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

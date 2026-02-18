@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gameplay.adapter.out.eventpublisher.chat;
 
-import com.jefflife.mudmk2.gameplay.application.port.out.SendCombatMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendCombatMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatActionVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CombatStartVariables;
 import org.springframework.stereotype.Component;

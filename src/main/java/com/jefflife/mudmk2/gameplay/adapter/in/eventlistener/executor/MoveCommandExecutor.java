@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.MoveCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.MoveUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.MoveUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

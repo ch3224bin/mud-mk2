@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.StatusCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.StatusUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.StatusUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

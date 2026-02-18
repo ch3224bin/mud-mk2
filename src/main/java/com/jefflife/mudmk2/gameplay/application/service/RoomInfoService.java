@@ -2,8 +2,8 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gameplay.application.port.in.RoomDescriber;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendRoomInfoMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.RoomInfoVariables;
 import org.slf4j.Logger;

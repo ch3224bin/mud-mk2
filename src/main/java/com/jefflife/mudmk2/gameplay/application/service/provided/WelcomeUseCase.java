@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gameplay.application.port.in;
+package com.jefflife.mudmk2.gameplay.application.service.provided;
 
 /**
  * Use case for sending welcome messages to users.

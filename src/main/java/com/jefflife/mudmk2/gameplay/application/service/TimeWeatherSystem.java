@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
-import com.jefflife.mudmk2.gameplay.application.port.out.SendGameTimeMessagePort;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendWeatherMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendGameTimeMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendWeatherMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.GameTimeVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.WeatherVariables;
 import com.jefflife.mudmk2.gameplay.application.tick.TickListener;

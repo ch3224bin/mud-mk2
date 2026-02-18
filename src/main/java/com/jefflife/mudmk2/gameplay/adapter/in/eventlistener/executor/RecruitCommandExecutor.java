@@ -2,7 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener.executor;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.Command;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.RecruitUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.RecruitUseCase;
 import org.springframework.stereotype.Component;
 
 @Component

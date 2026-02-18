@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
-import com.jefflife.mudmk2.gameplay.application.port.in.WelcomeUseCase;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.provided.WelcomeUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;

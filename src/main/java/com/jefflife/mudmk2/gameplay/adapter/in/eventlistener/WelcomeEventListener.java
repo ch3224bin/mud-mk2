@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gameplay.adapter.in.eventlistener;
 
 import com.jefflife.mudmk2.chat.event.JoinUserEvent;
-import com.jefflife.mudmk2.gameplay.application.port.in.WelcomeUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.provided.WelcomeUseCase;
 import com.jefflife.mudmk2.user.domain.User;
 import com.jefflife.mudmk2.user.service.UserSessionManager;
 import org.springframework.context.event.EventListener;

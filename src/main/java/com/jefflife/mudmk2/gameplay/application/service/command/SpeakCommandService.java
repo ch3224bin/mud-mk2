@@ -4,8 +4,8 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
-import com.jefflife.mudmk2.gameplay.application.port.in.SpeakUseCase;
-import com.jefflife.mudmk2.gameplay.application.port.out.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.provided.SpeakUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

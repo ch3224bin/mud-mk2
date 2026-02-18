@@ -1,4 +1,4 @@
-package com.jefflife.mudmk2.gameplay.application.port.in;
+package com.jefflife.mudmk2.gameplay.application.service.provided;
 
 public interface RoomDescriber {
     void describe(Long userId);

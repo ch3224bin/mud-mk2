@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gameplay.adapter.out.eventpublisher.chat;
 
-import com.jefflife.mudmk2.gameplay.application.port.out.SendRoomInfoMessagePort;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.RoomInfoVariables;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
