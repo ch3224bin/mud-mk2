@@ -1,7 +1,7 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomRegisterRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.LinkRoomRequest;
@@ -9,7 +9,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.RoomUpdateReque
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.RoomResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;

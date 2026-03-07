@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '4.0.3'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -23,43 +23,31 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('springAiVersion', "1.0.0-M8")
-}
-
 dependencies {
     // Spring Boot Starters - Core
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    
+
     // Spring Boot Starters - Data & Persistence
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    
+
     // Spring Boot Starters - Security & Authentication
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
     implementation 'org.springframework.session:spring-session-core'
-    
+
     // Spring Boot Starters - View & Template
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    
-    // AI & Machine Learning
-    implementation('org.springframework.ai:spring-ai-starter-model-anthropic') {
-        exclude group: 'javax.validation', module: 'validation-api'
-        exclude group: 'org.apache.commons', module: 'commons-lang3'
-        exclude group: 'io.rest-assured', module: 'json-path'
-    }
-    
+
     // Database Drivers
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    
+
     // Code Generation & Productivity
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    
+
     // Development Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -69,14 +57,9 @@ dependencies {
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-    }
 }
 
 tasks.named('test') {
