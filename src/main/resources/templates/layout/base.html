@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">MUD MK2</title>
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-base':      '#0d1117',
+                        'bg-surface':   '#161b22',
+                        'bg-elevated':  '#21262d',
+                        'bd-default':   '#30363d',
+                        'bd-muted':     '#21262d',
+                        'tx-normal':    '#c9d1d9',
+                        'tx-muted':     '#8b949e',
+                        'tx-dimmed':    '#6e7681',
+                        'mud-blue':     '#79c0ff',
+                        'mud-green':    '#56d364',
+                        'mud-red':      '#ff7b72',
+                        'mud-yellow':   '#f8e45c',
+                        'mud-purple':   '#d2a8ff',
+                        'mud-orange':   '#ffa657',
+                        'mud-sky':      '#a5d6ff',
+                        'mud-link':     '#58a6ff',
+                    },
+                    fontFamily: {
+                        'terminal': ['Consolas', 'Menlo', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!--
+        게임 전용 CSS
+        - 메시지 타입 시스템 (.msg-*)
+        - gameplay 프래그먼트 호환 클래스 (WebSocket innerHTML 주입 시 필요)
+        - chat.js가 참조하는 클래스 (.message, .system-message, .sender, .content, .cursor)
+    -->
+    <style>
+        /* ── 기본 레이아웃 ── */
+        body { background-color: #0d1117; color: #c9d1d9; font-family: Consolas, Menlo, 'Courier New', monospace; }
+
+        /* ── chat.js 참조 클래스 ── */
+        .message          { margin-bottom: 2px; padding: 1px 0; font-size: 14px; line-height: 1.7; }
+        .system-message   { color: #6e7681; font-style: italic; }
+        .other-message    { color: #c9d1d9; }
+        .user-message     { color: #58a6ff; }
+        .message .sender  { color: #6e7681; margin-right: 6px; }
+        .message .content { flex: 1; }
+        .cursor           { display: inline-block; width: 8px; height: 14px; background: #56d364;
+                            margin-left: 2px; animation: blink 1s infinite; vertical-align: text-bottom; }
+        @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* ── 메시지 타입 시스템 ── */
+        .msg-system       { color: #6e7681; font-style: italic; font-size: 0.9em; }
+        .msg-room-title   { color: #79c0ff; font-weight: 700; margin-top: 6px; }
+        .msg-room-desc    { color: #c9d1d9; }
+        .msg-exits        { margin: 2px 0; }
+        .msg-exits .label { color: #8b949e; }
+        .msg-exits .dir   { color: #56d364; font-weight: 600; }
+        .msg-exits .sep   { color: #3d444d; margin: 0 4px; }
+        .msg-player-input { color: #58a6ff; }
+        .msg-npc          { color: #c9d1d9; }
+        .msg-npc .name    { color: #d2a8ff; font-weight: 600; }
+        .msg-combat-event { color: #f8e45c; font-weight: 600; }
+        .msg-dmg-dealt    { color: #56d364; }
+        .msg-dmg-dealt .val { font-weight: 700; }
+        .msg-dmg-taken    { color: #ff7b72; }
+        .msg-dmg-taken .val { font-weight: 700; }
+        .msg-item         { color: #ffa657; }
+        .msg-exp          { color: #a5d6ff; font-style: italic; }
+
+        /* ── gameplay 프래그먼트 호환 ── */
+        .font-terminal    { font-family: Consolas, Menlo, 'Courier New', monospace !important; }
+        .font-bold        { font-weight: 700 !important; }
+        .font-italic      { font-style: italic !important; }
+        .text-primary     { color: #79c0ff !important; }
+        .text-secondary   { color: #8b949e !important; }
+        .text-warning     { color: #f8e45c !important; }
+        .text-success     { color: #56d364 !important; }
+        .text-danger      { color: #ff7b72 !important; }
+        .text-info        { color: #58a6ff !important; }
+        .text-highlight   { color: #a5d6ff !important; font-weight: 700; }
+        .text-npc         { color: #ffa657 !important; font-weight: 500; }
+        .text-player      { color: #58a6ff !important; font-weight: 500; }
+        .text-monster     { color: #ff7b72 !important; font-weight: 600; }
+        .text-exit        { color: #56d364 !important; font-weight: 600; }
+        .text-item        { color: #ffa657 !important; }
+        .text-green       { color: #56d364; }
+        .text-orange      { color: #ffa657; }
+        .text-gray        { color: #6e7681; }
+
+        /* ── layout/spacing 유틸리티 ── */
+        .line             { margin: 2px 0; }
+        .line-spacer      { margin: 8px 0; }
+        .list-unstyled    { list-style-type: none !important; padding-left: 0 !important; margin: 0 !important; }
+
+        /* ── room-info 프래그먼트 ── */
+        .room-info        { padding: 8px 0; font-family: Consolas, Menlo, 'Courier New', monospace; }
+
+        /* ── status 프래그먼트 ── */
+        .section-title    { color: #f8e45c; font-weight: 600; margin: 12px 0 6px;
+                            padding-bottom: 4px; border-bottom: 1px solid #21262d; }
+        .info-line, .stat-line, .equipment-line, .skill-line
+                          { display: flex; align-items: center; margin: 3px 0; }
+        .info-label, .stat-label, .equipment-slot
+                          { min-width: 120px; margin-right: 8px; color: #8b949e; }
+        .progress-line    { margin: 5px 0; display: block; }
+        .progress-label   { display: inline-block; min-width: 120px; }
+        .progress-text    { font-family: Consolas, Menlo, 'Courier New', monospace; }
+        .progress-bar-ascii { font-family: Consolas, Menlo, 'Courier New', monospace;
+                              font-size: 13px; margin-left: 8px; }
+        .stat-modifier    { font-size: 12px; margin-left: 4px; }
+        .stats-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .skill-name       { min-width: 200px; }
+        .skill-dots       { flex: 1; overflow: hidden; white-space: nowrap; color: #3d444d; }
+        .skill-level      { min-width: 60px; text-align: right; }
+        .equipment-item   { flex: 1; }
+        .ascii-header     { font-size: 12px; line-height: 1.2; }
+        .ascii-art        { font-size: 12px; line-height: 1.2; white-space: pre; color: #56d364; }
+        .combat-action-message { margin: 6px 0; }
+
+        /* ── weather/game-time 프래그먼트 ── */
+        .weather-message, .game-time-message
+                          { margin: 3px 0; color: #f8e45c; font-style: italic; }
+        .weather-label, .time-label  { color: #8b949e; }
+        .weather-value, .time-value  { font-weight: 600; }
+        .period-value     { font-size: 0.9em; opacity: 0.9; margin-left: 4px; }
+        .weather-icon, .time-icon    { display: inline-block; margin-right: 4px; }
+
+        /* 날씨별 이모지 */
+        .weather-icon-맑음::before  { content: "☀️"; }
+        .weather-icon-흐림::before  { content: "☁️"; }
+        .weather-icon-비::before    { content: "🌧️"; }
+        .weather-icon-눈::before    { content: "❄️"; }
+        .weather-icon-폭풍::before  { content: "⚡"; }
+        .weather-icon-안개::before  { content: "🌫️"; }
+
+        /* 시간대별 이모지 */
+        .time-icon-새벽::before { content: "🌅"; }
+        .time-icon-아침::before { content: "🌞"; }
+        .time-icon-낮::before   { content: "☀️"; }
+        .time-icon-저녁::before { content: "🌇"; }
+        .time-icon-밤::before   { content: "🌙"; }
+        .time-icon-심야::before { content: "✨"; }
+
+        /* ── 스크롤바 ── */
+        #chatContainer::-webkit-scrollbar { width: 6px; }
+        #chatContainer::-webkit-scrollbar-track { background: #0d1117; }
+        #chatContainer::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+        #chatContainer::-webkit-scrollbar-thumb:hover { background: #56d364; }
+    </style>
+</head>
+</html>
