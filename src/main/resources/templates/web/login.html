@@ -1,60 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-        .social-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            margin: 5px 0;
-            opacity: 0.85;
-            display: inline-block;
-            font-size: 17px;
-            line-height: 20px;
-            text-decoration: none;
-        }
-        .google-btn {
-            background-color: #dd4b39;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="login-container">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="text-center">Login</h3>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <h4>Sign in with</h4>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <a href="/oauth2/authorization/google" class="social-btn google-btn">
-                            <i class="fab fa-google"></i> Google
-                        </a>
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="text-center mt-3">
-                        <a href="/static" class="btn btn-outline-secondary">Back to Home</a>
-                    </div>
-                </div>
+<head th:replace="~{layout/base :: head('MUD MK2 — Login')}"></head>
+<body class="min-h-screen flex items-center justify-center bg-bg-base">
+
+<div class="w-full max-w-sm px-6">
+
+    <!-- 창 프레임 -->
+    <div class="bg-bg-surface border border-bd-default rounded-lg overflow-hidden">
+
+        <!-- 타이틀바 -->
+        <div class="bg-bg-elevated border-b border-bd-default px-4 py-2 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
+            <span class="ml-3 text-xs text-tx-dimmed font-terminal">mud-client — login</span>
+        </div>
+
+        <!-- 본문 -->
+        <div class="p-8 flex flex-col items-center gap-5 font-terminal">
+
+            <!-- ASCII 박스 -->
+            <pre class="text-tx-dimmed text-center leading-tight select-none" style="font-size:0.55rem;">
+╔════════════════════════╗
+║  M U L T I  U S E R   ║
+║  D U N G E O N  M K 2  ║
+╚════════════════════════╝</pre>
+
+            <!-- 로고 -->
+            <div class="text-2xl font-bold tracking-widest text-mud-blue">
+                MUD<span class="text-mud-green">▋</span>
             </div>
+
+            <!-- 안내 문구 -->
+            <p class="text-tx-dimmed text-xs tracking-wide text-center">
+                # 멀티유저 던전에 접속하려면 인증이 필요합니다
+            </p>
+
+            <hr class="w-full border-bd-muted">
+
+            <!-- Google 로그인 버튼 -->
+            <a href="/oauth2/authorization/google"
+               class="w-full flex items-center justify-center gap-3 bg-bg-elevated border border-bd-default
+                      text-tx-normal text-sm px-5 py-2.5 rounded hover:border-mud-green hover:text-mud-green
+                      transition-colors duration-200 no-underline">
+                <!-- Google 색상 원형 아이콘 -->
+                <svg width="16" height="16" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                Google 계정으로 로그인
+            </a>
+
+            <!-- 하단 -->
+            <p class="text-tx-dimmed text-center" style="font-size:0.6rem;">
+                © 2025 MUD MK2 · unauthorized access is prohibited
+            </p>
+
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</div>
+
 </body>
 </html>
