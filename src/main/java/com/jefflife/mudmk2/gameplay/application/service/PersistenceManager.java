@@ -8,9 +8,11 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
+import com.jefflife.mudmk2.gamedata.application.service.required.PartyRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
+import com.jefflife.mudmk2.gameplay.application.service.sync.BatchSyncable;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -32,19 +34,25 @@ public class PersistenceManager {
     private final RoomRepository roomRepository;
     private final MonsterTypeRepository monsterTypeRepository;
     private final GameWorldService gameWorldService;
+    private final PartyRepository partyRepository;
+    private final List<BatchSyncable> batchSyncables;
 
     public PersistenceManager(
             final PlayerCharacterRepository playerCharacterRepository,
             final NonPlayerCharacterRepository nonPlayerCharacterRepository,
             final RoomRepository roomRepository,
             final MonsterTypeRepository monsterTypeRepository,
-            final GameWorldService gameWorldService
+            final GameWorldService gameWorldService,
+            final PartyRepository partyRepository,
+            final List<BatchSyncable> batchSyncables
     ) {
         this.playerCharacterRepository = playerCharacterRepository;
         this.nonPlayerCharacterRepository = nonPlayerCharacterRepository;
         this.roomRepository = roomRepository;
         this.monsterTypeRepository = monsterTypeRepository;
         this.gameWorldService = gameWorldService;
+        this.partyRepository = partyRepository;
+        this.batchSyncables = batchSyncables;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -59,6 +67,8 @@ public class PersistenceManager {
 
         Iterable<NonPlayerCharacter> nonPlayerCharacters = nonPlayerCharacterRepository.findAll();
         gameWorldService.loadNpcs(nonPlayerCharacters);
+
+        gameWorldService.loadParties(partyRepository.findAll());
 
         // MonsterType을 기반으로 Monster 생성 및 로드
         loadMonsters();
@@ -106,7 +116,7 @@ public class PersistenceManager {
     @Transactional
     @Scheduled(fixedDelay = 60_000) // 1분마다 저장
     public void persistGameState() {
-        playerCharacterRepository.saveAll(gameWorldService.getActivePlayers());
+        batchSyncables.forEach(BatchSyncable::syncToDb);
     }
 
     /**
