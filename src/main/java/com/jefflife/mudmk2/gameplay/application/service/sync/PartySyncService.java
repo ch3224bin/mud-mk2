@@ -23,7 +23,6 @@ public class PartySyncService implements BatchSyncable {
     }
 
     @Override
-    @Transactional
     public void syncToDb() {
         partyRepository.saveAll(gameWorldService.getActiveParties());
     }
