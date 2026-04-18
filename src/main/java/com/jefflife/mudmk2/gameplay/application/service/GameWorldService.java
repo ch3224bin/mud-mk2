@@ -5,9 +5,12 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.event.PartyCreatedEvent;
+import com.jefflife.mudmk2.gamedata.application.event.PartyDisbandedEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -17,6 +20,12 @@ import java.util.stream.Collectors;
 @Component
 public class GameWorldService {
     private final static Logger logger = LoggerFactory.getLogger(GameWorldService.class);
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    public GameWorldService(final ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     private final Map<UUID, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
     private final Map<Long, PlayerCharacter> activePlayersByUserId = new ConcurrentHashMap<>();
@@ -277,6 +286,23 @@ public class GameWorldService {
 
     public void addParty(final Party party) {
         parties.put(party.getId(), party);
+        eventPublisher.publishEvent(new PartyCreatedEvent(this, party));
+    }
+
+    public void removeParty(final UUID partyId) {
+        Party removed = parties.remove(partyId);
+        if (removed != null) {
+            eventPublisher.publishEvent(new PartyDisbandedEvent(this, partyId));
+        }
+    }
+
+    public void loadParties(final Iterable<Party> parties) {
+        parties.forEach(party -> this.parties.put(party.getId(), party));
+        logger.info("Loaded {} parties", this.parties.size());
+    }
+
+    public Collection<Party> getActiveParties() {
+        return parties.values();
     }
 
     public Optional<Party> getPartyByPlayerId(UUID playerId) {

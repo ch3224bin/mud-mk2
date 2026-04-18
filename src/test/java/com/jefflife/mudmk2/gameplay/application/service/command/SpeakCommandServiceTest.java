@@ -200,6 +200,10 @@ class SpeakCommandServiceTest {
 
     // Fake implementation of GameWorldService
     static class FakeGameWorldService extends GameWorldService {
+        public FakeGameWorldService() {
+            super(event -> {});
+        }
+
         private final Map<Long, PlayerCharacter> playersByUserId = new HashMap<>();
         private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
         private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
