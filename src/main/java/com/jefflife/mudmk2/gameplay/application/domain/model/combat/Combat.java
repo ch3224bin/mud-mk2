@@ -101,11 +101,11 @@ public class Combat {
             // 2. Attack Execution
             // 2-1. Hit Check
             int attackRoll = diceRoller.roll(1, 20);
-            int attackModifier = attackerCombatable.getStats().getDexterityModifier();
+            int attackModifier = (attackerCombatable.getStats().agility() - 10) / 2;
             int attackTotal = attackRoll + attackModifier;
 
             int defenseRoll = diceRoller.roll(1, 20);
-            int defenseModifier = targetCombatable.getStats().getDexterityModifier();
+            int defenseModifier = (targetCombatable.getStats().agility() - 10) / 2;
             int defenseTotal = defenseRoll + defenseModifier;
 
             boolean hitSuccess = attackTotal >= defenseTotal;
@@ -122,7 +122,7 @@ public class Combat {
             if (hitSuccess) {
                 // 2-2. Damage Calculation
                 baseDamage = diceRoller.roll(1, 6); // Simulate weapon damage (1d6)
-                damageModifier = getStrengthModifier(attackerCombatable.getStats().str());
+                damageModifier = getStrengthModifier(attackerCombatable.getStats().vigor());
                 damageTotal = baseDamage + damageModifier;
 
                 // 2-3. Defense Application

@@ -25,24 +25,39 @@ public class MonsterType {
     // 기본 스탯
     private int baseHp;
     private int baseMp;
-    private int baseStr;
-    private int baseDex;
-    private int baseCon;
-    private int baseIntelligence;
-    private int basePow;
-    private int baseCha;
+
+    // 속성 기본값
+    private int baseVigor;
+    private int basePhysique;
+    private int baseAgility;
+    private int baseIntellect;
+    private int baseWill;
+    private int baseMeridian;
 
     // 기본 경험치 보상
     private long baseExperience;
 
     // 레벨별 스탯 증가치
     private int hpPerLevel;
-    private int strPerLevel;
-    private int dexPerLevel;
-    private int conPerLevel;
-    private int intelligencePerLevel;
-    private int powPerLevel;
-    private int chaPerLevel;
+
+    // 속성 레벨당 증가치
+    private int vigorPerLevel;
+    private int physiquePerLevel;
+    private int agilityPerLevel;
+    private int intellectPerLevel;
+    private int willPerLevel;
+    private int meridianPerLevel;
+
+    // 무예 기본값
+    private int baseInnerPower;
+    private int baseSpecialTechnique;
+    private int baseLightStep;
+    private int baseFistsAndPalms;
+    private int baseSwordMethod;
+    private int baseBladeMethod;
+    private int baseLongWeapon;
+    private int baseEsotericWeapon;
+    private int baseArchery;
 
     // 레벨당 경험치 증가치
     private int expPerLevel;

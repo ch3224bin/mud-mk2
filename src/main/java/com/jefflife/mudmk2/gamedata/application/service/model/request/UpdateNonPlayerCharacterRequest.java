@@ -12,16 +12,27 @@ public record UpdateNonPlayerCharacterRequest(
     // BaseCharacter fields
     String name,
     String background,
+    // 현재 자원
     int hp,
-    int maxHp,
     int mp,
-    int maxMp,
-    int str,
-    int dex,
-    int con,
-    int intelligence,
-    int pow,
-    int cha,
+    int ap,
+    // 속성
+    int vigor,
+    int physique,
+    int agility,
+    int intellect,
+    int will,
+    int meridian,
+    // 무예
+    int innerPower,
+    int specialTechnique,
+    int lightStep,
+    int fistsAndPalms,
+    int swordMethod,
+    int bladeMethod,
+    int longWeapon,
+    int esotericWeapon,
+    int archery,
     Long roomId,
     boolean alive,
 
@@ -45,15 +56,23 @@ public record UpdateNonPlayerCharacterRequest(
                         .name(name)
                         .background(background)
                         .hp(hp)
-                        .maxHp(maxHp)
                         .mp(mp)
-                        .maxMp(maxMp)
-                        .str(str)
-                        .dex(dex)
-                        .con(con)
-                        .intelligence(intelligence)
-                        .pow(pow)
-                        .cha(cha)
+                        .ap(ap)
+                        .vigor(vigor)
+                        .physique(physique)
+                        .agility(agility)
+                        .intellect(intellect)
+                        .will(will)
+                        .meridian(meridian)
+                        .innerPower(innerPower)
+                        .specialTechnique(specialTechnique)
+                        .lightStep(lightStep)
+                        .fistsAndPalms(fistsAndPalms)
+                        .swordMethod(swordMethod)
+                        .bladeMethod(bladeMethod)
+                        .longWeapon(longWeapon)
+                        .esotericWeapon(esotericWeapon)
+                        .archery(archery)
                         .roomId(roomId)
                         .alive(alive)
                         .build())

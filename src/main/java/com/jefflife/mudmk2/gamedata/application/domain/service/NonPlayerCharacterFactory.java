@@ -39,6 +39,24 @@ public class NonPlayerCharacterFactory {
         };
     }
 
+    private static BaseCharacter buildBaseCharacter(
+            String name, String background, int hp, int mp, int ap,
+            int vigor, int physique, int agility, int intellect, int will, int meridian,
+            Long roomId) {
+        return BaseCharacter.builder()
+                .name(name)
+                .background(background)
+                .hp(hp).mp(mp).ap(ap)
+                .vigor(vigor).physique(physique).agility(agility)
+                .intellect(intellect).will(will).meridian(meridian)
+                .innerPower(0).specialTechnique(0).lightStep(0)
+                .fistsAndPalms(0).swordMethod(0).bladeMethod(0)
+                .longWeapon(0).esotericWeapon(0).archery(0)
+                .roomId(roomId)
+                .alive(true)
+                .build();
+    }
+
     /**
      * Creates a basic NPC with minimal required fields
      * @param name The name of the NPC
@@ -49,22 +67,7 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createBasicNPC(String name, NPCType npcType, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("")
-                        .hp(100)
-                        .maxHp(100)
-                        .mp(50)
-                        .maxMp(50)
-                        .str(10)
-                        .dex(10)
-                        .con(10)
-                        .intelligence(10)
-                        .pow(10)
-                        .cha(10)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "", 100, 50, 80, 10, 10, 10, 10, 10, 10, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(1)
                         .experience(0)
@@ -87,22 +90,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createMerchant(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("A local merchant selling various goods.")
-                        .hp(80)
-                        .maxHp(80)
-                        .mp(20)
-                        .maxMp(20)
-                        .str(8)
-                        .dex(12)
-                        .con(10)
-                        .intelligence(14)
-                        .pow(8)
-                        .cha(16)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "A local merchant selling various goods.",
+                        80, 20, 80, 8, 10, 12, 14, 8, 16, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(5)
                         .experience(0)
@@ -125,22 +114,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createQuestGiver(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("An important figure with tasks for adventurers.")
-                        .hp(120)
-                        .maxHp(120)
-                        .mp(80)
-                        .maxMp(80)
-                        .str(12)
-                        .dex(10)
-                        .con(12)
-                        .intelligence(16)
-                        .pow(14)
-                        .cha(14)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "An important figure with tasks for adventurers.",
+                        120, 80, 80, 12, 12, 10, 16, 14, 14, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(10)
                         .experience(0)
@@ -163,22 +138,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createTrainer(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("A skilled trainer who can teach various abilities.")
-                        .hp(150)
-                        .maxHp(150)
-                        .mp(100)
-                        .maxMp(100)
-                        .str(15)
-                        .dex(15)
-                        .con(15)
-                        .intelligence(18)
-                        .pow(15)
-                        .cha(12)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "A skilled trainer who can teach various abilities.",
+                        150, 100, 120, 15, 15, 15, 18, 15, 12, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(15)
                         .experience(0)
@@ -201,22 +162,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createGuard(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("A vigilant guard protecting the area.")
-                        .hp(200)
-                        .maxHp(200)
-                        .mp(50)
-                        .maxMp(50)
-                        .str(18)
-                        .dex(14)
-                        .con(18)
-                        .intelligence(10)
-                        .pow(8)
-                        .cha(10)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "A vigilant guard protecting the area.",
+                        200, 50, 112, 18, 18, 14, 10, 8, 10, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(8)
                         .experience(0)
@@ -239,22 +186,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createInnkeeper(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("A hospitable innkeeper providing lodging and food.")
-                        .hp(90)
-                        .maxHp(90)
-                        .mp(30)
-                        .maxMp(30)
-                        .str(10)
-                        .dex(12)
-                        .con(12)
-                        .intelligence(12)
-                        .pow(8)
-                        .cha(18)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "A hospitable innkeeper providing lodging and food.",
+                        90, 30, 96, 10, 12, 12, 12, 8, 18, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(6)
                         .experience(0)
@@ -277,22 +210,8 @@ public class NonPlayerCharacterFactory {
      */
     public static NonPlayerCharacter createCommonNPC(String name, String uniqueId, Long roomId) {
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("A common resident of the area.")
-                        .hp(70)
-                        .maxHp(70)
-                        .mp(20)
-                        .maxMp(20)
-                        .str(8)
-                        .dex(8)
-                        .con(8)
-                        .intelligence(8)
-                        .pow(8)
-                        .cha(8)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "A common resident of the area.",
+                        70, 20, 64, 8, 8, 8, 8, 8, 8, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(3)
                         .experience(0)
@@ -346,15 +265,23 @@ public class NonPlayerCharacterFactory {
                 .name(baseInfo.getName())
                 .background(background)
                 .hp(baseInfo.getHp())
-                .maxHp(baseInfo.getMaxHp())
                 .mp(baseInfo.getMp())
-                .maxMp(baseInfo.getMaxMp())
-                .str(baseInfo.getStr())
-                .dex(baseInfo.getDex())
-                .con(baseInfo.getCon())
-                .intelligence(baseInfo.getIntelligence())
-                .pow(baseInfo.getPow())
-                .cha(baseInfo.getCha())
+                .ap(baseInfo.getAp())
+                .vigor(baseInfo.getVigor())
+                .physique(baseInfo.getPhysique())
+                .agility(baseInfo.getAgility())
+                .intellect(baseInfo.getIntellect())
+                .will(baseInfo.getWill())
+                .meridian(baseInfo.getMeridian())
+                .innerPower(baseInfo.getInnerPower())
+                .specialTechnique(baseInfo.getSpecialTechnique())
+                .lightStep(baseInfo.getLightStep())
+                .fistsAndPalms(baseInfo.getFistsAndPalms())
+                .swordMethod(baseInfo.getSwordMethod())
+                .bladeMethod(baseInfo.getBladeMethod())
+                .longWeapon(baseInfo.getLongWeapon())
+                .esotericWeapon(baseInfo.getEsotericWeapon())
+                .archery(baseInfo.getArchery())
                 .roomId(baseInfo.getRoomId())
                 .alive(baseInfo.isAlive())
                 .build();
@@ -378,35 +305,20 @@ public class NonPlayerCharacterFactory {
      * @param roomId The room where the NPC is located
      * @param hp The HP stat
      * @param mp The MP stat
-     * @param str The strength stat
-     * @param dex The dexterity stat
-     * @param con The constitution stat
-     * @param intelligence The intelligence stat
-     * @param pow The power stat
-     * @param cha The charisma stat
+     * @param vigor The vigor stat
+     * @param physique The physique stat
+     * @param agility The agility stat
+     * @param intellect The intellect stat
+     * @param will The will stat
+     * @param meridian The meridian stat
      * @return A new NonPlayerCharacter with the specified stats
      */
     public static NonPlayerCharacter createNPCWithStats(
             String name, NPCType npcType, Long roomId,
-            int hp, int mp, int str, int dex, int con, int intelligence, int pow, int cha) {
-
+            int hp, int mp, int vigor, int physique, int agility, int intellect, int will, int meridian) {
+        int ap = agility * 8;
         return builder()
-                .baseCharacter(BaseCharacter.builder()
-                        .name(name)
-                        .background("")
-                        .hp(hp)
-                        .maxHp(hp)
-                        .mp(mp)
-                        .maxMp(mp)
-                        .str(str)
-                        .dex(dex)
-                        .con(con)
-                        .intelligence(intelligence)
-                        .pow(pow)
-                        .cha(cha)
-                        .roomId(roomId)
-                        .alive(true)
-                        .build())
+                .baseCharacter(buildBaseCharacter(name, "", hp, mp, ap, vigor, physique, agility, intellect, will, meridian, roomId))
                 .playableCharacter(PlayableCharacter.builder()
                         .level(1)
                         .experience(0)

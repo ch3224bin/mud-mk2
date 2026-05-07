@@ -11,12 +11,12 @@ public class InitiativeSystem {
 
     public InitiativeRoll rollInitiative(CharacterStats stats) {
         int diceRoll = rollD20();
-        int dexBonus = stats.getDexterityModifier();
+        int agilityBonus = (stats.agility() - 10) / 2;
         int skillBonus = 0;
         int miscBonus = 0;
         return new InitiativeRoll(
                 diceRoll,
-                dexBonus,
+                agilityBonus,
                 skillBonus,
                 miscBonus
         );

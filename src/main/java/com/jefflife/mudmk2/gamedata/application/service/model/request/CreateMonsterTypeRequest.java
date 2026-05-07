@@ -11,20 +11,32 @@ public record CreateMonsterTypeRequest(
     Gender gender,
     int baseHp,
     int baseMp,
-    int baseStr,
-    int baseDex,
-    int baseCon,
-    int baseIntelligence,
-    int basePow,
-    int baseCha,
+    // 속성 기본값
+    int baseVigor,
+    int basePhysique,
+    int baseAgility,
+    int baseIntellect,
+    int baseWill,
+    int baseMeridian,
     long baseExperience,
     int hpPerLevel,
-    int strPerLevel,
-    int dexPerLevel,
-    int conPerLevel,
-    int intelligencePerLevel,
-    int powPerLevel,
-    int chaPerLevel,
+    // 속성 레벨당 증가치
+    int vigorPerLevel,
+    int physiquePerLevel,
+    int agilityPerLevel,
+    int intellectPerLevel,
+    int willPerLevel,
+    int meridianPerLevel,
+    // 무예 기본값
+    int baseInnerPower,
+    int baseSpecialTechnique,
+    int baseLightStep,
+    int baseFistsAndPalms,
+    int baseSwordMethod,
+    int baseBladeMethod,
+    int baseLongWeapon,
+    int baseEsotericWeapon,
+    int baseArchery,
     int expPerLevel,
     List<MonsterSpawnRoomRequest> spawnRooms,
     int aggressiveness,
@@ -37,20 +49,29 @@ public record CreateMonsterTypeRequest(
                 .gender(gender)
                 .baseHp(baseHp)
                 .baseMp(baseMp)
-                .baseStr(baseStr)
-                .baseDex(baseDex)
-                .baseCon(baseCon)
-                .baseIntelligence(baseIntelligence)
-                .basePow(basePow)
-                .baseCha(baseCha)
+                .baseVigor(baseVigor)
+                .basePhysique(basePhysique)
+                .baseAgility(baseAgility)
+                .baseIntellect(baseIntellect)
+                .baseWill(baseWill)
+                .baseMeridian(baseMeridian)
                 .baseExperience(baseExperience)
                 .hpPerLevel(hpPerLevel)
-                .strPerLevel(strPerLevel)
-                .dexPerLevel(dexPerLevel)
-                .conPerLevel(conPerLevel)
-                .intelligencePerLevel(intelligencePerLevel)
-                .powPerLevel(powPerLevel)
-                .chaPerLevel(chaPerLevel)
+                .vigorPerLevel(vigorPerLevel)
+                .physiquePerLevel(physiquePerLevel)
+                .agilityPerLevel(agilityPerLevel)
+                .intellectPerLevel(intellectPerLevel)
+                .willPerLevel(willPerLevel)
+                .meridianPerLevel(meridianPerLevel)
+                .baseInnerPower(baseInnerPower)
+                .baseSpecialTechnique(baseSpecialTechnique)
+                .baseLightStep(baseLightStep)
+                .baseFistsAndPalms(baseFistsAndPalms)
+                .baseSwordMethod(baseSwordMethod)
+                .baseBladeMethod(baseBladeMethod)
+                .baseLongWeapon(baseLongWeapon)
+                .baseEsotericWeapon(baseEsotericWeapon)
+                .baseArchery(baseArchery)
                 .expPerLevel(expPerLevel)
                 .aggressiveness(aggressiveness)
                 .respawnTime(respawnTime)

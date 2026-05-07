@@ -32,27 +32,36 @@ public class Monster implements Combatable, Statable {
      */
     public static Monster createFromType(MonsterType monsterType, int level, Long roomId) {
         // 레벨 기반으로 스탯 계산
-        int maxHp = monsterType.getBaseHp() + (level * monsterType.getHpPerLevel());
-        int maxMp = monsterType.getBaseMp();
-        int strength = monsterType.getBaseStr() + (level * monsterType.getStrPerLevel());
-        int dexterity = monsterType.getBaseDex() + (level * monsterType.getDexPerLevel());
-        int constitution = monsterType.getBaseCon() + (level * monsterType.getConPerLevel());
-        int intelligence = monsterType.getBaseIntelligence() + (level * monsterType.getIntelligencePerLevel());
-        int power = monsterType.getBasePow() + (level * monsterType.getPowPerLevel());
-        int charisma = monsterType.getBaseCha() + (level * monsterType.getChaPerLevel());
+        int hp = monsterType.getBaseHp() + (level * monsterType.getHpPerLevel());
+        int mp = monsterType.getBaseMp();
+        int vigor = monsterType.getBaseVigor() + (level * monsterType.getVigorPerLevel());
+        int physique = monsterType.getBasePhysique() + (level * monsterType.getPhysiquePerLevel());
+        int agility = monsterType.getBaseAgility() + (level * monsterType.getAgilityPerLevel());
+        int intellect = monsterType.getBaseIntellect() + (level * monsterType.getIntellectPerLevel());
+        int will = monsterType.getBaseWill() + (level * monsterType.getWillPerLevel());
+        int meridian = monsterType.getBaseMeridian() + (level * monsterType.getMeridianPerLevel());
+        int ap = agility * CharacterStats.AP_PER_AGILITY;
         long experienceReward = monsterType.getBaseExperience() + (level * monsterType.getExpPerLevel());
 
         BaseCharacter baseCharacterInfo = BaseCharacter.builder()
-                .hp(maxHp)
-                .maxHp(maxHp)
-                .mp(maxMp)
-                .maxMp(maxMp)
-                .str(strength)
-                .dex(dexterity)
-                .con(constitution)
-                .intelligence(intelligence)
-                .pow(power)
-                .cha(charisma)
+                .hp(hp)
+                .mp(mp)
+                .ap(ap)
+                .vigor(vigor)
+                .physique(physique)
+                .agility(agility)
+                .intellect(intellect)
+                .will(will)
+                .meridian(meridian)
+                .innerPower(monsterType.getBaseInnerPower())
+                .specialTechnique(monsterType.getBaseSpecialTechnique())
+                .lightStep(monsterType.getBaseLightStep())
+                .fistsAndPalms(monsterType.getBaseFistsAndPalms())
+                .swordMethod(monsterType.getBaseSwordMethod())
+                .bladeMethod(monsterType.getBaseBladeMethod())
+                .longWeapon(monsterType.getBaseLongWeapon())
+                .esotericWeapon(monsterType.getBaseEsotericWeapon())
+                .archery(monsterType.getBaseArchery())
                 .name(monsterType.getName())
                 .background(monsterType.getDescription())
                 .roomId(roomId)

@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
@@ -106,88 +107,23 @@ public class PlayerCharacterService {
      * @return the base character
      */
     private BaseCharacter createBaseCharacter(String name, CharacterClass characterClass, Gender gender) {
-        // Set base stats based on class
-        int hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha;
-
-        switch (characterClass) {
-            case WARRIOR:
-                hp = maxHp = 100;
-                mp = maxMp = 20;
-                str = 15;
-                dex = 10;
-                con = 15;
-                intelligence = 8;
-                pow = 5;
-                cha = 10;
-                break;
-            case MAGE:
-                hp = maxHp = 60;
-                mp = maxMp = 100;
-                str = 5;
-                dex = 8;
-                con = 8;
-                intelligence = 15;
-                pow = 15;
-                cha = 10;
-                break;
-            case ROGUE:
-                hp = maxHp = 70;
-                mp = maxMp = 40;
-                str = 10;
-                dex = 15;
-                con = 10;
-                intelligence = 10;
-                pow = 8;
-                cha = 12;
-                break;
-            case CLERIC:
-                hp = maxHp = 80;
-                mp = maxMp = 80;
-                str = 8;
-                dex = 8;
-                con = 12;
-                intelligence = 12;
-                pow = 12;
-                cha = 15;
-                break;
-            case RANGER:
-                hp = maxHp = 80;
-                mp = maxMp = 50;
-                str = 12;
-                dex = 15;
-                con = 12;
-                intelligence = 10;
-                pow = 8;
-                cha = 8;
-                break;
-            default:
-                hp = maxHp = 80;
-                mp = maxMp = 50;
-                str = 10;
-                dex = 10;
-                con = 10;
-                intelligence = 10;
-                pow = 10;
-                cha = 10;
-                break;
-        }
+        int baseAttr = 10;
+        int hp = baseAttr * CharacterStats.HP_PER_PHYSIQUE;   // 100
+        int mp = baseAttr * CharacterStats.MP_PER_MERIDIAN;   // 50
+        int ap = baseAttr * CharacterStats.AP_PER_AGILITY;    // 80
 
         return BaseCharacter.builder()
                 .name(name)
-                .background("A new adventurer")
-                .hp(hp)
-                .maxHp(maxHp)
-                .mp(mp)
-                .maxMp(maxMp)
-                .str(str)
-                .dex(dex)
-                .con(con)
-                .intelligence(intelligence)
-                .pow(pow)
-                .cha(cha)
-                .roomId(1L) // Start in room 1
-                .alive(true)
+                .background("새로운 강호인")
                 .gender(gender)
+                .hp(hp).mp(mp).ap(ap)
+                .vigor(baseAttr).physique(baseAttr).agility(baseAttr)
+                .intellect(baseAttr).will(baseAttr).meridian(baseAttr)
+                .innerPower(0).specialTechnique(0).lightStep(0)
+                .fistsAndPalms(0).swordMethod(0).bladeMethod(0)
+                .longWeapon(0).esotericWeapon(0).archery(0)
+                .roomId(1L)
+                .alive(true)
                 .build();
     }
 }
