@@ -14,14 +14,15 @@ class InitiativeSystemTest {
         // given
         int fixedDiceRoll = 15; // 고정된 주사위 값
         CharacterStats stats = new CharacterStats(
-                100, 100, // hp, maxHp
-                50, 50,   // mp, maxMp
-                10,       // str
-                14,       // dex (민첩 수정치 +2)
-                10,       // con
-                10,       // int
-                10,       // pow
-                10        // cha
+                100, 50, 80, // hp, mp, ap
+                10,           // vigor
+                10,           // physique
+                14,           // agility (민첩 수정치 +2)
+                10,           // intellect
+                10,           // will
+                10,           // meridian
+                0, 0, 0,      // innerPower, specialTechnique, lightStep
+                0, 0, 0, 0, 0, 0 // fistsAndPalms, swordMethod, bladeMethod, longWeapon, esotericWeapon, archery
         );
 
         // 항상 15(0-19 기준에서 14)가 나오도록 고정된 값을 반환하는 RandomGenerator 구현
@@ -45,14 +46,15 @@ class InitiativeSystemTest {
         // given
         int fixedDiceRoll = 10; // 고정된 주사위 값
         CharacterStats stats = new CharacterStats(
-                100, 100, // hp, maxHp
-                50, 50,   // mp, maxMp
-                10,       // str
-                8,        // dex (민첩 수정치 -1)
-                10,       // con
-                10,       // int
-                10,       // pow
-                10        // cha
+                100, 50, 80, // hp, mp, ap
+                10,           // vigor
+                10,           // physique
+                8,            // agility (민첩 수정치 -1)
+                10,           // intellect
+                10,           // will
+                10,           // meridian
+                0, 0, 0,      // innerPower, specialTechnique, lightStep
+                0, 0, 0, 0, 0, 0 // fistsAndPalms, swordMethod, bladeMethod, longWeapon, esotericWeapon, archery
         );
 
         // 항상 10(0-19 기준에서 9)가 나오도록 고정된 값을 반환하는 RandomGenerator 구현
@@ -75,7 +77,11 @@ class InitiativeSystemTest {
     void rollInitiative_WithDifferentRandomGenerators_ReturnsExpectedDiceRolls() {
         // given
         CharacterStats stats = new CharacterStats(
-                100, 100, 50, 50, 10, 10, 10, 10, 10, 10
+                100, 50, 80, // hp, mp, ap
+                10, 10, 10,  // vigor, physique, agility
+                10, 10, 10,  // intellect, will, meridian
+                0, 0, 0,     // innerPower, specialTechnique, lightStep
+                0, 0, 0, 0, 0, 0 // fistsAndPalms, swordMethod, bladeMethod, longWeapon, esotericWeapon, archery
         );
 
         // 최소값(1)이 나오는 RandomGenerator

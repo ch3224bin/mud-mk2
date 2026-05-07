@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NPCType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
@@ -316,7 +317,7 @@ public class NonPlayerCharacterFactory {
     public static NonPlayerCharacter createNPCWithStats(
             String name, NPCType npcType, Long roomId,
             int hp, int mp, int vigor, int physique, int agility, int intellect, int will, int meridian) {
-        int ap = agility * 8;
+        int ap = agility * CharacterStats.AP_PER_AGILITY;
         return builder()
                 .baseCharacter(buildBaseCharacter(name, "", hp, mp, ap, vigor, physique, agility, intellect, will, meridian, roomId))
                 .playableCharacter(PlayableCharacter.builder()

@@ -40,15 +40,23 @@ public class NonPlayerCharacterControllerSystemTest {
         String background = "This is a test NPC";
         Gender gender = Gender.MALE;
         int hp = 100;
-        int maxHp = 100;
         int mp = 50;
-        int maxMp = 50;
-        int str = 10;
-        int dex = 10;
-        int con = 10;
-        int intelligence = 10;
-        int pow = 10;
-        int cha = 10;
+        int ap = 80;
+        int vigor = 10;
+        int physique = 10;  // maxHp = 10×10 = 100
+        int agility = 10;   // maxAp = 10×8 = 80
+        int intellect = 10;
+        int will = 10;
+        int meridian = 10;  // maxMp = 10×5 = 50
+        int innerPower = 0;
+        int specialTechnique = 0;
+        int lightStep = 0;
+        int fistsAndPalms = 0;
+        int swordMethod = 0;
+        int bladeMethod = 0;
+        int longWeapon = 0;
+        int esotericWeapon = 0;
+        int archery = 0;
         Long roomId = 1L;
         int level = 1;
         long experience = 0;
@@ -59,10 +67,17 @@ public class NonPlayerCharacterControllerSystemTest {
         Long spawnRoomId = 1L;
         boolean essential = true;
 
-        String requestJson = createNonPlayerCharacterJson(
-                name, background, gender, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
-                level, experience, nextLevelExp, conversable, persona, npcType, spawnRoomId, essential
+        CreateNonPlayerCharacterRequest request = new CreateNonPlayerCharacterRequest(
+                name, background, gender,
+                hp, mp, ap,
+                vigor, physique, agility, intellect, will, meridian,
+                innerPower, specialTechnique, lightStep,
+                fistsAndPalms, swordMethod, bladeMethod, longWeapon, esotericWeapon, archery,
+                roomId,
+                level, experience, nextLevelExp, conversable,
+                persona, npcType, spawnRoomId, essential
         );
+        String requestJson = objectMapper.writeValueAsString(request);
 
         // When
         MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -80,15 +95,15 @@ public class NonPlayerCharacterControllerSystemTest {
         assertThat(response.background()).isEqualTo(background);
         assertThat(response.gender()).isEqualTo(gender);
         assertThat(response.hp()).isEqualTo(hp);
-        assertThat(response.maxHp()).isEqualTo(maxHp);
+        assertThat(response.maxHp()).isEqualTo(physique * 10 + specialTechnique * 3); // maxHp formula
         assertThat(response.mp()).isEqualTo(mp);
-        assertThat(response.maxMp()).isEqualTo(maxMp);
-        assertThat(response.str()).isEqualTo(str);
-        assertThat(response.dex()).isEqualTo(dex);
-        assertThat(response.con()).isEqualTo(con);
-        assertThat(response.intelligence()).isEqualTo(intelligence);
-        assertThat(response.pow()).isEqualTo(pow);
-        assertThat(response.cha()).isEqualTo(cha);
+        assertThat(response.maxMp()).isEqualTo(meridian * 5 + innerPower * 3); // maxMp formula
+        assertThat(response.vigor()).isEqualTo(vigor);
+        assertThat(response.physique()).isEqualTo(physique);
+        assertThat(response.agility()).isEqualTo(agility);
+        assertThat(response.intellect()).isEqualTo(intellect);
+        assertThat(response.will()).isEqualTo(will);
+        assertThat(response.meridian()).isEqualTo(meridian);
         assertThat(response.roomId()).isEqualTo(roomId);
         assertThat(response.level()).isEqualTo(level);
         assertThat(response.experience()).isEqualTo(experience);
@@ -102,18 +117,5 @@ public class NonPlayerCharacterControllerSystemTest {
         // Verify Location header
         String locationHeader = result.getResponse().getHeader("Location");
         assertThat(locationHeader).isEqualTo(BASE_URL + "/" + response.id());
-    }
-
-    private String createNonPlayerCharacterJson(
-            String name, String background, Gender gender, int hp, int maxHp, int mp, int maxMp,
-            int str, int dex, int con, int intelligence, int pow, int cha, Long roomId,
-            int level, long experience, long nextLevelExp, boolean conversable,
-            String persona, NPCType npcType, Long spawnRoomId, boolean essential
-    ) throws Exception {
-        CreateNonPlayerCharacterRequest request = new CreateNonPlayerCharacterRequest(
-                name, background, gender, hp, maxHp, mp, maxMp, str, dex, con, intelligence, pow, cha, roomId,
-                level, experience, nextLevelExp, conversable, persona, npcType, spawnRoomId, essential
-        );
-        return objectMapper.writeValueAsString(request);
     }
 }

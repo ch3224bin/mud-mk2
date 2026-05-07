@@ -29,9 +29,14 @@ public class GameTestFixture {
                 .name("TestPlayer")
                 .roomId(roomId)
                 .hp(100)
-                .maxHp(100)
-                .mp(100)
-                .maxMp(100)
+                .mp(50)
+                .ap(80)
+                .vigor(10)
+                .physique(10)   // maxHp = 10×10 = 100
+                .agility(10)    // maxAp = 10×8 = 80
+                .intellect(10)
+                .will(10)
+                .meridian(10)   // maxMp = 10×5 = 50
                 .build();
 
         PlayableCharacter playableCharacter = PlayableCharacter.builder()

@@ -48,20 +48,32 @@ public class MonsterTypeControllerSystemTest {
                 Gender.MALE, // gender
                 100, // baseHp
                 50,  // baseMp
-                10,  // baseStr
-                8,   // baseDex
-                5,   // baseCon
-                7,   // baseIntelligence
-                6,   // basePow
-                5,   // baseCha
+                // 속성 기본값
+                10,  // baseVigor
+                10,  // basePhysique
+                8,   // baseAgility
+                7,   // baseIntellect
+                6,   // baseWill
+                10,  // baseMeridian
                 100, // baseExperience
                 10,  // hpPerLevel
-                2,   // strPerLevel
-                2,   // dexPerLevel
-                1,   // conPerLevel
-                1,   // intelligencePerLevel
-                1,   // powPerLevel
-                1,   // chaPerLevel
+                // 속성 레벨당 증가치
+                2,   // vigorPerLevel
+                2,   // physiquePerLevel
+                1,   // agilityPerLevel
+                1,   // intellectPerLevel
+                1,   // willPerLevel
+                1,   // meridianPerLevel
+                // 무예 기본값
+                0,   // baseInnerPower
+                0,   // baseSpecialTechnique
+                0,   // baseLightStep
+                0,   // baseFistsAndPalms
+                0,   // baseSwordMethod
+                0,   // baseBladeMethod
+                0,   // baseLongWeapon
+                0,   // baseEsotericWeapon
+                0,   // baseArchery
                 50,  // expPerLevel
                 List.of(), // spawnRooms
                 1,   // aggressiveness
@@ -81,7 +93,7 @@ public class MonsterTypeControllerSystemTest {
         MonsterTypeResponse response = objectMapper.readValue(responseJson, MonsterTypeResponse.class);
 
         assertThat(response.id()).isNotNull();
-        assertMonsterTypeEquals(response, monsterTypeName, 100, 10, 5);
+        assertMonsterTypeEquals(response, monsterTypeName, 100, 10, 10);
 
         // Verify Location header
         String locationHeader = result.getResponse().getHeader("Location");
@@ -109,20 +121,32 @@ public class MonsterTypeControllerSystemTest {
                 Gender.MALE,
                 100,                // baseHp
                 50,                 // baseMp
-                10,                 // baseStr
-                8,                  // baseDex
-                5,                  // baseCon
-                7,                  // baseIntelligence
-                6,                  // basePow
-                5,                  // baseCha
+                // 속성 기본값
+                10,                 // baseVigor
+                10,                 // basePhysique
+                8,                  // baseAgility
+                7,                  // baseIntellect
+                6,                  // baseWill
+                10,                 // baseMeridian
                 100,                // baseExperience
                 10,                 // hpPerLevel
-                2,                  // strPerLevel
-                2,                  // dexPerLevel
-                1,                  // conPerLevel
-                1,                  // intelligencePerLevel
-                1,                  // powPerLevel
-                1,                  // chaPerLevel
+                // 속성 레벨당 증가치
+                2,                  // vigorPerLevel
+                2,                  // physiquePerLevel
+                1,                  // agilityPerLevel
+                1,                  // intellectPerLevel
+                1,                  // willPerLevel
+                1,                  // meridianPerLevel
+                // 무예 기본값
+                0,                  // baseInnerPower
+                0,                  // baseSpecialTechnique
+                0,                  // baseLightStep
+                0,                  // baseFistsAndPalms
+                0,                  // baseSwordMethod
+                0,                  // baseBladeMethod
+                0,                  // baseLongWeapon
+                0,                  // baseEsotericWeapon
+                0,                  // baseArchery
                 50,                 // expPerLevel
                 List.of(),          // spawnRooms
                 1,                  // aggressiveness
@@ -140,8 +164,8 @@ public class MonsterTypeControllerSystemTest {
     @Test
     void getMonsterTypes_shouldReturnAllMonsterTypes() throws Exception {
         // Given
-        MonsterTypeResponse createdMonsterType1 = createTestMonsterType("Test Monster 1", 100, 10, 5);
-        MonsterTypeResponse createdMonsterType2 = createTestMonsterType("Test Monster 2", 120, 12, 6);
+        MonsterTypeResponse createdMonsterType1 = createTestMonsterType("Test Monster 1", 100, 10, 10);
+        MonsterTypeResponse createdMonsterType2 = createTestMonsterType("Test Monster 2", 120, 12, 12);
 
         // When
         List<MonsterTypeResponse> monsterTypes = getAllMonsterTypes();
@@ -158,20 +182,20 @@ public class MonsterTypeControllerSystemTest {
     @Test
     void getMonsterType_shouldReturnMonsterTypeById() throws Exception {
         // Given
-        MonsterTypeResponse createdMonsterType = createTestMonsterType("Test Monster for GetById", 150, 15, 7);
+        MonsterTypeResponse createdMonsterType = createTestMonsterType("Test Monster for GetById", 150, 15, 15);
 
         // When
         MonsterTypeResponse retrievedMonsterType = getMonsterTypeById(createdMonsterType.id());
 
         // Then
         assertThat(retrievedMonsterType.id()).isEqualTo(createdMonsterType.id());
-        assertMonsterTypeEquals(retrievedMonsterType, "Test Monster for GetById", 150, 15, 7);
+        assertMonsterTypeEquals(retrievedMonsterType, "Test Monster for GetById", 150, 15, 15);
     }
 
     @Test
     void updateMonsterType_shouldUpdateMonsterTypeAndReturnUpdatedResponse() throws Exception {
         // Given
-        MonsterTypeResponse createdMonsterType = createTestMonsterType("Original Monster Name", 200, 20, 10);
+        MonsterTypeResponse createdMonsterType = createTestMonsterType("Original Monster Name", 200, 20, 20);
 
         // When
         String updatedMonsterTypeName = "Updated Monster Name";
@@ -181,20 +205,32 @@ public class MonsterTypeControllerSystemTest {
                 Gender.MALE,
                 220,                    // baseHp
                 60,                     // baseMp
-                22,                     // baseStr
-                10,                     // baseDex
-                11,                     // baseCon
-                9,                      // baseIntelligence
-                8,                      // basePow
-                7,                      // baseCha
+                // 속성 기본값
+                22,                     // baseVigor
+                22,                     // basePhysique
+                10,                     // baseAgility
+                9,                      // baseIntellect
+                8,                      // baseWill
+                12,                     // baseMeridian
                 120,                    // baseExperience
                 12,                     // hpPerLevel
-                3,                      // strPerLevel
-                3,                      // dexPerLevel
-                2,                      // conPerLevel
-                2,                      // intelligencePerLevel
-                2,                      // powPerLevel
-                2,                      // chaPerLevel
+                // 속성 레벨당 증가치
+                3,                      // vigorPerLevel
+                3,                      // physiquePerLevel
+                2,                      // agilityPerLevel
+                2,                      // intellectPerLevel
+                2,                      // willPerLevel
+                2,                      // meridianPerLevel
+                // 무예 기본값
+                0,                      // baseInnerPower
+                0,                      // baseSpecialTechnique
+                0,                      // baseLightStep
+                0,                      // baseFistsAndPalms
+                0,                      // baseSwordMethod
+                0,                      // baseBladeMethod
+                0,                      // baseLongWeapon
+                0,                      // baseEsotericWeapon
+                0,                      // baseArchery
                 60,                     // expPerLevel
                 List.of(),              // spawnRooms
                 2,                      // aggressiveness
@@ -204,17 +240,17 @@ public class MonsterTypeControllerSystemTest {
 
         // Then
         assertThat(updatedMonsterType.id()).isEqualTo(createdMonsterType.id());
-        assertMonsterTypeEquals(updatedMonsterType, updatedMonsterTypeName, 220, 22, 11);
+        assertMonsterTypeEquals(updatedMonsterType, updatedMonsterTypeName, 220, 22, 22);
 
         // Verify that the monster type was actually updated in the database
         MonsterTypeResponse retrievedMonsterType = getMonsterTypeById(createdMonsterType.id());
-        assertMonsterTypeEquals(retrievedMonsterType, updatedMonsterTypeName, 220, 22, 11);
+        assertMonsterTypeEquals(retrievedMonsterType, updatedMonsterTypeName, 220, 22, 22);
     }
 
     @Test
     void deleteMonsterType_shouldDeleteMonsterTypeAndReturnNoContent() throws Exception {
         // Given
-        MonsterTypeResponse createdMonsterType = createTestMonsterType("Test Monster for Delete", 50, 5, 2);
+        MonsterTypeResponse createdMonsterType = createTestMonsterType("Test Monster for Delete", 50, 5, 5);
 
         // When
         deleteMonsterType(createdMonsterType.id());
@@ -237,40 +273,39 @@ public class MonsterTypeControllerSystemTest {
                 .andExpect(status().isNotFound());
     }
 
-    private MonsterTypeResponse createTestMonsterType(String name, String description, int baseHp, int baseMp, int baseStr, int baseDex, int baseCon, int baseIntelligence, int basePow, int baseCha, long baseExperience, int hpPerLevel, int strPerLevel, int dexPerLevel, int conPerLevel, int intelligencePerLevel, int powPerLevel, int chaPerLevel, int expPerLevel, List<MonsterSpawnRoomRequest> spawnRooms, int aggressiveness, int respawnTime) throws Exception {
-        CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(name, description, Gender.MALE, baseHp, baseMp, baseStr, baseDex, baseCon, baseIntelligence, basePow, baseCha, baseExperience, hpPerLevel, strPerLevel, dexPerLevel, conPerLevel, intelligencePerLevel, powPerLevel, chaPerLevel, expPerLevel, spawnRooms, aggressiveness, respawnTime);
-        String requestJson = objectMapper.writeValueAsString(createRequest);
-
-        MvcResult result = mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        return objectMapper.readValue(result.getResponse().getContentAsString(), MonsterTypeResponse.class);
-    }
-
-    private MonsterTypeResponse createTestMonsterType(String name, int baseHp, int baseStr, int baseCon) throws Exception {
+    private MonsterTypeResponse createTestMonsterType(String name, int baseHp, int baseVigor, int basePhysique) throws Exception {
         CreateMonsterTypeRequest createRequest = new CreateMonsterTypeRequest(
                 name,                // name
                 "Description for " + name, // description
                 Gender.MALE,        // gender
                 baseHp,             // baseHp
                 50,                 // baseMp
-                baseStr,            // baseStr
-                8,                  // baseDex
-                baseCon,            // baseCon
-                7,                  // baseIntelligence
-                6,                  // basePow
-                5,                  // baseCha
+                // 속성 기본값
+                baseVigor,          // baseVigor
+                basePhysique,       // basePhysique
+                8,                  // baseAgility
+                7,                  // baseIntellect
+                6,                  // baseWill
+                10,                 // baseMeridian
                 100,                // baseExperience
                 10,                 // hpPerLevel
-                2,                  // strPerLevel
-                2,                  // dexPerLevel
-                1,                  // conPerLevel
-                1,                  // intelligencePerLevel
-                1,                  // powPerLevel
-                1,                  // chaPerLevel
+                // 속성 레벨당 증가치
+                2,                  // vigorPerLevel
+                2,                  // physiquePerLevel
+                1,                  // agilityPerLevel
+                1,                  // intellectPerLevel
+                1,                  // willPerLevel
+                1,                  // meridianPerLevel
+                // 무예 기본값
+                0,                  // baseInnerPower
+                0,                  // baseSpecialTechnique
+                0,                  // baseLightStep
+                0,                  // baseFistsAndPalms
+                0,                  // baseSwordMethod
+                0,                  // baseBladeMethod
+                0,                  // baseLongWeapon
+                0,                  // baseEsotericWeapon
+                0,                  // baseArchery
                 50,                 // expPerLevel
                 List.of(),          // spawnRooms
                 1,                  // aggressiveness
@@ -323,12 +358,12 @@ public class MonsterTypeControllerSystemTest {
                 .andExpect(status().isNoContent());
     }
 
-    private void assertMonsterTypeEquals(MonsterTypeResponse monsterType, String expectedName, int expectedBaseHp, int expectedBaseStr, int expectedBaseCon) {
+    private void assertMonsterTypeEquals(MonsterTypeResponse monsterType, String expectedName, int expectedBaseHp, int expectedBaseVigor, int expectedBasePhysique) {
         assertThat(monsterType).isNotNull();
         assertThat(monsterType.name()).isEqualTo(expectedName);
         assertThat(monsterType.baseHp()).isEqualTo(expectedBaseHp);
-        assertThat(monsterType.baseStr()).isEqualTo(expectedBaseStr);
-        assertThat(monsterType.baseCon()).isEqualTo(expectedBaseCon);
+        assertThat(monsterType.baseVigor()).isEqualTo(expectedBaseVigor);
+        assertThat(monsterType.basePhysique()).isEqualTo(expectedBasePhysique);
     }
 
     private void assertMonsterTypeInList(List<MonsterTypeResponse> monsterTypes, MonsterTypeResponse expectedMonsterType) {
@@ -336,7 +371,7 @@ public class MonsterTypeControllerSystemTest {
         for (MonsterTypeResponse monsterType : monsterTypes) {
             if (monsterType.id().equals(expectedMonsterType.id())) {
                 found = true;
-                assertMonsterTypeEquals(monsterType, expectedMonsterType.name(), expectedMonsterType.baseHp(), expectedMonsterType.baseStr(), expectedMonsterType.baseCon());
+                assertMonsterTypeEquals(monsterType, expectedMonsterType.name(), expectedMonsterType.baseHp(), expectedMonsterType.baseVigor(), expectedMonsterType.basePhysique());
                 break;
             }
         }

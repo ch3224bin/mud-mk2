@@ -28,7 +28,7 @@ class CombatTest {
 
         InitiativeProvider initiativeProvider = stats -> {
             int diceRoll = 10; // 고정된 주사위 값으로 테스트
-            int dexBonus = stats.getDexterityModifier();
+            int dexBonus = (stats.agility() - 10) / 2;
             return new InitiativeRoll(diceRoll, dexBonus, 0, 0);
         };
 
@@ -56,7 +56,7 @@ class CombatTest {
 
         InitiativeProvider initiativeProvider = stats -> {
             int diceRoll = 10; // 고정된 주사위 값으로 테스트
-            int dexBonus = stats.getDexterityModifier();
+            int dexBonus = (stats.agility() - 10) / 2;
             return new InitiativeRoll(diceRoll, dexBonus, 0, 0);
         };
 
@@ -102,7 +102,7 @@ class CombatTest {
         // 4. 선제권 제공자 설정 (고정된 값으로)
         InitiativeProvider initiativeProvider = stats -> {
             int diceRoll = 10; // 고정된 주사위 값으로 테스트
-            int dexBonus = stats.getDexterityModifier();
+            int dexBonus = (stats.agility() - 10) / 2;
             return new InitiativeRoll(diceRoll, dexBonus, 0, 0);
         };
 
@@ -169,15 +169,14 @@ class CombatTest {
         BaseCharacter baseCharacter = BaseCharacter.builder()
                 .name("테스터")
                 .hp(100)
-                .maxHp(100)
                 .mp(50)
-                .maxMp(50)
-                .str(12)
-                .dex(dexterity) // 파라미터로 받은 민첩성 사용
-                .con(14)
-                .intelligence(10)
-                .pow(8)
-                .cha(10)
+                .ap(dexterity * 8)
+                .vigor(12)
+                .physique(10)   // maxHp = 10×10 = 100
+                .agility(dexterity) // 파라미터로 받은 민첩성 사용
+                .intellect(10)
+                .will(8)
+                .meridian(10)   // maxMp = 10×5 = 50
                 .roomId(1L)
                 .build();
 
@@ -204,15 +203,14 @@ class CombatTest {
         BaseCharacter baseCharacter = BaseCharacter.builder()
                 .name("조력자NPC")
                 .hp(80)
-                .maxHp(80)
                 .mp(40)
-                .maxMp(40)
-                .str(10)
-                .dex(dexterity) // 파라미터로 받은 민첩성 사용
-                .con(12)
-                .intelligence(14)
-                .pow(12)
-                .cha(16)
+                .ap(dexterity * 8)
+                .vigor(10)
+                .physique(8)    // maxHp = 8×10 = 80
+                .agility(dexterity) // 파라미터로 받은 민첩성 사용
+                .intellect(14)
+                .will(12)
+                .meridian(8)    // maxMp = 8×5 = 40
                 .roomId(1L)
                 .build();
 
@@ -241,12 +239,12 @@ class CombatTest {
                 .description("테스트용 몬스터입니다.")
                 .baseHp(50)
                 .baseMp(20)
-                .baseStr(10)
-                .baseDex(dexterity) // 파라미터로 받은 민첩성 사용
-                .baseCon(10)
-                .baseIntelligence(8)
-                .basePow(8)
-                .baseCha(5)
+                .baseVigor(10)
+                .basePhysique(5)    // maxHp = 5×10 = 50
+                .baseAgility(dexterity) // 파라미터로 받은 민첩성 사용
+                .baseIntellect(8)
+                .baseWill(8)
+                .baseMeridian(4)    // maxMp = 4×5 = 20
                 .build();
 
         return Monster.createFromType(monsterType, 1, 1L);
