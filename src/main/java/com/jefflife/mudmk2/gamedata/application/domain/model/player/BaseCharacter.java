@@ -8,33 +8,44 @@ import lombok.*;
 @Builder @AllArgsConstructor
 public class BaseCharacter {
     private String name;
+
     @Builder.Default
     private CharacterState state = CharacterState.NORMAL;
 
     @Column(length = 1000)
     private String background;
 
-    // 성별
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Gender gender = Gender.MALE;
 
-    // 스탯
+    // 현재 자원
     private int hp;
-    private int maxHp;
     private int mp;
-    private int maxMp;
-    private int str; // 힘
-    private int dex; // 민첩
-    private int con; // 체력
-    private int intelligence; // 지능
-    private int pow; // 마력
-    private int cha; // 매력
+    private int ap;
+
+    // 속성 (屬性) — 6개
+    private int vigor;            // 근력(筋力)
+    private int physique;         // 체질(體質)
+    private int agility;          // 민첩(敏捷)
+    private int intellect;        // 지력(智力)
+    private int will;             // 의지(意志)
+    private int meridian;         // 경맥(經脈)
+
+    // 무예 (武藝) — 9개
+    private int innerPower;       // 내공(內功)
+    private int specialTechnique; // 절기(絶技)
+    private int lightStep;        // 경공(輕功)
+    private int fistsAndPalms;    // 권장(拳掌)
+    private int swordMethod;      // 검법(劍法)
+    private int bladeMethod;      // 도법(刀法)
+    private int longWeapon;       // 장병(長兵)
+    private int esotericWeapon;   // 기문(奇門)
+    private int archery;          // 사술(射術)
 
     // 위치 정보
     private Long roomId;
 
-    // 생존 여부
     @Builder.Default
     private boolean alive = true;
 
@@ -42,24 +53,12 @@ public class BaseCharacter {
         this.roomId = roomId;
     }
 
-    public void fullRestore() {
-        this.hp = this.maxHp;
-        this.mp = this.maxMp;
-        this.alive = true;
-    }
-
     public CharacterStats getStats() {
         return new CharacterStats(
-                hp,
-                maxHp,
-                mp,
-                maxMp,
-                str,
-                dex,
-                con,
-                intelligence,
-                pow,
-                cha
+                hp, mp, ap,
+                vigor, physique, agility, intellect, will, meridian,
+                innerPower, specialTechnique, lightStep,
+                fistsAndPalms, swordMethod, bladeMethod, longWeapon, esotericWeapon, archery
         );
     }
 
@@ -67,8 +66,16 @@ public class BaseCharacter {
         this.state = characterState;
     }
 
-    public void decreaseHp(int hp) {
-        this.hp -= hp;
+    public void fullRestore() {
+        CharacterStats stats = getStats();
+        this.hp = stats.maxHp();
+        this.mp = stats.maxMp();
+        this.ap = stats.maxAp();
+        this.alive = true;
+    }
+
+    public void decreaseHp(int amount) {
+        this.hp -= amount;
         if (this.hp <= 0) {
             this.alive = false;
             this.state = CharacterState.DEAD;
