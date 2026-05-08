@@ -63,6 +63,18 @@ public class GameWorldService {
     }
 
     /**
+     * 플레이어 캐릭터를 인메모리 캐시에서 제거합니다.
+     * @param userId 제거할 플레이어의 사용자 ID
+     */
+    public void removePlayer(Long userId) {
+        PlayerCharacter player = activePlayersByUserId.remove(userId);
+        if (player != null) {
+            activePlayers.remove(player.getId());
+            logger.debug("Player removed from game world: userId={}", userId);
+        }
+    }
+
+    /**
      * 게임에 NPC를 로드합니다.
      * @param npcs 로드할 NPC 목록
      */
@@ -205,6 +217,17 @@ public class GameWorldService {
             throw new IllegalArgumentException("Room not found for ID: " + id);
         }
         return room;
+    }
+
+    /**
+     * 방을 인메모리 캐시에서 제거합니다.
+     * @param roomId 제거할 방 ID
+     */
+    public void removeRoom(Long roomId) {
+        Room removed = rooms.remove(roomId);
+        if (removed != null) {
+            logger.debug("Room removed from game world: roomId={}", roomId);
+        }
     }
 
     public PlayerCharacter getPlayerByUserId(Long userId) {
