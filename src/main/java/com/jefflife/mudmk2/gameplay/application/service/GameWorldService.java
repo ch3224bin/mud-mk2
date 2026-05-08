@@ -66,7 +66,7 @@ public class GameWorldService {
      * 플레이어 캐릭터를 인메모리 캐시에서 제거합니다.
      * @param userId 제거할 플레이어의 사용자 ID
      */
-    public void removePlayer(Long userId) {
+    public void removePlayer(final Long userId) {
         PlayerCharacter player = activePlayersByUserId.remove(userId);
         if (player != null) {
             activePlayers.remove(player.getId());
@@ -223,7 +223,7 @@ public class GameWorldService {
      * 방을 인메모리 캐시에서 제거합니다.
      * @param roomId 제거할 방 ID
      */
-    public void removeRoom(Long roomId) {
+    public void removeRoom(final Long roomId) {
         Room removed = rooms.remove(roomId);
         if (removed != null) {
             logger.debug("Room removed from game world: roomId={}", roomId);
