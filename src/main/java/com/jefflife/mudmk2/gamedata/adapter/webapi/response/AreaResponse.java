@@ -1,5 +1,7 @@
 package com.jefflife.mudmk2.gamedata.adapter.webapi.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Area;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.AreaType;
 import lombok.Getter;
@@ -10,7 +12,8 @@ public class AreaResponse {
     private final String name;
     private final AreaType type;
 
-    private AreaResponse(Long id, String name, AreaType type) {
+    @JsonCreator
+    private AreaResponse(@JsonProperty("id") Long id, @JsonProperty("name") String name, @JsonProperty("type") AreaType type) {
         this.id = id;
         this.name = name;
         this.type = type;
