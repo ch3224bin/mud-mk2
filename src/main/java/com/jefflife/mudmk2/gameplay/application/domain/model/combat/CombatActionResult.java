@@ -5,34 +5,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class CombatActionResult {
-    static final CombatActionResult NOT_ACTED_RESULT = new CombatActionResult();
+    public static final CombatActionResult NOT_ACTED = new CombatActionResult();
     private List<CombatLog> logs = Collections.emptyList();
     private boolean acted = false;
 
-    public void addLogs(List<CombatLog> combatLogs) {
-        if (logs.isEmpty()) {
-            logs = new ArrayList<>();
-        }
-        logs.addAll(combatLogs);
-        acted = !logs.isEmpty();
+    public void addLog(CombatLog log) {
+        if (logs.isEmpty()) logs = new ArrayList<>();
+        logs.add(log);
+        acted = true;
     }
 
-    /**
-     * Returns the combat logs recorded during this action.
-     * Used primarily for testing.
-     *
-     * @return The list of combat logs
-     */
-    public List<CombatLog> getLogs() {
-        return logs;
+    public void addLogs(List<CombatLog> newLogs) {
+        newLogs.forEach(this::addLog);
     }
 
-    /**
-     * Returns whether any action was taken during this turn.
-     *
-     * @return true if action was taken, false otherwise
-     */
-    public boolean isActed() {
-        return acted;
-    }
+    public List<CombatLog> getLogs() { return logs; }
+    public boolean isActed() { return acted; }
 }

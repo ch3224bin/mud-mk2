@@ -53,7 +53,7 @@ public class Combat {
 
     public CombatActionResult action() {
         if (combatState != CombatState.ACTIVE) {
-            return CombatActionResult.NOT_ACTED_RESULT;
+            return CombatActionResult.NOT_ACTED;
         }
 
         if (tickCount++ % TICKS_PER_TURN == 0) {
@@ -68,7 +68,7 @@ public class Combat {
             return actionResult;
         }
 
-        return CombatActionResult.NOT_ACTED_RESULT;
+        return CombatActionResult.NOT_ACTED;
     }
 
     private List<CombatLog> executeGroupAction(CombatGroup currentActiveGroup) {
