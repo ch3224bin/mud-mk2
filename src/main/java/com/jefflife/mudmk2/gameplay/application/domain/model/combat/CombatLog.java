@@ -39,7 +39,14 @@ public record CombatLog(
 
     // Target status after attack
     int targetRemainingHp,
-    boolean targetDefeated
+    boolean targetDefeated,
+
+    // ATB 전투 신규 필드
+    boolean evaded,
+    boolean isCrit,
+    int attackerApAfter,
+    int targetApAfter,
+    String weaponTypeName
 ) {
     @Builder
     public CombatLog {
