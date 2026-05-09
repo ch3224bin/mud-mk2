@@ -2,7 +2,9 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.combat.*;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.tick.TickListener;
@@ -15,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class CombatService implements TickListener {
 
-    private static final Map<UUID, ATBCombat> combatMap = new ConcurrentHashMap<>();
+    private final Map<UUID, ATBCombat> combatMap = new ConcurrentHashMap<>();
 
     private final GameWorldService gameWorldService;
     private final SendMessageToUserPort sendMessageToUserPort;
@@ -46,7 +48,7 @@ public class CombatService implements TickListener {
         });
     }
 
-    public void startCombat(PlayerCharacter attacker, Statable defender) {
+    public void startCombat(PlayerCharacter attacker, Combatable defender) {
         List<ATBCombatParticipant> participants = new ArrayList<>();
 
         Party party = gameWorldService.getPartyByPlayerId(attacker.getId()).orElse(null);
@@ -59,7 +61,7 @@ public class CombatService implements TickListener {
             participants.add(new ATBCombatParticipant(attacker, CombatGroupType.ALLY));
         }
 
-        Combatable enemy = (Combatable) defender;
+        Combatable enemy = defender;
         participants.add(createEnemyParticipant(enemy));
 
         ATBCombat combat = new ATBCombat(UUID.randomUUID(), participants, new DefaultRandomGenerator());

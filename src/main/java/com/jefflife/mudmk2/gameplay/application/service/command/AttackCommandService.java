@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.AttackCommand;
@@ -50,7 +51,7 @@ public class AttackCommandService implements AttackUseCase {
         }
 
         // 3. Combat 생성하여 등록
-        combatService.startCombat(player, target);
+        combatService.startCombat(player, (Combatable) target);
         sendAttackNoticeOtherPlayersInRoom(playerRoomId, player, target);
     }
 

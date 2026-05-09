@@ -134,7 +134,7 @@ public class GameWorldService {
      * @param monsterId 몬스터 ID
      * @return 찾은 몬스터, 없으면 null
      */
-    public Monster getMonsterById(String monsterId) {
+    public Monster getMonsterById(UUID monsterId) {
         return activeMonsters.get(monsterId);
     }
 
@@ -150,7 +150,7 @@ public class GameWorldService {
      * 몬스터를 제거합니다.
      * @param monsterId 제거할 몬스터 ID
      */
-    public void removeMonster(String monsterId) {
+    public void removeMonster(UUID monsterId) {
         Monster removed = activeMonsters.remove(monsterId);
         if (removed != null) {
             logger.debug("Monster removed from game world: {} (ID: {})", removed.getName(), monsterId);
