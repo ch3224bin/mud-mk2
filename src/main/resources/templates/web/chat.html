@@ -54,6 +54,7 @@
               no-underline">
         ⟶ Google로 로그인
     </a>
+</div>
 
 <!-- WebSocket 클라이언트 라이브러리 (변경 금지) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
@@ -254,6 +255,7 @@
         });
 
         // Connect if username is available
+        console.log(`username: ${username}`);
         if (username) {
             connect();
         }
