@@ -4,8 +4,6 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterSta
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import lombok.Getter;
 
-import java.util.stream.IntStream;
-
 @Getter
 public class ATBCombatParticipant {
 
@@ -32,8 +30,9 @@ public class ATBCombatParticipant {
         this.equipArmor = equipArmor;
         this.equipArmorPct = equipArmorPct;
         CharacterStats stats = combatable.getStats();
-        this.weaponSkill = deriveWeaponSkill(stats);
-        this.weaponTypeName = deriveWeaponTypeName(stats);
+        WeaponDerivation derived = deriveWeapon(stats);
+        this.weaponSkill = derived.skill();
+        this.weaponTypeName = derived.name();
         this.currentMp = stats.mp();
         this.currentAp = stats.ap();
         this.atbGauge = 0.0;
@@ -76,22 +75,16 @@ public class ATBCombatParticipant {
         combatable.damaged(damage);
     }
 
-    private static int deriveWeaponSkill(CharacterStats stats) {
-        return IntStream.of(
-            stats.swordMethod(), stats.bladeMethod(), stats.fistsAndPalms(),
-            stats.longWeapon(), stats.esotericWeapon(), stats.archery()
-        ).max().orElse(0);
-    }
+    private record WeaponDerivation(int skill, String name) {}
 
-    private static String deriveWeaponTypeName(CharacterStats stats) {
-        int max = 0;
+    private static WeaponDerivation deriveWeapon(CharacterStats stats) {
+        int max = stats.fistsAndPalms();
         String name = "권장";
-        if (stats.swordMethod() > max) { max = stats.swordMethod(); name = "검법"; }
-        if (stats.bladeMethod() > max) { max = stats.bladeMethod(); name = "도법"; }
-        if (stats.fistsAndPalms() > max) { max = stats.fistsAndPalms(); name = "권장"; }
-        if (stats.longWeapon() > max) { max = stats.longWeapon(); name = "장병"; }
+        if (stats.swordMethod() > max)    { max = stats.swordMethod();    name = "검법"; }
+        if (stats.bladeMethod() > max)    { max = stats.bladeMethod();    name = "도법"; }
+        if (stats.longWeapon() > max)     { max = stats.longWeapon();     name = "장병"; }
         if (stats.esotericWeapon() > max) { max = stats.esotericWeapon(); name = "기문"; }
-        if (stats.archery() > max) { name = "사술"; }
-        return name;
+        if (stats.archery() > max)        { max = stats.archery();        name = "사술"; }
+        return new WeaponDerivation(max, name);
     }
 }
