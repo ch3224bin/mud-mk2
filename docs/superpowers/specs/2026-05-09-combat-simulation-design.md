@@ -254,11 +254,21 @@ GET /api/v1/simulation/battle/{id}
   "totalActions": 12,
   "attackerFinalHp": 45,
   "defenderFinalHp": 0,
+  "battleText": [
+    "[전투 시작] 홍길동과 산적두목의 전투가 시작되었습니다!",
+    "홍길동이 검법으로 산적두목을 공격했다!",
+    "  → 산적두목에게 42 데미지! (남은 HP: 108)",
+    "산적두목이 권장으로 홍길동을 공격했지만 홍길동이 피했다!",
+    "홍길동이 검법으로 산적두목에게 치명타를 날렸다!",
+    "  → 산적두목에게 63 데미지! (남은 HP: 45)",
+    "산적두목이 쓰러졌다!",
+    "[전투 종료] 홍길동 승리! (남은 HP: 45)"
+  ],
   "log": [
     {
       "tick": 10,
       "actorName": "홍길동",
-      "targetName": "적장",
+      "targetName": "산적두목",
       "evaded": false,
       "baseDamage": 28,
       "isCrit": true,
@@ -270,12 +280,65 @@ GET /api/v1/simulation/battle/{id}
 }
 ```
 
+`battleText`는 MUD 게임 전투 메시지와 동일한 형태의 한국어 텍스트 목록이다.
+구조화된 `log`는 밸런스 분석용, `battleText`는 전투 흐름 확인용으로 함께 제공한다.
+
 ### 4-4. `SimulationService` 책임
 
 - `CharacterSetup` DTO → `CharacterStats` + `ATBCombatParticipant` 변환 (DB 조회 없음)
 - `ATBCombat` 인스턴스 생성 → `tick()` 루프 (`maxTicks`까지 또는 전투 종료)
 - 결과 UUID로 in-memory `ConcurrentHashMap`에 저장
 - `CombatService`와 독립 — `ATBCombat` 도메인만 공유
+
+---
+
+## 4-5. MUD 인게임 시뮬레이션
+
+REST API가 스탯 조작과 자동 전투 실행을 담당한다면, MUD 인게임 시뮬레이션은 **실제 게임 전투 흐름 그대로** 시뮬레이션 방에서 테스트하는 방식이다.
+
+### 흐름
+
+```
+1. REST API로 시뮬레이션 방에 커스텀 스탯 NPC/몬스터 소환
+   POST /api/v1/simulation/spawn
+   { "roomId": <시뮬레이션 방 ID>, "target": { "name": "산적두목(시뮬)", "vigor": 20, ... } }
+
+2. 플레이어가 시뮬레이션 방으로 이동
+   > 북으로 이동
+   시뮬레이션 훈련장에 들어왔다.
+   산적두목(시뮬)이 있다.
+
+3. 기존 명령어로 전투 시작
+   > 때려 산적두목
+   [전투] 홍길동과 산적두목(시뮬)의 전투가 시작되었습니다!
+   홍길동이 검법으로 산적두목(시뮬)을 공격했다!
+     → 42 데미지! (남은 HP: 108)
+   ...
+
+4. 전투 종료 처리
+   - 플레이어 승리: 일반 전투 종료와 동일
+   - 플레이어 사망: 전투 종료 → 즉시 부활 → 시작 지점으로 이동
+     (시뮬레이션 방 사망은 패널티 없음)
+```
+
+### 추가되는 요소
+
+| 요소 | 내용 |
+|------|------|
+| 시뮬레이션 방 | DB에 특수 플래그(`isSimulationRoom = true`) 있는 기존 Room |
+| `POST /api/v1/simulation/spawn` | 시뮬레이션 방에 커스텀 스탯 Monster 소환. 기존 Monster 생성 로직 재사용 |
+| 전투 실행 | 기존 `때려` 명령어 + `CombatService` 그대로 사용. `ATBCombat`으로 교체된 전투 엔진이 자동 적용 |
+| 사망 처리 | 시뮬레이션 방 사망 시: 전투 종료 → HP 전량 회복 → 지정 부활 위치로 이동 |
+| 출력 | 기존 WebSocket 채팅 시스템으로 전투 메시지 전달 (`CombatNarrativeFormatter` 공유) |
+
+### REST API vs MUD 인게임 역할 비교
+
+| 역할 | REST API (`/simulation/battle`) | MUD 인게임 |
+|------|--------------------------------|-----------|
+| 스탯 설정 | 요청 body에 직접 | REST API (`/simulation/spawn`)로 소환 |
+| 전투 실행 | 자동 (전체 틱 루프) | 플레이어가 `때려`로 실시간 |
+| 결과 확인 | JSON 응답 + `battleText` | 채팅창 텍스트 |
+| 용도 | 빠른 밸런스 수치 검증 | 실제 플레이 감각 확인 |
 
 ---
 
@@ -306,6 +369,8 @@ GET /api/v1/simulation/battle/{id}
 | 1 | `CombatFormulas` 구현 + 단위 테스트 |
 | 2 | `ATBCombatParticipant` 구현 |
 | 3 | `ATBCombat` 구현 + 결정론적 시나리오 테스트 |
-| 4 | `SimulationController` + `SimulationService` + DTO 구현 |
-| 5 | `CombatService` 수정 (ATBCombat 교체) |
-| 6 | 기존 `CombatTest` 등 테스트 업데이트 |
+| 4 | `CombatNarrativeFormatter` 구현 |
+| 5 | REST API: `SimulationController` + `SimulationService` + DTO 구현 |
+| 6 | `CombatService` 수정 (ATBCombat 교체) |
+| 7 | MUD 인게임: 시뮬레이션 방 설정 + `/simulation/spawn` API + 사망 시 부활 처리 |
+| 8 | 기존 `CombatTest` 등 테스트 업데이트 |
