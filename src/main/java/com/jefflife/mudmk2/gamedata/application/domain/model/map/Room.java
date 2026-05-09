@@ -30,14 +30,18 @@ public class Room {
 	@Embedded
 	private WayOuts wayOuts = new WayOuts();
 
+	@Column(name = "simulation_room", nullable = false)
+	private boolean simulationRoom = false;
+
 	@Builder
-	public Room(final Long id, final Long areaId, final String name, final String summary, final String description, final WayOuts wayOuts) {
+	public Room(final Long id, final Long areaId, final String name, final String summary, final String description, final WayOuts wayOuts, final boolean simulationRoom) {
 		this.id = id;
 		this.areaId = areaId;
 		this.name = name;
 		this.summary = summary;
 		this.description = description;
 		this.wayOuts = wayOuts;
+		this.simulationRoom = simulationRoom;
 	}
 
 	public List<WayOut> getSortedWayOuts() {

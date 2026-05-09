@@ -219,6 +219,10 @@ public class GameWorldService {
         return room;
     }
 
+    public Optional<Room> getRoomOptional(Long roomId) {
+        return Optional.ofNullable(rooms.get(roomId));
+    }
+
     /**
      * 방을 인메모리 캐시에서 제거합니다.
      * @param roomId 제거할 방 ID

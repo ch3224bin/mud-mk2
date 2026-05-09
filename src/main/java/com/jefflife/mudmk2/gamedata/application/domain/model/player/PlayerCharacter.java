@@ -120,6 +120,10 @@ public class PlayerCharacter implements Combatable, Statable {
         return baseCharacterInfo.isAlive();
     }
 
+    public void fullRestore() {
+        baseCharacterInfo.fullRestore();
+    }
+
     public enum MoveResult {
         NO_WAY,
         LOCKED,

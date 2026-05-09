@@ -23,6 +23,13 @@ public class Monster implements Combatable, Statable {
     private int aggressiveness; // 0-100 범위의 공격성
     private int respawnTime; // 초 단위 리스폰 시간
 
+    @jakarta.persistence.Transient
+    private int weaponBaseDamage = 10;
+    @jakarta.persistence.Transient
+    private int equipmentArmor = 0;
+    @jakarta.persistence.Transient
+    private int equipmentArmorPct = 0;
+
     /**
      * MonsterType을 기반으로 Monster 인스턴스를 생성합니다.
      * @param monsterType 몬스터 타입
@@ -140,5 +147,36 @@ public class Monster implements Combatable, Statable {
     @Override
     public CharacterState getState() {
         return this.baseCharacterInfo.getState();
+    }
+
+    public static Monster createSimulation(String name, int vigor, int physique, int agility,
+                                            int intellect, int will, int meridian,
+                                            int innerPower, int specialTechnique, int lightStep,
+                                            int fistsAndPalms, int swordMethod, int bladeMethod,
+                                            int longWeapon, int esotericWeapon, int archery,
+                                            int weaponBaseDamage, int equipmentArmor,
+                                            int equipmentArmorPct, Long roomId) {
+        int maxHp = physique * CharacterStats.HP_PER_PHYSIQUE + specialTechnique * CharacterStats.HP_PER_SPECIAL_TECHNIQUE;
+        int maxMp = meridian * CharacterStats.MP_PER_MERIDIAN + innerPower * CharacterStats.MP_PER_INNER_POWER;
+        int maxAp = agility * CharacterStats.AP_PER_AGILITY;
+
+        BaseCharacter baseCharacterInfo = BaseCharacter.builder()
+            .name(name).background("시뮬레이션 몬스터").gender(Gender.MALE)
+            .hp(maxHp).mp(maxMp).ap(maxAp)
+            .vigor(vigor).physique(physique).agility(agility)
+            .intellect(intellect).will(will).meridian(meridian)
+            .innerPower(innerPower).specialTechnique(specialTechnique).lightStep(lightStep)
+            .fistsAndPalms(fistsAndPalms).swordMethod(swordMethod).bladeMethod(bladeMethod)
+            .longWeapon(longWeapon).esotericWeapon(esotericWeapon).archery(archery)
+            .roomId(roomId).alive(true).build();
+
+        Monster monster = Monster.builder()
+            .id(UUID.randomUUID()).description("시뮬레이션 몬스터").level(1)
+            .monsterTypeId(null).experienceReward(0).aggressiveness(0).respawnTime(0)
+            .baseCharacterInfo(baseCharacterInfo).build();
+        monster.weaponBaseDamage = weaponBaseDamage;
+        monster.equipmentArmor = equipmentArmor;
+        monster.equipmentArmorPct = equipmentArmorPct;
+        return monster;
     }
 }
