@@ -47,7 +47,7 @@ public class ATBCombat {
         List<ATBCombatParticipant> readyList = participants.stream()
             .filter(p -> !p.isDefeated() && p.isReadyToAct())
             .sorted(Comparator.comparingDouble(ATBCombatParticipant::getAtbGauge).reversed()
-                .thenComparingInt(p -> -p.getCombatable().getStats().agility()))
+                .thenComparing(Comparator.comparingInt((ATBCombatParticipant p) -> p.getCombatable().getStats().agility()).reversed()))
             .toList();
 
         CombatActionResult result = new CombatActionResult();
