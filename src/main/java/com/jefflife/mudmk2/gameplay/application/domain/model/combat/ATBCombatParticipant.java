@@ -77,6 +77,7 @@ public class ATBCombatParticipant {
 
     private record WeaponDerivation(int skill, String name) {}
 
+    // todo name은 장착한 무기 또는 무공 이름이 되어야 함
     private static WeaponDerivation deriveWeapon(CharacterStats stats) {
         int max = stats.fistsAndPalms();
         String name = "권장";
