@@ -41,7 +41,7 @@ public class PlayerCharacter implements Combatable, Statable {
     // 최근 접속 시간
     private LocalDateTime lastActiveAt;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 

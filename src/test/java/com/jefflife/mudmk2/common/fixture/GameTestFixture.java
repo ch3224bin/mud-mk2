@@ -56,7 +56,7 @@ public class GameTestFixture {
                 CharacterClass.WARRIOR,
                 true,
                 LocalDateTime.now(),
-                Inventory.create(100));
+                Inventory.create(Inventory.DEFAULT_MAX_WEIGHT_CAPACITY));
     }
 
     /**

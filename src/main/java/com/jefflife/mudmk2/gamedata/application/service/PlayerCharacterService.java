@@ -68,7 +68,7 @@ public class PlayerCharacterService {
                 .build();
 
         // Create inventory
-        final Inventory inventory = Inventory.create(100);
+        final Inventory inventory = Inventory.create(Inventory.DEFAULT_MAX_WEIGHT_CAPACITY);
 
         // Create player character
         final PlayerCharacter playerCharacter = new PlayerCharacter(

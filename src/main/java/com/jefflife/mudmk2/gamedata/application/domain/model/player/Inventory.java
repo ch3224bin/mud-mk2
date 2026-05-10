@@ -18,6 +18,8 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inventory {
 
+    public static final int DEFAULT_MAX_WEIGHT_CAPACITY = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
