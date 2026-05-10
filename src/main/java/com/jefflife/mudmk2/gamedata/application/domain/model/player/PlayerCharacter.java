@@ -41,6 +41,10 @@ public class PlayerCharacter implements Combatable, Statable {
     // 최근 접속 시간
     private LocalDateTime lastActiveAt;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "inventory_id")
+    private Inventory inventory;
+
     public PlayerCharacter(
             final UUID id,
             final BaseCharacter baseCharacterInfo,
@@ -49,7 +53,8 @@ public class PlayerCharacter implements Combatable, Statable {
             final String nickname,
             final CharacterClass characterClass,
             final boolean online,
-            final LocalDateTime lastActiveAt
+            final LocalDateTime lastActiveAt,
+            final Inventory inventory
     ) {
         this.id = id;
         this.baseCharacterInfo = baseCharacterInfo;
@@ -59,6 +64,7 @@ public class PlayerCharacter implements Combatable, Statable {
         this.characterClass = characterClass;
         this.online = online;
         this.lastActiveAt = lastActiveAt;
+        this.inventory = inventory;
     }
 
     public void initializeAssociatedEntities() {

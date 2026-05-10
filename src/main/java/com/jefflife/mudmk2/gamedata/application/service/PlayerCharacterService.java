@@ -4,6 +4,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacte
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
@@ -66,6 +67,9 @@ public class PlayerCharacterService {
                 .conversable(true)
                 .build();
 
+        // Create inventory
+        final Inventory inventory = Inventory.create(100);
+
         // Create player character
         final PlayerCharacter playerCharacter = new PlayerCharacter(
                 null, // ID will be generated
@@ -75,7 +79,8 @@ public class PlayerCharacterService {
                 name, // Use the same name as nickname
                 characterClass,
                 true, // Online
-                LocalDateTime.now() // Last active now
+                LocalDateTime.now(), // Last active now
+                inventory
         );
 
         // Save character

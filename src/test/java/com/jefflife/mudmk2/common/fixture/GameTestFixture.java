@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.WayOuts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 
@@ -54,7 +55,8 @@ public class GameTestFixture {
                 "TestPlayer",
                 CharacterClass.WARRIOR,
                 true,
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                Inventory.create(100));
     }
 
     /**
