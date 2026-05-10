@@ -1,8 +1,11 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.map;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,10 @@ public class Room {
 
 	@Column(name = "simulation_room", nullable = false)
 	private boolean simulationRoom = false;
+
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinColumn(name = "room_id")
+	private List<ItemInstance> floorItems = new ArrayList<>();
 
 	@Builder
 	public Room(final Long id, final Long areaId, final String name, final String summary, final String description, final WayOuts wayOuts, final boolean simulationRoom) {
@@ -122,5 +129,23 @@ public class Room {
 
 	public boolean isLocked(final Direction direction) {
 		return wayOuts.isLocked(direction);
+	}
+
+	public List<ItemInstance> getFloorItems() {
+		return Collections.unmodifiableList(floorItems);
+	}
+
+	public void addFloorItem(ItemInstance item) {
+		this.floorItems.add(item);
+	}
+
+	public void removeFloorItem(ItemInstance item) {
+		this.floorItems.remove(item);
+	}
+
+	public List<ItemInstance> findFloorItemsByName(String name) {
+		return floorItems.stream()
+				.filter(i -> i.getTemplate().getName().equals(name))
+				.toList();
 	}
 }
