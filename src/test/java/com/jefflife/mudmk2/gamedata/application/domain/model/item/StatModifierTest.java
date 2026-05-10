@@ -13,10 +13,8 @@ class StatModifierTest {
     }
 
     @Test
-    void statModifier_supportsAllStatTypes() {
-        for (StatType type : StatType.values()) {
-            StatModifier modifier = new StatModifier(type, 5);
-            assertThat(modifier.getStatType()).isEqualTo(type);
-        }
+    void statModifier_withNegativeValue_allowsDebuffRepresentation() {
+        StatModifier debuff = new StatModifier(StatType.PHYSIQUE, -5);
+        assertThat(debuff.getValue()).isEqualTo(-5);
     }
 }

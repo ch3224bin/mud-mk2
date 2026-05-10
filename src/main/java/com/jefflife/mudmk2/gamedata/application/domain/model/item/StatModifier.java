@@ -1,20 +1,23 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class StatModifier {
 
     @Enumerated(EnumType.STRING)
     private StatType statType;
 
+    @Column(nullable = false)
     private int value;
 }
