@@ -124,8 +124,9 @@ public int currentWeight() {
         .sum();
 }
 
-// 스택 처리: stackable 아이템은 기존 ItemInstance의 quantity 증가
-// 비stackable 아이템은 새 ItemInstance 추가
+// 스택 처리 규칙:
+// - stackable 아이템: 인벤토리에 같은 templateId의 ItemInstance가 있으면 quantity 증가, 없으면 신규 추가
+// - 비stackable 아이템: 항상 새 ItemInstance를 추가 (quantity는 항상 1)
 public void addItem(ItemInstance instance) { ... }
 ```
 
