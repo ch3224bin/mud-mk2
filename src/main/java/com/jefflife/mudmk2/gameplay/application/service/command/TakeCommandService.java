@@ -24,6 +24,12 @@ public class TakeCommandService implements TakeUseCase {
 
     @Override
     public void take(TakeCommand command) {
+        if (command.index() < 1) {
+            sendMessageToUserPort.messageToUser(command.userId(),
+                    "올바른 번호를 입력해주세요.");
+            return;
+        }
+
         PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
         Room room = gameWorldService.getRoom(player.getCurrentRoomId());
 

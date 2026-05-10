@@ -22,6 +22,7 @@ class TakeCommandParserTest {
         TakeCommand take = (TakeCommand) command;
         assertThat(take.itemName()).isEqualTo("철검");
         assertThat(take.index()).isEqualTo(1);
+        assertThat(take.userId()).isEqualTo(1L);
     }
 
     @Test
@@ -34,9 +35,29 @@ class TakeCommandParserTest {
     }
 
     @Test
-    void parse_alternativeVerb_줍다_returns() {
+    void parse_verb_줍다_returnsCommand() {
         Command command = parser.parse(1L, "만두 줍다");
         assertThat(command).isInstanceOf(TakeCommand.class);
+        TakeCommand take = (TakeCommand) command;
+        assertThat(take.itemName()).isEqualTo("만두");
+        assertThat(take.index()).isEqualTo(1);
+    }
+
+    @Test
+    void parse_verb_집어_returnsCommand() {
+        Command command = parser.parse(1L, "사과 집어");
+        assertThat(command).isInstanceOf(TakeCommand.class);
+        TakeCommand take = (TakeCommand) command;
+        assertThat(take.itemName()).isEqualTo("사과");
+    }
+
+    @Test
+    void parse_verb_집어_withIndex_returnsCorrectIndex() {
+        Command command = parser.parse(1L, "사과 3 집어");
+        assertThat(command).isInstanceOf(TakeCommand.class);
+        TakeCommand take = (TakeCommand) command;
+        assertThat(take.itemName()).isEqualTo("사과");
+        assertThat(take.index()).isEqualTo(3);
     }
 
     @Test
