@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,9 +27,14 @@ public class Inventory {
 
     private int maxWeightCapacity;
 
+    @Getter(AccessLevel.NONE)
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "inventory_id")
     private List<ItemInstance> items = new ArrayList<>();
+
+    public List<ItemInstance> getItems() {
+        return Collections.unmodifiableList(items);
+    }
 
     private Inventory(int maxWeightCapacity) {
         this.maxWeightCapacity = maxWeightCapacity;
