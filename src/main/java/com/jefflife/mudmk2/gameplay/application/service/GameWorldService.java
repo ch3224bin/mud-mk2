@@ -1,6 +1,5 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
@@ -29,18 +28,9 @@ public class GameWorldService {
 
     private final Map<UUID, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
     private final Map<Long, PlayerCharacter> activePlayersByUserId = new ConcurrentHashMap<>();
-    private final Map<Long, Room> rooms = new ConcurrentHashMap<>();
     private final Map<UUID, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
     private final Map<UUID, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
     private final Map<UUID, Party> parties = new ConcurrentHashMap<>();
-
-    public void loadRooms(final Iterable<Room> rooms) {
-        rooms.forEach(room -> {
-            room.initializeAssociatedEntities(); // Room 객체 내부에서 연관 객체 초기화
-            this.rooms.put(room.getId(), room);
-        });
-        logger.info("Loaded {} rooms", this.rooms.size());
-    }
 
     public void loadPlayers(final Iterable<PlayerCharacter> players) {
         players.forEach(playerCharacter -> {
@@ -211,29 +201,6 @@ public class GameWorldService {
                 .collect(Collectors.toList());
     }
 
-    public Room getRoom(Long id) {
-        final Room room = rooms.get(id);
-        if (room == null) {
-            throw new IllegalArgumentException("Room not found for ID: " + id);
-        }
-        return room;
-    }
-
-    public Optional<Room> getRoomOptional(Long roomId) {
-        return Optional.ofNullable(rooms.get(roomId));
-    }
-
-    /**
-     * 방을 인메모리 캐시에서 제거합니다.
-     * @param roomId 제거할 방 ID
-     */
-    public void removeRoom(final Long roomId) {
-        Room removed = rooms.remove(roomId);
-        if (removed != null) {
-            logger.debug("Room removed from game world: roomId={}", roomId);
-        }
-    }
-
     public PlayerCharacter getPlayerByUserId(Long userId) {
         final PlayerCharacter playerCharacter = activePlayersByUserId.get(userId);
         if (playerCharacter == null) {
@@ -275,7 +242,8 @@ public class GameWorldService {
      */
     public boolean moveNpcToRoom(UUID npcId, Long roomId) {
         NonPlayerCharacter npc = activeNpcs.get(npcId);
-        if (npc == null || rooms.get(roomId) == null) {
+        // TODO(phase4): roomId 존재성 검증을 NpcLocationService로 이전
+        if (npc == null) {
             return false;
         }
 
