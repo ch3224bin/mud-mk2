@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Instance Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #0a0b10; color: #e4e4e7; font-family: 'IBM Plex Mono', monospace; }
+        .page-header { background: #0d0e14; border-bottom: 1px solid #1e2030; padding: 12px 20px; }
+        .form-panel { background: #0d0e14; border: 1px solid #1e2030; border-radius: 6px; padding: 20px; max-width: 700px; }
+        .step-label { color: #60a5fa; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
+        input, select { background: #1a1c24 !important; color: #e4e4e7 !important; border-color: #333 !important; }
+        input:focus, select:focus { border-color: #4ade80 !important; box-shadow: none !important; }
+        .search-results { background: #111; border: 1px solid #333; border-radius: 4px; max-height: 200px; overflow-y: auto; }
+        .search-item { padding: 6px 12px; cursor: pointer; border-bottom: 1px solid #222; font-size: 12px; }
+        .search-item:hover, .search-item.selected-item { background: #1a1c24; }
+        .selected-preview { background: #0a1f0a; border: 1px solid #1a3320; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #4ade80; }
+        .type-badge { padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-right: 6px; }
+        .badge-FOOD { background:#1a3320; color:#4ade80; }
+        .badge-WEAPON { background:#1e3a5f; color:#60a5fa; }
+        .badge-EQUIPMENT { background:#3b2a1a; color:#f59e0b; }
+        .badge-ACCESSORY { background:#2a1a3b; color:#c084fc; }
+        .badge-MARTIAL_ARTS_BOOK { background:#1a2a3b; color:#38bdf8; }
+        .badge-MISSION { background:#3b1a1a; color:#f87171; }
+        .btn-green { background: #4ade80; color: #000; border: none; font-weight: bold; }
+        .btn-green:hover { background: #22c55e; color: #000; }
+        label.form-check-label { color: #aaa; font-size: 13px; }
+    </style>
+</head>
+<body>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <span style="color:#4ade80;font-weight:bold;">◆ ITEM INSTANCE PLACEMENT</span>
+    <a href="/admin" style="color:#aaa;font-size:12px;">← Admin 메뉴</a>
+</div>
+
+<div class="container-fluid p-4">
+    <div class="form-panel">
+
+        <!-- STEP 1: 템플릿 검색 -->
+        <div class="mb-4">
+            <div class="step-label">STEP 1 — 아이템 템플릿 검색</div>
+            <input type="text" id="templateSearch" class="form-control form-control-sm"
+                placeholder="🔍 이름으로 검색 (예: 철검, 만두...)"
+                oninput="searchTemplates()" autocomplete="off">
+            <div id="searchResults" class="search-results mt-1" style="display:none"></div>
+            <div id="selectedPreview" class="selected-preview mt-2" style="display:none"></div>
+        </div>
+
+        <!-- STEP 2: 수량 -->
+        <div class="mb-4">
+            <div class="step-label">STEP 2 — 수량</div>
+            <div class="d-flex align-items-center gap-3">
+                <input type="number" id="quantity" class="form-control form-control-sm"
+                    min="1" value="1" style="width:100px">
+                <span id="quantityHint" class="text-secondary" style="font-size:11px"></span>
+            </div>
+        </div>
+
+        <!-- STEP 3: 배치 위치 -->
+        <div class="mb-4">
+            <div class="step-label">STEP 3 — 배치 위치</div>
+            <div class="d-flex gap-3 mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="locType" id="locRoom" value="ROOM"
+                        checked onchange="onLocTypeChange()">
+                    <label class="form-check-label" for="locRoom">방 (Room)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="locType" id="locChar" value="CHARACTER"
+                        onchange="onLocTypeChange()">
+                    <label class="form-check-label" for="locChar">캐릭터 소지품</label>
+                </div>
+            </div>
+
+            <!-- 방 선택 -->
+            <div id="roomSection">
+                <div style="background:#111320;border:1px solid #333;border-radius:4px;padding:12px">
+                    <label class="form-label small text-secondary">방 ID 입력</label>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="number" id="roomId" class="form-control form-control-sm"
+                            placeholder="예: 42" style="width:120px">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="verifyRoom()">확인</button>
+                        <span id="roomName" style="color:#4ade80;font-size:12px"></span>
+                    </div>
+                    <div class="text-secondary mt-1" style="font-size:11px">ID 입력 후 확인 버튼으로 방 이름 조회</div>
+                </div>
+            </div>
+
+            <!-- 캐릭터 선택 -->
+            <div id="charSection" style="display:none">
+                <div style="background:#111320;border:1px solid #333;border-radius:4px;padding:12px">
+                    <label class="form-label small text-secondary">캐릭터 닉네임 검색</label>
+                    <input type="text" id="charSearch" class="form-control form-control-sm"
+                        placeholder="닉네임 입력..." oninput="searchCharacters()" autocomplete="off">
+                    <div id="charResults" class="search-results mt-1" style="display:none"></div>
+                    <div id="selectedChar" class="mt-2" style="font-size:12px;color:#4ade80"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 실행 -->
+        <div class="d-flex align-items-center gap-3">
+            <button type="button" class="btn btn-green" onclick="placeInstance()">배치 실행</button>
+            <span class="text-secondary" style="font-size:11px">→ DB 저장 + 게임 인메모리 즉시 반영</span>
+        </div>
+        <div id="placeMessage" class="mt-3" style="font-size:12px"></div>
+    </div>
+</div>
+
+<script>
+let selectedTemplate = null;
+let selectedCharacterId = null;
+let debounceTimer = null;
+
+function escHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function debounce(fn, delay) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(fn, delay);
+}
+
+async function searchTemplates() {
+    const query = document.getElementById('templateSearch').value.trim();
+    const resultsEl = document.getElementById('searchResults');
+    if (!query) { resultsEl.style.display = 'none'; return; }
+    debounce(async () => {
+        try {
+            const res = await fetch('/api/v1/item-templates?name=' + encodeURIComponent(query));
+            const templates = await res.json();
+            if (templates.length === 0) { resultsEl.style.display = 'none'; return; }
+            resultsEl.innerHTML = templates.slice(0, 10).map(t =>
+                `<div class="search-item" data-template="${escHtml(JSON.stringify(t))}" onclick="selectTemplateFromEl(this)">
+                    <span class="type-badge badge-${escHtml(t.itemType)}">${escHtml(t.itemType)}</span>
+                    <strong>${escHtml(t.name)}</strong>
+                    <span style="color:#555;font-size:10px;margin-left:6px">무게 ${t.weight}${t.stackable ? ' · stackable' : ''}</span>
+                </div>`
+            ).join('');
+            resultsEl.style.display = 'block';
+        } catch (e) {
+            resultsEl.style.display = 'none';
+        }
+    }, 200);
+}
+
+function selectTemplateFromEl(el) {
+    const t = JSON.parse(el.getAttribute('data-template'));
+    selectTemplate(t);
+}
+
+function selectTemplate(t) {
+    selectedTemplate = t;
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('templateSearch').value = t.name;
+    const preview = document.getElementById('selectedPreview');
+    preview.style.display = 'block';
+    let detail = '';
+    if (t.itemType === 'FOOD') detail = `HP회복: ${t.hpRecovery||0} | MP회복: ${t.mpRecovery||0} | AP회복: ${t.apRecovery||0}`;
+    else if (t.weaponType) detail = `무기타입: ${t.weaponType}`;
+    else if (t.equipmentSlot) detail = `슬롯: ${t.equipmentSlot}`;
+    preview.innerHTML = `✓ 선택됨: <strong>${escHtml(t.name)}</strong> (ID:${t.id}) · ${escHtml(t.itemType)}${t.stackable ? ' · stackable' : ''}${detail ? '<br><span style="color:#aaa">' + escHtml(detail) + '</span>' : ''}`;
+
+    const quantityInput = document.getElementById('quantity');
+    const hint = document.getElementById('quantityHint');
+    if (!t.stackable) {
+        quantityInput.value = 1;
+        quantityInput.disabled = true;
+        hint.textContent = 'non-stackable: 수량 1 고정';
+    } else {
+        quantityInput.disabled = false;
+        hint.textContent = 'stackable: 수량 입력 가능';
+    }
+}
+
+function onLocTypeChange() {
+    const isRoom = document.querySelector('input[name="locType"]:checked').value === 'ROOM';
+    document.getElementById('roomSection').style.display = isRoom ? 'block' : 'none';
+    document.getElementById('charSection').style.display = isRoom ? 'none' : 'block';
+}
+
+async function verifyRoom() {
+    const roomId = document.getElementById('roomId').value;
+    if (!roomId) return;
+    const nameEl = document.getElementById('roomName');
+    try {
+        const res = await fetch('/api/v1/rooms/' + roomId);
+        if (res.ok) {
+            const room = await res.json();
+            nameEl.style.color = '#4ade80';
+            nameEl.textContent = '→ "' + escHtml(room.name) + '"';
+        } else {
+            nameEl.style.color = '#f87171';
+            nameEl.textContent = '→ 방을 찾을 수 없음';
+        }
+    } catch (e) {
+        nameEl.style.color = '#f87171';
+        nameEl.textContent = '→ 조회 실패';
+    }
+}
+
+async function searchCharacters() {
+    const query = document.getElementById('charSearch').value.trim();
+    const resultsEl = document.getElementById('charResults');
+    if (!query) { resultsEl.style.display = 'none'; return; }
+    debounce(async () => {
+        try {
+            const res = await fetch('/api/v1/player-characters/search?nickname=' + encodeURIComponent(query));
+            const chars = await res.json();
+            if (chars.length === 0) { resultsEl.style.display = 'none'; return; }
+            resultsEl.innerHTML = chars.slice(0, 10).map(c =>
+                `<div class="search-item" data-id="${escHtml(c.id)}" data-nickname="${escHtml(c.nickname)}" onclick="selectCharacterFromEl(this)">
+                    <strong>${escHtml(c.nickname)}</strong>
+                    <span style="color:#555;font-size:10px;margin-left:6px">${escHtml(c.id)}</span>
+                </div>`
+            ).join('');
+            resultsEl.style.display = 'block';
+        } catch (e) {
+            resultsEl.style.display = 'none';
+        }
+    }, 200);
+}
+
+function selectCharacterFromEl(el) {
+    const id = el.getAttribute('data-id');
+    const nickname = el.getAttribute('data-nickname');
+    selectCharacter(id, nickname);
+}
+
+function selectCharacter(id, nickname) {
+    selectedCharacterId = id;
+    document.getElementById('charResults').style.display = 'none';
+    document.getElementById('charSearch').value = nickname;
+    document.getElementById('selectedChar').textContent = '✓ 선택됨: ' + nickname + ' (' + id + ')';
+}
+
+async function placeInstance() {
+    const msg = document.getElementById('placeMessage');
+    if (!selectedTemplate) { msg.style.color = '#f87171'; msg.textContent = '✗ 아이템 템플릿을 선택해주세요.'; return; }
+
+    const locType = document.querySelector('input[name="locType"]:checked').value;
+    let locationId;
+    if (locType === 'ROOM') {
+        locationId = document.getElementById('roomId').value;
+        if (!locationId) { msg.style.color = '#f87171'; msg.textContent = '✗ 방 ID를 입력해주세요.'; return; }
+    } else {
+        if (!selectedCharacterId) { msg.style.color = '#f87171'; msg.textContent = '✗ 캐릭터를 선택해주세요.'; return; }
+        locationId = selectedCharacterId;
+    }
+
+    const body = {
+        templateId: selectedTemplate.id,
+        quantity: parseInt(document.getElementById('quantity').value) || 1,
+        locationType: locType,
+        locationId: locationId
+    };
+
+    try {
+        const res = await fetch('/api/v1/item-instances/place', {
+            method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+        });
+        const result = await res.json();
+        if (result.success) {
+            msg.style.color = '#4ade80';
+            const target = locType === 'ROOM'
+                ? '방 ID:' + locationId
+                : '캐릭터:' + escHtml(document.getElementById('charSearch').value);
+            msg.textContent = `✓ ${escHtml(selectedTemplate.name)} ×${body.quantity} → ${target} 배치 완료 (Instance ID: ${result.instanceId})`;
+        } else {
+            msg.style.color = '#f87171';
+            msg.textContent = '✗ 배치 실패: ' + escHtml(result.message || '알 수 없는 오류');
+        }
+    } catch (e) {
+        msg.style.color = '#f87171';
+        msg.textContent = '✗ 네트워크 오류: ' + escHtml(e.message);
+    }
+}
+</script>
+</body>
+</html>
