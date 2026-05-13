@@ -121,6 +121,7 @@ gameplay
 public interface ActiveRoomRepository {
     Optional<Room> findById(Long id);
     Iterable<Room> findAll();
+    void add(Room room);
     void remove(Long id);
 }
 
