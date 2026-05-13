@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Template Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #0a0b10; color: #e4e4e7; font-family: 'IBM Plex Mono', monospace; }
+        .page-header { background: #0d0e14; border-bottom: 1px solid #1e2030; padding: 12px 20px; }
+        .table-dark { --bs-table-bg: #0d0e14; --bs-table-border-color: #1e2030; }
+        .badge-FOOD { background: #1a3320; color: #4ade80; }
+        .badge-WEAPON { background: #1e3a5f; color: #60a5fa; }
+        .badge-EQUIPMENT { background: #3b2a1a; color: #f59e0b; }
+        .badge-ACCESSORY { background: #2a1a3b; color: #c084fc; }
+        .badge-MARTIAL_ARTS_BOOK { background: #1a2a3b; color: #38bdf8; }
+        .badge-MISSION { background: #3b1a1a; color: #f87171; }
+        .form-panel { background: #0d0e14; border: 1px solid #1e2030; border-radius: 6px; padding: 20px; }
+        .type-section { display: none; background: #111320; border: 1px solid #1e3a5f; border-radius: 4px; padding: 14px; margin-top: 10px; }
+        .type-section.active { display: block; }
+        .stat-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .btn-green { background: #4ade80; color: #000; border: none; font-weight: bold; }
+        .btn-green:hover { background: #22c55e; color: #000; }
+        input, select, textarea { background: #1a1c24 !important; color: #e4e4e7 !important; border-color: #333 !important; }
+        input:focus, select:focus, textarea:focus { border-color: #4ade80 !important; box-shadow: none !important; }
+    </style>
+</head>
+<body>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <span style="color:#4ade80;font-weight:bold;">◆ ITEM TEMPLATE MANAGEMENT</span>
+    <a href="/admin" style="color:#aaa;font-size:12px;">← Admin 메뉴</a>
+</div>
+
+<div class="container-fluid p-4">
+    <!-- 목록 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-green btn-sm" onclick="showCreateForm()">+ 새 템플릿</button>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" id="nameFilter" class="form-control form-control-sm" style="width:200px" placeholder="이름 검색..." oninput="loadTemplates()">
+            <select id="typeFilter" class="form-select form-select-sm" style="width:160px" onchange="loadTemplates()">
+                <option value="">모든 타입</option>
+                <option>FOOD</option><option>WEAPON</option><option>EQUIPMENT</option>
+                <option>ACCESSORY</option><option>MARTIAL_ARTS_BOOK</option><option>MISSION</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-dark table-sm table-bordered mb-4">
+        <thead><tr style="color:#4ade80">
+            <th>ID</th><th>이름</th><th>타입</th><th>무게</th><th>스택</th><th>작업</th>
+        </tr></thead>
+        <tbody id="templateTableBody"></tbody>
+    </table>
+
+    <hr style="border-color:#1e2030">
+
+    <!-- 생성/편집 폼 -->
+    <div id="formPanel" class="form-panel" style="display:none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="color:#4ade80;font-weight:bold;" id="formTitle">◆ 새 아이템 템플릿</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="hideForm()">취소</button>
+        </div>
+        <input type="hidden" id="editId">
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <label class="form-label small text-secondary">아이템 타입 *</label>
+                <select id="itemType" class="form-select form-select-sm" onchange="onTypeChange()">
+                    <option value="">선택...</option>
+                    <option>FOOD</option><option>WEAPON</option><option>EQUIPMENT</option>
+                    <option>ACCESSORY</option><option>MARTIAL_ARTS_BOOK</option><option>MISSION</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-secondary">이름 *</label>
+                <input type="text" id="name" class="form-control form-control-sm" placeholder="철검">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">무게 *</label>
+                <input type="number" id="weight" class="form-control form-control-sm" min="0" placeholder="5">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check mb-1">
+                    <input type="checkbox" id="stackable" class="form-check-input">
+                    <label for="stackable" class="form-check-label small">stackable</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small text-secondary">설명</label>
+            <textarea id="description" class="form-control form-control-sm" rows="3" style="resize:vertical" placeholder="아이템 설명..."></textarea>
+        </div>
+
+        <!-- FOOD -->
+        <div id="section-FOOD" class="type-section">
+            <div style="color:#4ade80;font-size:12px;font-weight:bold;margin-bottom:8px">🍚 FOOD 설정</div>
+            <div class="row g-2">
+                <div class="col-4"><label class="form-label small text-secondary">HP 회복</label>
+                    <input type="number" id="hpRecovery" class="form-control form-control-sm" value="0"></div>
+                <div class="col-4"><label class="form-label small text-secondary">MP 회복</label>
+                    <input type="number" id="mpRecovery" class="form-control form-control-sm" value="0"></div>
+                <div class="col-4"><label class="form-label small text-secondary">AP 회복</label>
+                    <input type="number" id="apRecovery" class="form-control form-control-sm" value="0"></div>
+            </div>
+        </div>
+
+        <!-- WEAPON -->
+        <div id="section-WEAPON" class="type-section">
+            <div style="color:#60a5fa;font-size:12px;font-weight:bold;margin-bottom:8px">⚔ WEAPON 설정</div>
+            <div class="mb-2">
+                <label class="form-label small text-secondary">무기 타입</label>
+                <select id="weaponType" class="form-select form-select-sm" style="width:220px">
+                    <option>SWORD</option><option>BLADE</option><option>FIST</option>
+                    <option>ARCHERY</option><option>ESOTERIC</option><option>LONG_WEAPON</option>
+                </select>
+            </div>
+            <div id="weaponStatModifiers"></div>
+            <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="addStatRow('weaponStatModifiers')">+ 스탯 추가</button>
+        </div>
+
+        <!-- EQUIPMENT -->
+        <div id="section-EQUIPMENT" class="type-section">
+            <div style="color:#f59e0b;font-size:12px;font-weight:bold;margin-bottom:8px">🛡 EQUIPMENT 설정</div>
+            <div class="mb-2">
+                <label class="form-label small text-secondary">장착 슬롯</label>
+                <select id="equipmentSlot" class="form-select form-select-sm" style="width:220px">
+                    <option>HELMET</option><option>UPPER_ARMOR</option><option>LOWER_ARMOR</option>
+                    <option>GLOVES</option><option>BOOTS</option><option>BELT</option>
+                </select>
+            </div>
+            <div id="equipmentStatModifiers"></div>
+            <button type="button" class="btn btn-sm btn-outline-warning mt-1" onclick="addStatRow('equipmentStatModifiers')">+ 스탯 추가</button>
+        </div>
+
+        <!-- ACCESSORY -->
+        <div id="section-ACCESSORY" class="type-section">
+            <div style="color:#c084fc;font-size:12px;font-weight:bold;margin-bottom:8px">💍 ACCESSORY 설정</div>
+            <div class="mb-2">
+                <label class="form-label small text-secondary">악세서리 타입</label>
+                <select id="accessoryType" class="form-select form-select-sm" style="width:220px">
+                    <option>NECKLACE</option><option>RING</option>
+                </select>
+            </div>
+            <div id="accessoryStatModifiers"></div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addStatRow('accessoryStatModifiers')">+ 스탯 추가</button>
+        </div>
+
+        <!-- MARTIAL_ARTS_BOOK -->
+        <div id="section-MARTIAL_ARTS_BOOK" class="type-section">
+            <div style="color:#38bdf8;font-size:12px;font-weight:bold;margin-bottom:8px">📖 MARTIAL ARTS BOOK 설정</div>
+            <label class="form-label small text-secondary">스킬 참조 (skillRef)</label>
+            <input type="text" id="skillRef" class="form-control form-control-sm" placeholder="skill_id">
+        </div>
+
+        <!-- MISSION -->
+        <div id="section-MISSION" class="type-section">
+            <div style="color:#f87171;font-size:12px;font-weight:bold;margin-bottom:8px">🎯 MISSION 설정</div>
+            <div class="mb-2">
+                <label class="form-label small text-secondary">미션 아이템 타입</label>
+                <select id="missionItemType" class="form-select form-select-sm" style="width:220px">
+                    <option>KEY</option><option>QUEST_COMPLETION</option>
+                </select>
+            </div>
+            <label class="form-label small text-secondary">대상 참조 (targetRef)</label>
+            <input type="text" id="targetRef" class="form-control form-control-sm" placeholder="target_id">
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button type="button" class="btn btn-green btn-sm" onclick="saveTemplate()">저장</button>
+        </div>
+        <div id="formMessage" class="mt-2" style="font-size:12px"></div>
+    </div>
+</div>
+
+<script>
+const STAT_TYPES = ['VIGOR','PHYSIQUE','AGILITY','INTELLECT','WILL','MERIDIAN',
+    'INNER_POWER','SPECIAL_TECHNIQUE','LIGHT_STEP','FISTS_AND_PALMS',
+    'SWORD_METHOD','BLADE_METHOD','LONG_WEAPON','ESOTERIC_WEAPON','ARCHERY'];
+
+const TYPE_COLORS = {
+    FOOD:'#4ade80', WEAPON:'#60a5fa', EQUIPMENT:'#f59e0b',
+    ACCESSORY:'#c084fc', MARTIAL_ARTS_BOOK:'#38bdf8', MISSION:'#f87171'
+};
+
+function onTypeChange() {
+    const type = document.getElementById('itemType').value;
+    document.querySelectorAll('.type-section').forEach(s => s.classList.remove('active'));
+    if (type) document.getElementById('section-' + type)?.classList.add('active');
+}
+
+function addStatRow(containerId) {
+    const container = document.getElementById(containerId);
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `
+        <select class="form-select form-select-sm stat-type" style="width:180px">
+            ${STAT_TYPES.map(t => `<option>${t}</option>`).join('')}
+        </select>
+        <input type="number" class="form-control form-control-sm stat-value" style="width:80px" value="0">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()">✕</button>`;
+    container.appendChild(row);
+}
+
+function collectStatModifiers(containerId) {
+    return Array.from(document.querySelectorAll(`#${containerId} .stat-row`)).map(row => ({
+        statType: row.querySelector('.stat-type').value,
+        value: parseInt(row.querySelector('.stat-value').value) || 0
+    }));
+}
+
+async function loadTemplates() {
+    const name = document.getElementById('nameFilter').value;
+    const type = document.getElementById('typeFilter').value;
+    let url = '/api/v1/item-templates';
+    const params = new URLSearchParams();
+    if (name) params.set('name', name);
+    else if (type) params.set('type', type);
+    if (params.toString()) url += '?' + params;
+
+    const res = await fetch(url);
+    const templates = await res.json();
+    const tbody = document.getElementById('templateTableBody');
+    tbody.innerHTML = templates.map(t => `
+        <tr>
+            <td>${t.id}</td>
+            <td>${t.name}</td>
+            <td><span class="badge badge-${t.itemType}">${t.itemType}</span></td>
+            <td>${t.weight}</td>
+            <td>${t.stackable ? '✓' : '✗'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-info py-0" onclick="editTemplate(${t.id})">편집</button>
+                <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteTemplate(${t.id}, '${t.name}')">삭제</button>
+            </td>
+        </tr>`).join('');
+}
+
+function showCreateForm() {
+    document.getElementById('formTitle').textContent = '◆ 새 아이템 템플릿';
+    document.getElementById('editId').value = '';
+    document.getElementById('itemType').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('weight').value = '';
+    document.getElementById('stackable').checked = false;
+    ['weaponStatModifiers','equipmentStatModifiers','accessoryStatModifiers'].forEach(id => {
+        document.getElementById(id).innerHTML = '';
+    });
+    document.querySelectorAll('.type-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('formMessage').textContent = '';
+    document.getElementById('formPanel').style.display = 'block';
+    document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
+}
+
+async function editTemplate(id) {
+    const res = await fetch('/api/v1/item-templates/' + id);
+    const t = await res.json();
+    document.getElementById('formTitle').textContent = '◆ 템플릿 편집 (ID: ' + id + ')';
+    document.getElementById('editId').value = id;
+    document.getElementById('itemType').value = t.itemType;
+    document.getElementById('name').value = t.name;
+    document.getElementById('description').value = t.description || '';
+    document.getElementById('weight').value = t.weight;
+    document.getElementById('stackable').checked = t.stackable;
+    document.querySelectorAll('.type-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-' + t.itemType)?.classList.add('active');
+
+    if (t.itemType === 'FOOD') {
+        document.getElementById('hpRecovery').value = t.hpRecovery || 0;
+        document.getElementById('mpRecovery').value = t.mpRecovery || 0;
+        document.getElementById('apRecovery').value = t.apRecovery || 0;
+    } else if (t.itemType === 'WEAPON') {
+        document.getElementById('weaponType').value = t.weaponType;
+        const c = document.getElementById('weaponStatModifiers');
+        c.innerHTML = '';
+        (t.statModifiers || []).forEach(sm => {
+            addStatRow('weaponStatModifiers');
+            const rows = c.querySelectorAll('.stat-row');
+            const last = rows[rows.length - 1];
+            last.querySelector('.stat-type').value = sm.statType;
+            last.querySelector('.stat-value').value = sm.value;
+        });
+    } else if (t.itemType === 'EQUIPMENT') {
+        document.getElementById('equipmentSlot').value = t.equipmentSlot;
+        const c = document.getElementById('equipmentStatModifiers');
+        c.innerHTML = '';
+        (t.statModifiers || []).forEach(sm => {
+            addStatRow('equipmentStatModifiers');
+            const rows = c.querySelectorAll('.stat-row');
+            const last = rows[rows.length - 1];
+            last.querySelector('.stat-type').value = sm.statType;
+            last.querySelector('.stat-value').value = sm.value;
+        });
+    } else if (t.itemType === 'ACCESSORY') {
+        document.getElementById('accessoryType').value = t.accessoryType;
+        const c = document.getElementById('accessoryStatModifiers');
+        c.innerHTML = '';
+        (t.statModifiers || []).forEach(sm => {
+            addStatRow('accessoryStatModifiers');
+            const rows = c.querySelectorAll('.stat-row');
+            const last = rows[rows.length - 1];
+            last.querySelector('.stat-type').value = sm.statType;
+            last.querySelector('.stat-value').value = sm.value;
+        });
+    } else if (t.itemType === 'MARTIAL_ARTS_BOOK') {
+        document.getElementById('skillRef').value = t.skillRef || '';
+    } else if (t.itemType === 'MISSION') {
+        document.getElementById('missionItemType').value = t.missionItemType;
+        document.getElementById('targetRef').value = t.targetRef || '';
+    }
+
+    document.getElementById('formMessage').textContent = '';
+    document.getElementById('formPanel').style.display = 'block';
+    document.getElementById('formPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function hideForm() {
+    document.getElementById('formPanel').style.display = 'none';
+}
+
+function buildRequest() {
+    const type = document.getElementById('itemType').value;
+    const base = {
+        itemType: type,
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        weight: parseInt(document.getElementById('weight').value) || 0,
+        stackable: document.getElementById('stackable').checked
+    };
+    if (type === 'FOOD') {
+        return {...base,
+            hpRecovery: parseInt(document.getElementById('hpRecovery').value) || 0,
+            mpRecovery: parseInt(document.getElementById('mpRecovery').value) || 0,
+            apRecovery: parseInt(document.getElementById('apRecovery').value) || 0
+        };
+    } else if (type === 'WEAPON') {
+        return {...base,
+            weaponType: document.getElementById('weaponType').value,
+            statModifiers: collectStatModifiers('weaponStatModifiers')
+        };
+    } else if (type === 'EQUIPMENT') {
+        return {...base,
+            equipmentSlot: document.getElementById('equipmentSlot').value,
+            statModifiers: collectStatModifiers('equipmentStatModifiers')
+        };
+    } else if (type === 'ACCESSORY') {
+        return {...base,
+            accessoryType: document.getElementById('accessoryType').value,
+            statModifiers: collectStatModifiers('accessoryStatModifiers')
+        };
+    } else if (type === 'MARTIAL_ARTS_BOOK') {
+        return {...base, skillRef: document.getElementById('skillRef').value};
+    } else if (type === 'MISSION') {
+        return {...base,
+            missionItemType: document.getElementById('missionItemType').value,
+            targetRef: document.getElementById('targetRef').value
+        };
+    }
+    return base;
+}
+
+async function saveTemplate() {
+    const id = document.getElementById('editId').value;
+    const body = buildRequest();
+    const url = id ? '/api/v1/item-templates/' + id : '/api/v1/item-templates';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+        method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    });
+    const msg = document.getElementById('formMessage');
+    if (res.ok) {
+        msg.style.color = '#4ade80';
+        msg.textContent = '✓ 저장 완료';
+        hideForm();
+        loadTemplates();
+    } else {
+        msg.style.color = '#f87171';
+        msg.textContent = '✗ 저장 실패 (status: ' + res.status + ')';
+    }
+}
+
+async function deleteTemplate(id, name) {
+    if (!confirm(`"${name}" 템플릿을 삭제하시겠습니까?`)) return;
+    const res = await fetch('/api/v1/item-templates/' + id, {method:'DELETE'});
+    if (res.ok) loadTemplates();
+    else alert('삭제 실패');
+}
+
+loadTemplates();
+</script>
+</body>
+</html>
