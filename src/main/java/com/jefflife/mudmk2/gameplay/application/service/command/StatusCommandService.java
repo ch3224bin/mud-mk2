@@ -4,7 +4,9 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.StatusCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.StatusUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendStatusMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
@@ -21,20 +23,25 @@ public class StatusCommandService implements StatusUseCase {
     private static final Logger logger = LoggerFactory.getLogger(StatusCommandService.class);
 
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
     private final SendStatusMessagePort sendStatusMessagePort;
 
     public StatusCommandService(
             final GameWorldService gameWorldService,
+            final ActiveRoomRepository rooms,
             final SendStatusMessagePort sendStatusMessagePort
     ) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
         this.sendStatusMessagePort = sendStatusMessagePort;
     }
 
     @Override
     public void showStatus(final StatusCommand command) {
         PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
-        Room currentRoom = gameWorldService.getRoom(player.getCurrentRoomId());
+        Long currentRoomId = player.getCurrentRoomId();
+        Room currentRoom = rooms.findById(currentRoomId)
+                .orElseThrow(() -> new RoomNotFoundException(currentRoomId));
         
         CharacterStats stats = player.getStats();
         

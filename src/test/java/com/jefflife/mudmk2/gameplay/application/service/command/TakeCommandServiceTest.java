@@ -7,6 +7,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.TakeCommand;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -26,6 +28,9 @@ class TakeCommandServiceTest {
     private GameWorldService gameWorldService;
 
     @Mock
+    private ActiveRoomRepository rooms;
+
+    @Mock
     private SendMessageToUserPort sendMessageToUserPort;
 
     @InjectMocks
@@ -35,7 +40,7 @@ class TakeCommandServiceTest {
         PlayerCharacter player = mock(PlayerCharacter.class);
         when(player.getCurrentRoomId()).thenReturn(100L);
         when(gameWorldService.getPlayerByUserId(1L)).thenReturn(player);
-        when(gameWorldService.getRoom(100L)).thenReturn(room);
+        when(rooms.findById(100L)).thenReturn(Optional.of(room));
         return player;
     }
 

@@ -5,8 +5,10 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.event.PlayerMoveEvent;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.MoveCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.service.provided.MoveUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,17 +17,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class MoveCommandService implements MoveUseCase {
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
     private final RoomDescriber roomDescriber;
     private final SendMessageToUserPort sendMessageToUserPort;
     private final ApplicationEventPublisher eventPublisher;
 
     public MoveCommandService(
             final GameWorldService gameWorldService,
+            final ActiveRoomRepository rooms,
             final RoomDescriber roomDescriber,
             final SendMessageToUserPort sendMessageToUserPort,
             final ApplicationEventPublisher eventPublisher
     ) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
         this.roomDescriber = roomDescriber;
         this.sendMessageToUserPort = sendMessageToUserPort;
         this.eventPublisher = eventPublisher;
@@ -35,7 +40,8 @@ public class MoveCommandService implements MoveUseCase {
     public void move(final MoveCommand command) {
         PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
         Long fromRoomId = player.getCurrentRoomId();
-        Room room = gameWorldService.getRoom(fromRoomId);
+        Room room = rooms.findById(fromRoomId)
+                .orElseThrow(() -> new RoomNotFoundException(fromRoomId));
         Direction direction = Direction.valueOfString(command.direction());
         PlayerCharacter.MoveResult moveResult = player.move(room, direction);
         switch (moveResult) {

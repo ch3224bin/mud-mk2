@@ -5,8 +5,10 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.TakeCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import com.jefflife.mudmk2.gameplay.application.service.provided.TakeUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,12 @@ import java.util.List;
 @Service
 public class TakeCommandService implements TakeUseCase {
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public TakeCommandService(GameWorldService gameWorldService, SendMessageToUserPort sendMessageToUserPort) {
+    public TakeCommandService(GameWorldService gameWorldService, ActiveRoomRepository rooms, SendMessageToUserPort sendMessageToUserPort) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
@@ -31,7 +35,9 @@ public class TakeCommandService implements TakeUseCase {
         }
 
         PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
-        Room room = gameWorldService.getRoom(player.getCurrentRoomId());
+        Long currentRoomId = player.getCurrentRoomId();
+        Room room = rooms.findById(currentRoomId)
+                .orElseThrow(() -> new RoomNotFoundException(currentRoomId));
 
         List<ItemInstance> matching = room.findFloorItemsByName(command.itemName());
         if (matching.isEmpty()) {
