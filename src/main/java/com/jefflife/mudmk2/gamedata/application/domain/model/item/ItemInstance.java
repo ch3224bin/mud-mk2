@@ -15,7 +15,7 @@ public class ItemInstance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", nullable = false)
     private ItemTemplate template;
 
@@ -28,5 +28,13 @@ public class ItemInstance {
 
     public void addQuantity(int amount) {
         this.quantity += amount;
+    }
+
+    /**
+     * GameWorldService 캐시 적재 시점에 LAZY 관계를 강제 초기화한다.
+     * detached 상태에서 template 접근 시 LazyInitializationException을 방지.
+     */
+    public void initializeAssociatedEntities() {
+        this.template.initializeAssociatedEntities();
     }
 }

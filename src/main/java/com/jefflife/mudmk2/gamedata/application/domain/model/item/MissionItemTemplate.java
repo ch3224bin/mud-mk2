@@ -32,4 +32,9 @@ public class MissionItemTemplate extends ItemTemplate {
         this.missionItemType = request.missionItemType();
         this.targetRef = request.targetRef();
     }
+
+    @Override
+    public void initializeAssociatedEntities() {
+        // 초기화할 LAZY 컬렉션 없음
+    }
 }

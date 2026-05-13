@@ -68,7 +68,8 @@ public class PlayerCharacter implements Combatable, Statable {
     }
 
     public void initializeAssociatedEntities() {
-
+        // inventory LAZY 프록시 + 그 안의 items + 각 item의 template 그래프 초기화
+        this.inventory.initializeAssociatedEntities();
     }
 
     public MoveResult move(final Room currentRoom, final Direction direction) {

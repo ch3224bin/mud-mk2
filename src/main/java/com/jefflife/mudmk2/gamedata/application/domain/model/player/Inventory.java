@@ -76,4 +76,14 @@ public class Inventory {
                 .filter(i -> i.getTemplate().getName().equals(name))
                 .toList();
     }
+
+    /**
+     * GameWorldService 캐시 적재 시점에 LAZY 컬렉션 + 각 아이템의 template 그래프를 강제 초기화한다.
+     */
+    public void initializeAssociatedEntities() {
+        this.items.size();
+        for (ItemInstance item : this.items) {
+            item.initializeAssociatedEntities();
+        }
+    }
 }

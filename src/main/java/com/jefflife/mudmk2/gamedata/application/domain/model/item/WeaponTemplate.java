@@ -42,4 +42,9 @@ public class WeaponTemplate extends ItemTemplate {
             request.statModifiers().forEach(sm -> this.statModifiers.add(sm.toDomain()));
         }
     }
+
+    @Override
+    public void initializeAssociatedEntities() {
+        this.statModifiers.size();
+    }
 }

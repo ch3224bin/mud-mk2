@@ -29,4 +29,9 @@ public class MartialArtsBookTemplate extends ItemTemplate {
         updateCommon(request.name(), request.description(), request.weight(), request.stackable());
         this.skillRef = request.skillRef();
     }
+
+    @Override
+    public void initializeAssociatedEntities() {
+        // 초기화할 LAZY 컬렉션 없음
+    }
 }

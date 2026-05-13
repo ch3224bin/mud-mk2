@@ -35,4 +35,9 @@ public class FoodTemplate extends ItemTemplate {
         this.mpRecovery = request.mpRecovery() != null ? request.mpRecovery() : 0;
         this.apRecovery = request.apRecovery() != null ? request.apRecovery() : 0;
     }
+
+    @Override
+    public void initializeAssociatedEntities() {
+        // 초기화할 LAZY 컬렉션 없음
+    }
 }
