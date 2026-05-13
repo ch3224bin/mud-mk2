@@ -2,6 +2,8 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemInstancePlaceRequest;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemInstancePlaceRequest.LocationType;
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRepository;
@@ -88,6 +90,29 @@ class ItemInstanceServiceTest {
         ItemInstancePlaceRequest request = new ItemInstancePlaceRequest(1L, 1, LocationType.CHARACTER, characterId.toString());
         assertThatThrownBy(() -> service.place(request))
             .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void place_toCharacter_shouldSaveInstanceAndAddToInventoryAndInMemory() {
+        FoodTemplate template = FoodTemplate.builder()
+            .name("만두").description("찐만두").weight(1).stackable(true)
+            .hpRecovery(10).mpRecovery(0).apRecovery(0).build();
+        UUID characterId = UUID.randomUUID();
+        PlayerCharacter character = mock(PlayerCharacter.class);
+        Inventory inventory = mock(Inventory.class);
+        when(character.getInventory()).thenReturn(inventory);
+
+        when(itemTemplateRepository.findById(1L)).thenReturn(Optional.of(template));
+        when(playerCharacterRepository.findById(characterId)).thenReturn(Optional.of(character));
+        when(itemInstanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(playerCharacterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ItemInstancePlaceRequest request = new ItemInstancePlaceRequest(1L, 5, LocationType.CHARACTER, characterId.toString());
+        ItemInstance result = service.place(request);
+
+        assertThat(result.getQuantity()).isEqualTo(5);
+        verify(inventory).addItem(result);
+        verify(playerCharacterRepository).save(character);
     }
 
     @Test
