@@ -372,6 +372,13 @@ class CharacterCreationServiceTest {
         public void deleteAll() {
             throw new UnsupportedOperationException("Not implemented for test");
         }
+
+        @Override
+        public java.util.List<PlayerCharacter> findByNicknameContaining(String nickname) {
+            return charactersById.values().stream()
+                    .filter(pc -> pc.getNickname() != null && pc.getNickname().contains(nickname))
+                    .toList();
+        }
     }
 
     // Fake implementation of SendMessageToUserPort

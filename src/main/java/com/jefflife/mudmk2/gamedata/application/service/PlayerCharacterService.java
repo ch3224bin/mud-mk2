@@ -7,6 +7,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.service.provided.PlayerCharacterFinder;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-public class PlayerCharacterService {
+@Transactional(readOnly = true)
+public class PlayerCharacterService implements PlayerCharacterFinder {
     private final PlayerCharacterRepository playerCharacterRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -26,6 +29,11 @@ public class PlayerCharacterService {
     ) {
         this.playerCharacterRepository = playerCharacterRepository;
         this.eventPublisher = eventPublisher;
+    }
+
+    @Override
+    public List<PlayerCharacter> findByNicknameContaining(final String nickname) {
+        return playerCharacterRepository.findByNicknameContaining(nickname);
     }
 
     /**

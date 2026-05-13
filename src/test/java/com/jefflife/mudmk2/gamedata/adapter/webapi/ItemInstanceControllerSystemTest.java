@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityMockMvcConfiguration.class)
 class ItemInstanceControllerSystemTest {
 
-    private static final String BASE_URL = "/api/v1/item-instances";
+    private static final String BASE_URL = ItemInstanceController.BASE_PATH;
 
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;

@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/v1/item-instances")
+@RequestMapping(ItemInstanceController.BASE_PATH)
 public class ItemInstanceController {
+
+    public static final String BASE_PATH = "/api/v1/item-instances";
 
     private final ItemInstancePlacer itemInstancePlacer;
 

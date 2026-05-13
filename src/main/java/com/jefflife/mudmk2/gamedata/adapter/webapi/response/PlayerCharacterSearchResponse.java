@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import java.util.UUID;
 
 public record PlayerCharacterSearchResponse(UUID id, String nickname) {
-    public static PlayerCharacterSearchResponse from(PlayerCharacter character) {
+    public static PlayerCharacterSearchResponse from(final PlayerCharacter character) {
         return new PlayerCharacterSearchResponse(character.getId(), character.getNickname());
     }
 }
