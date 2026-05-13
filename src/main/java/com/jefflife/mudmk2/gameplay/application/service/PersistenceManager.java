@@ -3,9 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
-import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PartyRepository;
 import com.jefflife.mudmk2.gameplay.application.service.sync.BatchSyncable;
 import org.slf4j.Logger;
@@ -24,20 +22,17 @@ public class PersistenceManager {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PersistenceManager.class);
     private static final Random random = new Random();
 
-    private final NonPlayerCharacterRepository nonPlayerCharacterRepository;
     private final MonsterTypeRepository monsterTypeRepository;
     private final GameWorldService gameWorldService;
     private final PartyRepository partyRepository;
     private final List<BatchSyncable> batchSyncables;
 
     public PersistenceManager(
-            final NonPlayerCharacterRepository nonPlayerCharacterRepository,
             final MonsterTypeRepository monsterTypeRepository,
             final GameWorldService gameWorldService,
             final PartyRepository partyRepository,
             final List<BatchSyncable> batchSyncables
     ) {
-        this.nonPlayerCharacterRepository = nonPlayerCharacterRepository;
         this.monsterTypeRepository = monsterTypeRepository;
         this.gameWorldService = gameWorldService;
         this.partyRepository = partyRepository;
@@ -47,9 +42,6 @@ public class PersistenceManager {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional(readOnly = true)
     public void loadGameState() {
-        Iterable<NonPlayerCharacter> nonPlayerCharacters = nonPlayerCharacterRepository.findAll();
-        gameWorldService.loadNpcs(nonPlayerCharacters);
-
         gameWorldService.loadParties(partyRepository.findAll());
 
         // MonsterType을 기반으로 Monster 생성 및 로드
