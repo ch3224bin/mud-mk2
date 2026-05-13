@@ -2,7 +2,9 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.FloorItemInfo;
@@ -18,13 +20,16 @@ public class RoomInfoService implements RoomDescriber {
     private static final Logger logger = LoggerFactory.getLogger(RoomInfoService.class);
 
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
     private final SendRoomInfoMessagePort sendRoomInfoMessagePort;
 
     public RoomInfoService(
             final GameWorldService gameWorldService,
+            final ActiveRoomRepository rooms,
             final SendRoomInfoMessagePort sendRoomInfoMessagePort
     ) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
         this.sendRoomInfoMessagePort = sendRoomInfoMessagePort;
     }
 
@@ -37,7 +42,8 @@ public class RoomInfoService implements RoomDescriber {
             return;
         }
 
-        final Room currentRoom = gameWorldService.getRoom(character.getCurrentRoomId());
+        final Room currentRoom = rooms.findById(character.getCurrentRoomId())
+                .orElseThrow(() -> new RoomNotFoundException(character.getCurrentRoomId()));
 
         // 현재 방에 있는 NPC 목록 가져오기
         List<CreatureInfo> npcsInRoom = gameWorldService.getNpcsInRoom(currentRoom.getId())

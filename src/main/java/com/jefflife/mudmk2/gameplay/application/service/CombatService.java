@@ -6,6 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.combat.*;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.tick.TickListener;
 import org.springframework.scheduling.annotation.Async;
@@ -20,13 +21,16 @@ public class CombatService implements TickListener {
     private final Map<UUID, ATBCombat> combatMap = new ConcurrentHashMap<>();
 
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
     private final SendMessageToUserPort sendMessageToUserPort;
     private final CombatNarrativeFormatter narrativeFormatter;
 
     public CombatService(GameWorldService gameWorldService,
+                         ActiveRoomRepository rooms,
                          SendMessageToUserPort sendMessageToUserPort,
                          CombatNarrativeFormatter narrativeFormatter) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
         this.sendMessageToUserPort = sendMessageToUserPort;
         this.narrativeFormatter = narrativeFormatter;
     }
@@ -95,7 +99,7 @@ public class CombatService implements TickListener {
         combat.getAllyUsers().forEach(player -> {
             if (!player.isAlive()) {
                 Long roomId = player.getCurrentRoomId();
-                Optional<Room> room = gameWorldService.getRoomOptional(roomId);
+                Optional<Room> room = rooms.findById(roomId);
                 if (room.isPresent() && room.get().isSimulationRoom()) {
                     player.fullRestore();
                     sendMessageToUserPort.messageToUser(player.getUserId(),

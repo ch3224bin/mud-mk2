@@ -11,6 +11,7 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRep
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemTemplateRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,19 +27,22 @@ public class ItemInstanceService implements ItemInstancePlacer {
     private final RoomRepository roomRepository;
     private final PlayerCharacterRepository playerCharacterRepository;
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
 
     public ItemInstanceService(
         ItemTemplateRepository itemTemplateRepository,
         ItemInstanceRepository itemInstanceRepository,
         RoomRepository roomRepository,
         PlayerCharacterRepository playerCharacterRepository,
-        GameWorldService gameWorldService
+        GameWorldService gameWorldService,
+        ActiveRoomRepository rooms
     ) {
         this.itemTemplateRepository = itemTemplateRepository;
         this.itemInstanceRepository = itemInstanceRepository;
         this.roomRepository = roomRepository;
         this.playerCharacterRepository = playerCharacterRepository;
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class ItemInstanceService implements ItemInstancePlacer {
             .orElseThrow(() -> new NoSuchElementException("Room not found: " + roomId));
         room.addFloorItem(instance);
         roomRepository.save(room);
-        gameWorldService.getRoomOptional(roomId).ifPresent(r -> {
+        rooms.findById(roomId).ifPresent(r -> {
             if (r != room) {
                 r.addFloorItem(instance);
             }

@@ -10,6 +10,7 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRep
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemTemplateRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,7 @@ class ItemInstanceServiceTest {
     @Mock private RoomRepository roomRepository;
     @Mock private PlayerCharacterRepository playerCharacterRepository;
     @Mock private GameWorldService gameWorldService;
+    @Mock private ActiveRoomRepository rooms;
 
     private ItemInstanceService service;
 
@@ -40,7 +42,7 @@ class ItemInstanceServiceTest {
     void setUp() {
         service = new ItemInstanceService(
             itemTemplateRepository, itemInstanceRepository,
-            roomRepository, playerCharacterRepository, gameWorldService
+            roomRepository, playerCharacterRepository, gameWorldService, rooms
         );
     }
 
@@ -56,7 +58,7 @@ class ItemInstanceServiceTest {
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
         when(itemInstanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(roomRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(gameWorldService.getRoomOptional(1L)).thenReturn(Optional.of(room));
+        when(rooms.findById(1L)).thenReturn(Optional.of(room));
 
         ItemInstancePlaceRequest request = new ItemInstancePlaceRequest(1L, 10, LocationType.ROOM, "1");
         ItemInstance result = service.place(request);
