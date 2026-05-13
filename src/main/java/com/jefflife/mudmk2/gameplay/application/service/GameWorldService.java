@@ -6,6 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.event.PartyCreatedEvent;
 import com.jefflife.mudmk2.gamedata.application.event.PartyDisbandedEvent;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveNpcRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,30 +25,20 @@ public class GameWorldService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final ActivePlayerRepository players;
+    private final ActiveNpcRepository npcs;
 
     public GameWorldService(
             final ApplicationEventPublisher eventPublisher,
-            final ActivePlayerRepository players
+            final ActivePlayerRepository players,
+            final ActiveNpcRepository npcs
     ) {
         this.eventPublisher = eventPublisher;
         this.players = players;
+        this.npcs = npcs;
     }
 
-    private final Map<UUID, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
     private final Map<UUID, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
     private final Map<UUID, Party> parties = new ConcurrentHashMap<>();
-
-    /**
-     * 게임에 NPC를 로드합니다.
-     * @param npcs 로드할 NPC 목록
-     */
-    public void loadNpcs(final Iterable<NonPlayerCharacter> npcs) {
-        npcs.forEach(npc -> {
-            npc.initializeAssociatedEntities();
-            activeNpcs.put(npc.getId(), npc);
-        });
-        logger.info("Loaded {} NPCs", this.activeNpcs.size());
-    }
 
     /**
      * 게임에 몬스터를 로드합니다.
@@ -144,21 +135,13 @@ public class GameWorldService {
     }
 
     /**
-     * 새로운 NPC를 인메모리 캐시에 추가합니다.
-     * @param npc 추가할 NPC
-     */
-    public void addNpc(final NonPlayerCharacter npc) {
-        activeNpcs.put(npc.getId(), npc);
-        logger.debug("NPC added to game world: {} (ID: {})", npc.getName(), npc.getId());
-    }
-
-    /**
      * 특정 방에 있는 모든 NPC를 조회합니다.
      * @param roomId 방 ID
      * @return 방에 있는 NPC 목록
      */
+    // TODO(phase6): RoomOccupancyQuery.npcsIn(roomId)으로 이전 — 위치 기반 조회는 Read Model로 분리
     public List<NonPlayerCharacter> getNpcsInRoom(Long roomId) {
-        return activeNpcs.values().stream()
+        return StreamSupport.stream(npcs.findAll().spliterator(), false)
                 .filter(npc -> npc.getCurrentRoomId().equals(roomId))
                 .collect(Collectors.toList());
     }
@@ -176,50 +159,16 @@ public class GameWorldService {
     }
 
     /**
-     * ID로 NPC를 찾습니다.
-     * @param npcId NPC ID
-     * @return 찾은 NPC, 없으면 null
-     */
-    public NonPlayerCharacter getNpcById(UUID npcId) {
-        return activeNpcs.get(npcId);
-    }
-
-    /**
      * 이름으로 NPC를 찾습니다.
      * @param name NPC 이름
      * @return 찾은 NPC, 없으면 null
      */
+    // TODO(phase6): CreatureLookupQuery.findNpcByName(name)으로 이전 — 이름 기반 조회는 Read Model로 분리
     public NonPlayerCharacter getNpcByName(String name) {
-        return activeNpcs.values().stream()
+        return StreamSupport.stream(npcs.findAll().spliterator(), false)
                 .filter(npc -> npc.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * NPC를 특정 방으로 이동시킵니다.
-     * @param npcId NPC ID
-     * @param roomId 이동할 방 ID
-     * @return 이동 성공 여부
-     */
-    public boolean moveNpcToRoom(UUID npcId, Long roomId) {
-        NonPlayerCharacter npc = activeNpcs.get(npcId);
-        // TODO(phase4): roomId 존재성 검증을 NpcLocationService로 이전
-        if (npc == null) {
-            return false;
-        }
-
-        // NPC의 방 ID 변경 (BaseCharacter의 roomId 필드 접근)
-        try {
-            java.lang.reflect.Field roomIdField = npc.getBaseCharacterInfo().getClass().getDeclaredField("roomId");
-            roomIdField.setAccessible(true);
-            roomIdField.set(npc.getBaseCharacterInfo(), roomId);
-            logger.debug("Moved NPC {} to room {}", npc.getName(), roomId);
-            return true;
-        } catch (Exception e) {
-            logger.error("Failed to move NPC to room: {}", e.getMessage(), e);
-            return false;
-        }
     }
 
     public boolean isInParty(UUID characterId) {
