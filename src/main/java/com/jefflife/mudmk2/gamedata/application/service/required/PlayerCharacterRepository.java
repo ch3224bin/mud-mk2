@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.service.required;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface PlayerCharacterRepository extends CrudRepository<PlayerCharacter, UUID> {
@@ -26,4 +27,6 @@ public interface PlayerCharacterRepository extends CrudRepository<PlayerCharacte
      * @return true if a player character exists with the nickname, false otherwise
      */
     boolean existsByNickname(String nickname);
+
+    List<PlayerCharacter> findByNicknameContaining(String nickname);
 }

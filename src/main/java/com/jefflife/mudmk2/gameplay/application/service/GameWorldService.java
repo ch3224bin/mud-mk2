@@ -345,4 +345,13 @@ public class GameWorldService {
                 .findFirst()
                 .orElse(null);
     }
+
+    /**
+     * ID로 플레이어를 찾습니다.
+     * @param characterId 플레이어 캐릭터 ID
+     * @return 찾은 플레이어, 없으면 empty Optional
+     */
+    public Optional<PlayerCharacter> getPlayerById(UUID characterId) {
+        return Optional.ofNullable(activePlayers.get(characterId));
+    }
 }
