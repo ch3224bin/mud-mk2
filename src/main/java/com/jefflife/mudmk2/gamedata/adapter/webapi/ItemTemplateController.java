@@ -23,10 +23,10 @@ public class ItemTemplateController {
     private final ItemTemplateRemover itemTemplateRemover;
 
     public ItemTemplateController(
-        ItemTemplateCreator itemTemplateCreator,
-        ItemTemplateFinder itemTemplateFinder,
-        ItemTemplateModifier itemTemplateModifier,
-        ItemTemplateRemover itemTemplateRemover
+            final ItemTemplateCreator itemTemplateCreator,
+            final ItemTemplateFinder itemTemplateFinder,
+            final ItemTemplateModifier itemTemplateModifier,
+            final ItemTemplateRemover itemTemplateRemover
     ) {
         this.itemTemplateCreator = itemTemplateCreator;
         this.itemTemplateFinder = itemTemplateFinder;
@@ -35,20 +35,22 @@ public class ItemTemplateController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemTemplateResponse> create(@RequestBody ItemTemplateRequest request) {
-        ItemTemplate template = itemTemplateCreator.create(request);
-        ItemTemplateResponse response = ItemTemplateResponse.from(template);
+    public ResponseEntity<ItemTemplateResponse> createItemTemplate(
+            @RequestBody final ItemTemplateRequest request
+    ) {
+        final ItemTemplate template = itemTemplateCreator.create(request);
+        final ItemTemplateResponse response = ItemTemplateResponse.from(template);
         return ResponseEntity
-            .created(URI.create(BASE_PATH + "/" + response.id()))
+            .created(URI.create(String.format("%s/%s", BASE_PATH, response.id())))
             .body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemTemplateResponse>> getAll(
-        @RequestParam(required = false) ItemType type,
-        @RequestParam(required = false) String name
+    public ResponseEntity<List<ItemTemplateResponse>> getAllItemTemplates(
+            @RequestParam(required = false) final ItemType type,
+            @RequestParam(required = false) final String name
     ) {
-        List<ItemTemplate> templates;
+        final List<ItemTemplate> templates;
         if (name != null && !name.isBlank()) {
             templates = itemTemplateFinder.findByNameContaining(name);
         } else if (type != null) {
@@ -60,7 +62,7 @@ public class ItemTemplateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemTemplateResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<ItemTemplateResponse> getItemTemplate(@PathVariable final Long id) {
         try {
             return ResponseEntity.ok(ItemTemplateResponse.from(itemTemplateFinder.findById(id)));
         } catch (NoSuchElementException e) {
@@ -69,9 +71,9 @@ public class ItemTemplateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemTemplateResponse> update(
-        @PathVariable Long id,
-        @RequestBody ItemTemplateRequest request
+    public ResponseEntity<ItemTemplateResponse> updateItemTemplate(
+            @PathVariable final Long id,
+            @RequestBody final ItemTemplateRequest request
     ) {
         try {
             return ResponseEntity.ok(ItemTemplateResponse.from(itemTemplateModifier.update(id, request)));
@@ -81,7 +83,7 @@ public class ItemTemplateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteItemTemplate(@PathVariable final Long id) {
         try {
             itemTemplateRemover.delete(id);
             return ResponseEntity.noContent().build();
