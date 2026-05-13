@@ -10,6 +10,7 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRep
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemTemplateRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ class ItemInstanceServiceTest {
     @Mock private ItemInstanceRepository itemInstanceRepository;
     @Mock private RoomRepository roomRepository;
     @Mock private PlayerCharacterRepository playerCharacterRepository;
-    @Mock private GameWorldService gameWorldService;
     @Mock private ActiveRoomRepository rooms;
+    @Mock private ActivePlayerRepository players;
 
     private ItemInstanceService service;
 
@@ -42,7 +43,7 @@ class ItemInstanceServiceTest {
     void setUp() {
         service = new ItemInstanceService(
             itemTemplateRepository, itemInstanceRepository,
-            roomRepository, playerCharacterRepository, gameWorldService, rooms
+            roomRepository, playerCharacterRepository, rooms, players
         );
     }
 
@@ -133,7 +134,7 @@ class ItemInstanceServiceTest {
         when(itemInstanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(playerCharacterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         // In-memory returns the SAME character object — guard should skip the second addItem
-        when(gameWorldService.getPlayerById(characterId)).thenReturn(Optional.of(character));
+        when(players.findById(characterId)).thenReturn(Optional.of(character));
 
         ItemInstancePlaceRequest request = new ItemInstancePlaceRequest(1L, 1, LocationType.CHARACTER, characterId.toString());
         service.place(request);

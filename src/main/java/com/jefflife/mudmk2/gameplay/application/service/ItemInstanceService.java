@@ -11,6 +11,7 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRep
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemTemplateRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,23 +27,23 @@ public class ItemInstanceService implements ItemInstancePlacer {
     private final ItemInstanceRepository itemInstanceRepository;
     private final RoomRepository roomRepository;
     private final PlayerCharacterRepository playerCharacterRepository;
-    private final GameWorldService gameWorldService;
     private final ActiveRoomRepository rooms;
+    private final ActivePlayerRepository players;
 
     public ItemInstanceService(
         ItemTemplateRepository itemTemplateRepository,
         ItemInstanceRepository itemInstanceRepository,
         RoomRepository roomRepository,
         PlayerCharacterRepository playerCharacterRepository,
-        GameWorldService gameWorldService,
-        ActiveRoomRepository rooms
+        ActiveRoomRepository rooms,
+        ActivePlayerRepository players
     ) {
         this.itemTemplateRepository = itemTemplateRepository;
         this.itemInstanceRepository = itemInstanceRepository;
         this.roomRepository = roomRepository;
         this.playerCharacterRepository = playerCharacterRepository;
-        this.gameWorldService = gameWorldService;
         this.rooms = rooms;
+        this.players = players;
     }
 
     @Override
@@ -90,7 +91,7 @@ public class ItemInstanceService implements ItemInstancePlacer {
             .orElseThrow(() -> new NoSuchElementException("PlayerCharacter not found: " + characterId));
         character.getInventory().addItem(instance);
         playerCharacterRepository.save(character);
-        gameWorldService.getPlayerById(characterId).ifPresent(p -> {
+        players.findById(characterId).ifPresent(p -> {
             if (p != character) {
                 p.getInventory().addItem(instance);
             }
