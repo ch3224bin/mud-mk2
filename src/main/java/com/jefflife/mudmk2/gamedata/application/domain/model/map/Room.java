@@ -114,6 +114,9 @@ public class Room {
                 }
             }
         }
+
+        // floorItems LAZY 컬렉션 강제 초기화 — detached 상태에서 addFloorItem/removeFloorItem 호출 가능하도록
+        this.floorItems.size();
     }
 
 	public Optional<Room> getNextRoomByDirection(final Direction direction) {
