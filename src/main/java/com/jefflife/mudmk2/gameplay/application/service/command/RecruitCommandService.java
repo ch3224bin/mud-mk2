@@ -4,7 +4,9 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RecruitUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
@@ -18,20 +20,24 @@ public class RecruitCommandService implements RecruitUseCase {
     private static final Logger logger = LoggerFactory.getLogger(RecruitCommandService.class);
 
     private final GameWorldService gameWorldService;
+    private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public RecruitCommandService(
             final GameWorldService gameWorldService,
+            final ActivePlayerRepository players,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
         this.gameWorldService = gameWorldService;
+        this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
     public void recruit(final RecruitCommand recruitCommand) {
         // 1. 플레이어 정보 가져오기
-        PlayerCharacter player = gameWorldService.getPlayerByUserId(recruitCommand.userId());
+        PlayerCharacter player = players.findByUserId(recruitCommand.userId())
+                .orElseThrow(() -> new PlayerNotFoundException(recruitCommand.userId()));
         UUID playerId = player.getId();
         Long playerRoomId = player.getCurrentRoomId();
 

@@ -4,6 +4,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,9 @@ class RecruitCommandServiceTest {
     private GameWorldService gameWorldService;
 
     @Mock
+    private ActivePlayerRepository players;
+
+    @Mock
     private SendMessageToUserPort sendMessageToUserPort;
 
     @Captor
@@ -47,7 +51,7 @@ class RecruitCommandServiceTest {
 
     @BeforeEach
     void setUp() {
-        recruitCommandService = new RecruitCommandService(gameWorldService, sendMessageToUserPort);
+        recruitCommandService = new RecruitCommandService(gameWorldService, players, sendMessageToUserPort);
     }
 
     @Nested
@@ -70,7 +74,7 @@ class RecruitCommandServiceTest {
 
             lenient().when(player.getId()).thenReturn(PLAYER_ID);
             lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(null);
 
             // when
@@ -96,7 +100,7 @@ class RecruitCommandServiceTest {
             lenient().when(npc.getName()).thenReturn(NPC_NAME);
             lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID + 1); // 다른 방
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
 
             // when
@@ -122,7 +126,7 @@ class RecruitCommandServiceTest {
             lenient().when(npc.getName()).thenReturn(NPC_NAME);
             lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID); // 같은 방
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(true); // 이미 파티에 속해 있음
 
@@ -151,7 +155,7 @@ class RecruitCommandServiceTest {
             lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID);
             lenient().when(party.isLeader(PLAYER_ID)).thenReturn(false); // 리더가 아님
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
@@ -182,7 +186,7 @@ class RecruitCommandServiceTest {
             lenient().when(party.isLeader(PLAYER_ID)).thenReturn(true); // 리더임
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.PARTY_FULL);
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
@@ -213,7 +217,7 @@ class RecruitCommandServiceTest {
             lenient().when(party.isLeader(PLAYER_ID)).thenReturn(true); // 리더임
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.ALREADY_IN_SAME_PARTY);
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
@@ -244,7 +248,7 @@ class RecruitCommandServiceTest {
             lenient().when(party.isLeader(PLAYER_ID)).thenReturn(true); // 리더임
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.SUCCESS);
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
@@ -275,7 +279,7 @@ class RecruitCommandServiceTest {
             lenient().when(newParty.isLeader(PLAYER_ID)).thenReturn(true);
             lenient().when(newParty.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.SUCCESS);
 
-            lenient().when(gameWorldService.getPlayerByUserId(USER_ID)).thenReturn(player);
+            lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
             lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
             lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
             lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.empty()); // 파티 없음
