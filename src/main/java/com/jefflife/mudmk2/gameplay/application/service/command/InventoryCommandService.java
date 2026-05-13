@@ -4,24 +4,26 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.InventoryCommand;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.InventoryUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InventoryCommandService implements InventoryUseCase {
-    private final GameWorldService gameWorldService;
+    private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public InventoryCommandService(GameWorldService gameWorldService, SendMessageToUserPort sendMessageToUserPort) {
-        this.gameWorldService = gameWorldService;
+    public InventoryCommandService(ActivePlayerRepository players, SendMessageToUserPort sendMessageToUserPort) {
+        this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
     public void showInventory(InventoryCommand command) {
-        PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
+        PlayerCharacter player = players.findByUserId(command.userId())
+                .orElseThrow(() -> new PlayerNotFoundException(command.userId()));
         Inventory inventory = player.getInventory();
 
         StringBuilder sb = new StringBuilder("[ 소지품 ]\n");
