@@ -49,9 +49,21 @@ public class ItemInstanceService implements ItemInstancePlacer {
         ItemInstance instance = itemInstanceRepository.save(new ItemInstance(template, request.quantity()));
 
         if (request.locationType() == LocationType.ROOM) {
-            placeInRoom(instance, Long.parseLong(request.locationId()));
+            long roomId;
+            try {
+                roomId = Long.parseLong(request.locationId());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid room ID: " + request.locationId());
+            }
+            placeInRoom(instance, roomId);
         } else {
-            placeInCharacter(instance, UUID.fromString(request.locationId()));
+            UUID characterId;
+            try {
+                characterId = UUID.fromString(request.locationId());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid character ID: " + request.locationId());
+            }
+            placeInCharacter(instance, characterId);
         }
 
         return instance;

@@ -23,6 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class ItemInstanceServiceTest {
@@ -113,6 +114,30 @@ class ItemInstanceServiceTest {
         assertThat(result.getQuantity()).isEqualTo(5);
         verify(inventory).addItem(result);
         verify(playerCharacterRepository).save(character);
+    }
+
+    @Test
+    void place_toCharacter_sameInstanceGuard_shouldNotAddItemTwice() {
+        FoodTemplate template = FoodTemplate.builder()
+            .name("만두").description("찐만두").weight(1).stackable(true)
+            .hpRecovery(10).mpRecovery(0).apRecovery(0).build();
+        UUID characterId = UUID.randomUUID();
+        PlayerCharacter character = mock(PlayerCharacter.class);
+        Inventory inventory = mock(Inventory.class);
+        when(character.getInventory()).thenReturn(inventory);
+
+        when(itemTemplateRepository.findById(1L)).thenReturn(Optional.of(template));
+        when(playerCharacterRepository.findById(characterId)).thenReturn(Optional.of(character));
+        when(itemInstanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(playerCharacterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // In-memory returns the SAME character object — guard should skip the second addItem
+        when(gameWorldService.getPlayerById(characterId)).thenReturn(Optional.of(character));
+
+        ItemInstancePlaceRequest request = new ItemInstancePlaceRequest(1L, 1, LocationType.CHARACTER, characterId.toString());
+        service.place(request);
+
+        // addItem should be called only once (from DB path), not twice
+        verify(inventory, times(1)).addItem(any());
     }
 
     @Test
