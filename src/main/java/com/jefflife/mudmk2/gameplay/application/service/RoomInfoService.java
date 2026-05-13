@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.FloorItemInfo;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.RoomInfoVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,13 @@ public class RoomInfoService implements RoomDescriber {
                         monster.getState()))
                 .toList();
 
+        List<FloorItemInfo> floorItems = currentRoom.getFloorItems().stream()
+                .map(item -> new FloorItemInfo(
+                        item.getTemplate().getName(),
+                        item.getQuantity(),
+                        item.getTemplate().isStackable()))
+                .toList();
+
         sendRoomInfoMessagePort.sendMessage(new RoomInfoVariables(
                 userId,
                 currentRoom.getName(),
@@ -66,7 +74,8 @@ public class RoomInfoService implements RoomDescriber {
                 currentRoom.getExitString(),
                 npcsInRoom,
                 otherPlayersInRoom,
-                monstersInRoom // 몬스터 정보 추가
+                monstersInRoom,
+                floorItems
         ));
         logger.info("Sent room info to user {}", userId);
     }

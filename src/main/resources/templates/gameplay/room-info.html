@@ -37,4 +37,14 @@
         </div>
         <div class="line-spacer"></div>
     </div>
+
+    <div th:if="${not #lists.isEmpty(floorItems)}">
+        <div class="msg-room-title">=== 바닥의 아이템 ===</div>
+        <div class="line" th:each="item : ${floorItems}">
+            <span class="text-item">📦
+                <span th:text="${item.stackable and item.quantity > 1 ? item.name + ' x' + item.quantity : item.name}"></span>
+            </span>
+        </div>
+        <div class="line-spacer"></div>
+    </div>
 </div>

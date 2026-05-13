@@ -9,6 +9,7 @@ public record RoomInfoVariables(
         String exits,
         List<CreatureInfo> npcsInRoom,
         List<CreatureInfo> otherPlayersInRoom,
-        List<CreatureInfo> monstersInRoom
+        List<CreatureInfo> monstersInRoom,
+        List<FloorItemInfo> floorItems
 ) {
 }
