@@ -1,6 +1,5 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
-import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
@@ -10,7 +9,6 @@ import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepo
 import com.jefflife.mudmk2.gamedata.application.service.required.NonPlayerCharacterRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PartyRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
-import com.jefflife.mudmk2.gamedata.application.service.required.RoomRepository;
 import com.jefflife.mudmk2.gamedata.application.event.PlayerCharacterCreatedEvent;
 import com.jefflife.mudmk2.gameplay.application.service.sync.BatchSyncable;
 import org.slf4j.Logger;
@@ -31,7 +29,6 @@ public class PersistenceManager {
 
     private final PlayerCharacterRepository playerCharacterRepository;
     private final NonPlayerCharacterRepository nonPlayerCharacterRepository;
-    private final RoomRepository roomRepository;
     private final MonsterTypeRepository monsterTypeRepository;
     private final GameWorldService gameWorldService;
     private final PartyRepository partyRepository;
@@ -40,7 +37,6 @@ public class PersistenceManager {
     public PersistenceManager(
             final PlayerCharacterRepository playerCharacterRepository,
             final NonPlayerCharacterRepository nonPlayerCharacterRepository,
-            final RoomRepository roomRepository,
             final MonsterTypeRepository monsterTypeRepository,
             final GameWorldService gameWorldService,
             final PartyRepository partyRepository,
@@ -48,7 +44,6 @@ public class PersistenceManager {
     ) {
         this.playerCharacterRepository = playerCharacterRepository;
         this.nonPlayerCharacterRepository = nonPlayerCharacterRepository;
-        this.roomRepository = roomRepository;
         this.monsterTypeRepository = monsterTypeRepository;
         this.gameWorldService = gameWorldService;
         this.partyRepository = partyRepository;
@@ -59,9 +54,6 @@ public class PersistenceManager {
     @Transactional(readOnly = true)
     public void loadGameState() {
         // 서버 시작시 DB에서 메모리로 로드
-        Iterable<Room> rooms = roomRepository.findAll();
-        gameWorldService.loadRooms(rooms);
-
         Iterable<PlayerCharacter> players = playerCharacterRepository.findAll();
         gameWorldService.loadPlayers(players);
 
