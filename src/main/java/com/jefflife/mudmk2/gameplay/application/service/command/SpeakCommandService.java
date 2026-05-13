@@ -4,7 +4,9 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.SpeakUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
@@ -23,13 +25,16 @@ public class SpeakCommandService implements SpeakUseCase {
     private static final Logger logger = LoggerFactory.getLogger(SpeakCommandService.class);
 
     private final GameWorldService gameWorldService;
+    private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public SpeakCommandService(
             final GameWorldService gameWorldService,
+            final ActivePlayerRepository players,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
         this.gameWorldService = gameWorldService;
+        this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
@@ -88,7 +93,8 @@ public class SpeakCommandService implements SpeakUseCase {
     }
 
     private PlayerCharacter getSpeaker(Long userId) {
-        return gameWorldService.getPlayerByUserId(userId);
+        return players.findByUserId(userId)
+                .orElseThrow(() -> new PlayerNotFoundException(userId));
     }
 
     private boolean isInSameRoom(Long targetRoomId, Long speakerRoomId) {

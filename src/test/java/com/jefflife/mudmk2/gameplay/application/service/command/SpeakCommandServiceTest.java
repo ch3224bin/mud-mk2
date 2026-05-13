@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service.command;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,14 +30,16 @@ class SpeakCommandServiceTest {
     private static final String MESSAGE = "안녕하세요";
 
     private FakeGameWorldService gameWorldService;
+    private FakeActivePlayerRepository players;
     private FakeMessageSender messageSender;
     private SpeakCommandService speakCommandService;
 
     @BeforeEach
     void setUp() {
         gameWorldService = new FakeGameWorldService();
+        players = new FakeActivePlayerRepository();
         messageSender = new FakeMessageSender();
-        speakCommandService = new SpeakCommandService(gameWorldService, messageSender);
+        speakCommandService = new SpeakCommandService(gameWorldService, players, messageSender);
     }
 
     @Nested
@@ -54,8 +58,10 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
             FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
 
-            gameWorldService.addPlayer(player);
-            gameWorldService.addPlayer(otherPlayer);
+            players.addPlayer(player);
+            gameWorldService.indexPlayer(player);
+            players.addPlayer(otherPlayer);
+            gameWorldService.indexPlayer(otherPlayer);
 
             SpeakCommand command = new SpeakCommand(USER_ID, null, MESSAGE);
 
@@ -88,8 +94,10 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
             FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID);
 
-            gameWorldService.addPlayer(player);
-            gameWorldService.addPlayer(otherPlayer);
+            players.addPlayer(player);
+            gameWorldService.indexPlayer(player);
+            players.addPlayer(otherPlayer);
+            gameWorldService.indexPlayer(otherPlayer);
             gameWorldService.addNpc(npc);
 
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
@@ -122,8 +130,10 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
             FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
 
-            gameWorldService.addPlayer(player);
-            gameWorldService.addPlayer(otherPlayer);
+            players.addPlayer(player);
+            gameWorldService.indexPlayer(player);
+            players.addPlayer(otherPlayer);
+            gameWorldService.indexPlayer(otherPlayer);
 
             SpeakCommand command = new SpeakCommand(USER_ID, OTHER_PLAYER_NAME, MESSAGE);
 
@@ -155,7 +165,8 @@ class SpeakCommandServiceTest {
             String targetName = "존재하지않는타겟";
             FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
 
-            gameWorldService.addPlayer(player);
+            players.addPlayer(player);
+            gameWorldService.indexPlayer(player);
 
             SpeakCommand command = new SpeakCommand(USER_ID, targetName, MESSAGE);
 
@@ -179,7 +190,8 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
             FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID + 1); // 다른 방
 
-            gameWorldService.addPlayer(player);
+            players.addPlayer(player);
+            gameWorldService.indexPlayer(player);
             gameWorldService.addNpc(npc);
 
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
@@ -204,24 +216,17 @@ class SpeakCommandServiceTest {
             super(event -> {});
         }
 
-        private final Map<Long, PlayerCharacter> playersByUserId = new HashMap<>();
         private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
         private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
         private final Map<String, PlayerCharacter> playersByName = new HashMap<>();
 
-        public void addPlayer(PlayerCharacter player) {
-            playersByUserId.put(player.getUserId(), player);
+        public void indexPlayer(PlayerCharacter player) {
             playersByRoomId.computeIfAbsent(player.getCurrentRoomId(), k -> new ArrayList<>()).add(player);
             playersByName.put(player.getName(), player);
         }
 
         public void addNpc(NonPlayerCharacter npc) {
             npcsByName.put(npc.getName(), npc);
-        }
-
-        @Override
-        public PlayerCharacter getPlayerByUserId(Long userId) {
-            return playersByUserId.get(userId);
         }
 
         @Override
@@ -237,6 +242,43 @@ class SpeakCommandServiceTest {
         @Override
         public List<PlayerCharacter> getPlayersInRoom(Long roomId) {
             return playersByRoomId.getOrDefault(roomId, Collections.emptyList());
+        }
+    }
+
+    // Fake implementation of ActivePlayerRepository
+    static class FakeActivePlayerRepository implements ActivePlayerRepository {
+        private final Map<Long, PlayerCharacter> byUserId = new HashMap<>();
+        private final Map<UUID, PlayerCharacter> byId = new HashMap<>();
+
+        public void addPlayer(PlayerCharacter player) {
+            byUserId.put(player.getUserId(), player);
+            byId.put(player.getId(), player);
+        }
+
+        @Override
+        public Optional<PlayerCharacter> findById(UUID id) {
+            return Optional.ofNullable(byId.get(id));
+        }
+
+        @Override
+        public Optional<PlayerCharacter> findByUserId(Long userId) {
+            return Optional.ofNullable(byUserId.get(userId));
+        }
+
+        @Override
+        public Iterable<PlayerCharacter> findAll() {
+            return byUserId.values();
+        }
+
+        @Override
+        public void add(PlayerCharacter player) {
+            addPlayer(player);
+        }
+
+        @Override
+        public void removeByUserId(Long userId) {
+            PlayerCharacter p = byUserId.remove(userId);
+            if (p != null) byId.remove(p.getId());
         }
     }
 
