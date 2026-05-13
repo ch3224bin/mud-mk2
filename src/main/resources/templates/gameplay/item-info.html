@@ -1,0 +1,47 @@
+<div th:fragment="itemInfo" class="item-info font-terminal">
+    <div class="msg-room-title" th:text="${'[ ' + name + ' ]'}"></div>
+    <div th:if="${description != null and not #strings.isEmpty(description)}"
+         class="msg-room-desc" th:utext="${description}"></div>
+    <div class="line">
+        <span class="label">위치: </span><span th:text="${location}"></span>
+        &nbsp;&nbsp;
+        <span class="label">타입: </span><span th:text="${typeLabel}"></span>
+    </div>
+    <div class="line">
+        <span class="label">무게: </span><span th:text="${weight + 'kg'}"></span>
+    </div>
+    <div th:if="${stackable and quantity > 1}" class="line">
+        <span class="label">수량: </span><span th:text="${quantity}"></span>
+    </div>
+
+    <div th:if="${hasRecovery}">
+        <div class="line-spacer"></div>
+        <div class="msg-room-title">회복 효과</div>
+        <div th:if="${hpRecovery > 0}" class="line">- HP +<span th:text="${hpRecovery}"></span></div>
+        <div th:if="${mpRecovery > 0}" class="line">- MP +<span th:text="${mpRecovery}"></span></div>
+        <div th:if="${apRecovery > 0}" class="line">- AP +<span th:text="${apRecovery}"></span></div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(statModifiers)}">
+        <div class="line-spacer"></div>
+        <div class="msg-room-title">스탯</div>
+        <div class="line" th:each="sm : ${statModifiers}">
+            - <span th:text="${sm.label}"></span>
+            <span th:text="${(sm.value >= 0 ? '+' : '') + sm.value}"></span>
+        </div>
+    </div>
+
+    <div th:if="${skillRef != null and not #strings.isEmpty(skillRef)}">
+        <div class="line-spacer"></div>
+        <div class="line">
+            <span class="label">스킬: </span><span th:text="${skillRef}"></span>
+        </div>
+    </div>
+
+    <div th:if="${missionInfo != null and not #strings.isEmpty(missionInfo)}">
+        <div class="line-spacer"></div>
+        <div class="line">
+            <span class="label">미션 대상: </span><span th:text="${missionInfo}"></span>
+        </div>
+    </div>
+</div>
