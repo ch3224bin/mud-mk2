@@ -39,7 +39,7 @@ class LookCommandServiceTest {
         @DisplayName("should call displayRoomInfo when target is null")
         void shouldCallDisplayRoomInfoWhenTargetIsNull() {
             // Given
-            LookCommand command = new LookCommand(userId, null);
+            LookCommand command = new LookCommand(userId, null, 0);
 
             // When
             lookCommandService.look(command);
@@ -52,7 +52,7 @@ class LookCommandServiceTest {
         @DisplayName("should call displayRoomInfo when target is empty")
         void shouldCallDisplayRoomInfoWhenTargetIsEmpty() {
             // Given
-            LookCommand command = new LookCommand(userId, "");
+            LookCommand command = new LookCommand(userId, "", 0);
 
             // When
             lookCommandService.look(command);
@@ -65,7 +65,7 @@ class LookCommandServiceTest {
         @DisplayName("should not call displayRoomInfo when target is specified")
         void shouldNotCallDisplayRoomInfoWhenTargetIsSpecified() {
             // Given
-            LookCommand command = new LookCommand(userId, "도토리");
+            LookCommand command = new LookCommand(userId, "도토리", 1);
 
             // When
             lookCommandService.look(command);
