@@ -1,9 +1,10 @@
 package com.jefflife.mudmk2.gameplay.application.service.event;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
-import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.event.PlayerMoveEvent;
+import com.jefflife.mudmk2.gameplay.application.service.NpcLocationService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveNpcRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
@@ -25,15 +26,21 @@ public class PartyMemberMoveListener {
 
     private final GameWorldService gameWorldService;
     private final ActivePlayerRepository players;
+    private final ActiveNpcRepository npcs;
+    private final NpcLocationService npcLocations;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public PartyMemberMoveListener(
             GameWorldService gameWorldService,
             ActivePlayerRepository players,
+            ActiveNpcRepository npcs,
+            NpcLocationService npcLocations,
             SendMessageToUserPort sendMessageToUserPort
     ) {
         this.gameWorldService = gameWorldService;
         this.players = players;
+        this.npcs = npcs;
+        this.npcLocations = npcLocations;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
@@ -60,19 +67,12 @@ public class PartyMemberMoveListener {
                 continue; // 리더 자신은 건너뜀
             }
 
-            // NPC인지 확인 (캐릭터 ID가 NPC의 ID와 일치하는지 확인)
-            NonPlayerCharacter npc = gameWorldService.getNpcById(memberId);
-            if (npc != null) {
-                // NPC를 이동시키는 로직
-                Long npcRoomId = npc.getCurrentRoomId();
-                if (!npcRoomId.equals(toRoomId)) {
-                    // NPC 이동 로직 (여기서는 단순히 방 ID 변경만 수행)
-                    gameWorldService.moveNpcToRoom(npc.getId(), toRoomId);
-
-                    // 로그 추가
+            // NPC인지 확인하고 리더를 따라가게 함
+            npcs.findById(memberId).ifPresent(npc -> {
+                if (!npc.getCurrentRoomId().equals(toRoomId)) {
+                    npcLocations.move(npc.getId(), toRoomId);
                     logger.info("NPC {} followed leader {} to room {}", npc.getName(), characterId, toRoomId);
 
-                    // 파티 리더에게 메시지 전송 (실제 플레이어 ID 조회 필요)
                     String message = npc.getName() + "이(가) 당신을 따라옵니다.";
                     players.findById(characterId)
                             .map(PlayerCharacter::getUserId)
@@ -81,7 +81,7 @@ public class PartyMemberMoveListener {
                                     () -> logger.warn("Failed to send follow message to leader: player not found for characterId={}", characterId)
                             );
                 }
-            }
+            });
         }
     }
 }
