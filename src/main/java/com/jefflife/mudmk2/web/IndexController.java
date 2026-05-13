@@ -127,4 +127,24 @@ public class IndexController {
         }
         return "web/simulation-management";
     }
+
+    @GetMapping("/item-template-management")
+    public String itemTemplateManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/item-template-management";
+    }
+
+    @GetMapping("/item-instance-management")
+    public String itemInstanceManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/item-instance-management";
+    }
 }
