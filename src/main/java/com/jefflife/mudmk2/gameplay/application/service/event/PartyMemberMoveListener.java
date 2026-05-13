@@ -2,8 +2,10 @@ package com.jefflife.mudmk2.gameplay.application.service.event;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.event.PlayerMoveEvent;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +24,16 @@ public class PartyMemberMoveListener {
     private static final Logger logger = LoggerFactory.getLogger(PartyMemberMoveListener.class);
 
     private final GameWorldService gameWorldService;
+    private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public PartyMemberMoveListener(
             GameWorldService gameWorldService,
+            ActivePlayerRepository players,
             SendMessageToUserPort sendMessageToUserPort
     ) {
         this.gameWorldService = gameWorldService;
+        this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
@@ -69,12 +74,12 @@ public class PartyMemberMoveListener {
 
                     // 파티 리더에게 메시지 전송 (실제 플레이어 ID 조회 필요)
                     String message = npc.getName() + "이(가) 당신을 따라옵니다.";
-                    try {
-                        Long userId = gameWorldService.getUserIdByCharacterId(characterId);
-                        sendMessageToUserPort.messageToUser(userId, message);
-                    } catch (Exception e) {
-                        logger.warn("Failed to send follow message to leader: {}", e.getMessage());
-                    }
+                    players.findById(characterId)
+                            .map(PlayerCharacter::getUserId)
+                            .ifPresentOrElse(
+                                    userId -> sendMessageToUserPort.messageToUser(userId, message),
+                                    () -> logger.warn("Failed to send follow message to leader: player not found for characterId={}", characterId)
+                            );
                 }
             }
         }
