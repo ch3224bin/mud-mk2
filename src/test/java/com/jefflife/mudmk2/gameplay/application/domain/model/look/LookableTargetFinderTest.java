@@ -5,18 +5,22 @@ import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.DirectionLookable;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.Lookable;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.LookableTargetFinder;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-record LookableTargetFinderTest(LookableTargetFinder targetFinder, GameWorldService gameWorldService) {
+record LookableTargetFinderTest(
+        LookableTargetFinder targetFinder,
+        GameWorldService gameWorldService,
+        ActiveRoomRepository rooms
+) {
 
     private static final Long TEST_USER_ID = 99999L;
     private static final Long TEST_ROOM_ID = 99001L;
@@ -27,15 +31,16 @@ record LookableTargetFinderTest(LookableTargetFinder targetFinder, GameWorldServ
         GameTestFixture.DirectionTestSetup setup = GameTestFixture.createDirectionTestSetup(
                 TEST_USER_ID, TEST_ROOM_ID, TEST_NEXT_ROOM_ID
         );
-        gameWorldService.loadRooms(List.of(setup.currentRoom(), setup.nextRoom()));
+        rooms.add(setup.currentRoom());
+        rooms.add(setup.nextRoom());
         gameWorldService.addPlayer(setup.player());
     }
 
     @AfterEach
     void tearDown() {
         gameWorldService.removePlayer(TEST_USER_ID);
-        gameWorldService.removeRoom(TEST_ROOM_ID);
-        gameWorldService.removeRoom(TEST_NEXT_ROOM_ID);
+        rooms.remove(TEST_ROOM_ID);
+        rooms.remove(TEST_NEXT_ROOM_ID);
     }
 
     @Test

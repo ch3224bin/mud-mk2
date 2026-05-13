@@ -8,6 +8,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ class DirectionSearchStrategyTest {
 
     @Mock
     private GameWorldService gameWorldService;
+
+    @Mock
+    private ActiveRoomRepository rooms;
 
     @InjectMocks
     private DirectionSearchStrategy directionSearchStrategy;
@@ -51,7 +55,7 @@ class DirectionSearchStrategyTest {
     void search_ValidDirectionWithExistingRoom_ReturnsDirectionLookable() {
         // Arrange
         when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
-        when(gameWorldService.getRoom(roomId)).thenReturn(currentRoom);
+        when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         // Act
         Optional<Lookable> result = directionSearchStrategy.search(userId, "동", 1);
@@ -69,7 +73,7 @@ class DirectionSearchStrategyTest {
     void search_ValidDirectionWithNoRoom_ReturnsEmptyOptional() {
         // Arrange
         when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
-        when(gameWorldService.getRoom(roomId)).thenReturn(currentRoom);
+        when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         // Act - Try to go NORTH where there's no room
         Optional<Lookable> result = directionSearchStrategy.search(userId, "북", 1);

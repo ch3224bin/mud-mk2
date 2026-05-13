@@ -3,7 +3,9 @@ package com.jefflife.mudmk2.gameplay.application.service.command.look;
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,9 +16,11 @@ import java.util.Optional;
 public class ItemSearchStrategy implements TargetSearchStrategy {
 
     private final GameWorldService gameWorldService;
+    private final ActiveRoomRepository rooms;
 
-    public ItemSearchStrategy(GameWorldService gameWorldService) {
+    public ItemSearchStrategy(GameWorldService gameWorldService, ActiveRoomRepository rooms) {
         this.gameWorldService = gameWorldService;
+        this.rooms = rooms;
     }
 
     @Override
@@ -26,7 +30,9 @@ public class ItemSearchStrategy implements TargetSearchStrategy {
         }
 
         PlayerCharacter player = gameWorldService.getPlayerByUserId(userId);
-        Room currentRoom = gameWorldService.getRoom(player.getCurrentRoomId());
+        Long currentRoomId = player.getCurrentRoomId();
+        Room currentRoom = rooms.findById(currentRoomId)
+                .orElseThrow(() -> new RoomNotFoundException(currentRoomId));
 
         List<MatchedItem> matches = new ArrayList<>();
         for (ItemInstance item : currentRoom.findFloorItemsByName(targetName)) {
