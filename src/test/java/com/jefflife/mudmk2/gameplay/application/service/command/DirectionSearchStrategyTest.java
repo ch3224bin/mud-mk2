@@ -7,7 +7,7 @@ import com.jefflife.mudmk2.gameplay.application.service.command.look.Lookable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class DirectionSearchStrategyTest {
 
     @Mock
-    private GameWorldService gameWorldService;
+    private ActivePlayerRepository players;
 
     @Mock
     private ActiveRoomRepository rooms;
@@ -54,7 +54,7 @@ class DirectionSearchStrategyTest {
     @DisplayName("유효한 방향과 존재하는 방이 주어졌을 때 DirectionLookable을 반환한다")
     void search_ValidDirectionWithExistingRoom_ReturnsDirectionLookable() {
         // Arrange
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         // Act
@@ -72,7 +72,7 @@ class DirectionSearchStrategyTest {
     @DisplayName("유효한 방향이지만 연결된 방이 없을 때 빈 Optional을 반환한다")
     void search_ValidDirectionWithNoRoom_ReturnsEmptyOptional() {
         // Arrange
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         // Act - Try to go NORTH where there's no room

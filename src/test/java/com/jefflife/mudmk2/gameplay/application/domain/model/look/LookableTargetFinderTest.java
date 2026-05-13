@@ -1,10 +1,10 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.look;
 
 import com.jefflife.mudmk2.common.fixture.GameTestFixture;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.DirectionLookable;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.Lookable;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.LookableTargetFinder;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 record LookableTargetFinderTest(
         LookableTargetFinder targetFinder,
-        GameWorldService gameWorldService,
+        ActivePlayerRepository players,
         ActiveRoomRepository rooms
 ) {
 
@@ -33,12 +33,12 @@ record LookableTargetFinderTest(
         );
         rooms.add(setup.currentRoom());
         rooms.add(setup.nextRoom());
-        gameWorldService.addPlayer(setup.player());
+        players.add(setup.player());
     }
 
     @AfterEach
     void tearDown() {
-        gameWorldService.removePlayer(TEST_USER_ID);
+        players.removeByUserId(TEST_USER_ID);
         rooms.remove(TEST_ROOM_ID);
         rooms.remove(TEST_NEXT_ROOM_ID);
     }

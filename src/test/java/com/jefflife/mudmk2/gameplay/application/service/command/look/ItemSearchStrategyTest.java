@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.common.fixture.GameTestFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class ItemSearchStrategyTest {
 
     @Mock
-    private GameWorldService gameWorldService;
+    private ActivePlayerRepository players;
 
     @Mock
     private ActiveRoomRepository rooms;
@@ -41,7 +41,7 @@ class ItemSearchStrategyTest {
 
     @BeforeEach
     void setUp() {
-        strategy = new ItemSearchStrategy(gameWorldService, rooms);
+        strategy = new ItemSearchStrategy(players, rooms);
         player = GameTestFixture.createTestPlayer(userId, roomId);
         currentRoom = GameTestFixture.createTestRoom(roomId, "테스트 방", "요약", "설명");
         manduTemplate = FoodTemplate.builder()
@@ -63,7 +63,7 @@ class ItemSearchStrategyTest {
     void search_floorOnly_returnsRoomItem() {
         currentRoom.addFloorItem(new ItemInstance(manduTemplate, 1));
 
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         Optional<Lookable> result = strategy.search(userId, "만두", 1);
@@ -79,7 +79,7 @@ class ItemSearchStrategyTest {
     void search_inventoryOnly_returnsInventoryItem() {
         player.getInventory().addItem(new ItemInstance(appleTemplate, 1));
 
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         Optional<Lookable> result = strategy.search(userId, "사과", 1);
@@ -98,7 +98,7 @@ class ItemSearchStrategyTest {
         ItemInstance inventoryMandu = new ItemInstance(manduTemplate, 1);
         inv.addItem(inventoryMandu);
 
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         Optional<Lookable> first = strategy.search(userId, "만두", 1);
@@ -113,7 +113,7 @@ class ItemSearchStrategyTest {
     @Test
     @DisplayName("매치 없으면 empty")
     void search_noMatch_empty() {
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         Optional<Lookable> result = strategy.search(userId, "없는것", 1);
@@ -125,7 +125,7 @@ class ItemSearchStrategyTest {
     void search_indexOutOfRange_empty() {
         currentRoom.addFloorItem(new ItemInstance(manduTemplate, 1));
 
-        when(gameWorldService.getPlayerByUserId(userId)).thenReturn(player);
+        when(players.findByUserId(userId)).thenReturn(Optional.of(player));
         when(rooms.findById(roomId)).thenReturn(Optional.of(currentRoom));
 
         Optional<Lookable> result = strategy.search(userId, "만두", 2);
