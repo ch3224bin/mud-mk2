@@ -6,7 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.TakeCommand;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class TakeCommandServiceTest {
 
     @Mock
-    private GameWorldService gameWorldService;
+    private ActivePlayerRepository players;
 
     @Mock
     private ActiveRoomRepository rooms;
@@ -39,7 +39,7 @@ class TakeCommandServiceTest {
     private PlayerCharacter stubPlayer(Room room) {
         PlayerCharacter player = mock(PlayerCharacter.class);
         when(player.getCurrentRoomId()).thenReturn(100L);
-        when(gameWorldService.getPlayerByUserId(1L)).thenReturn(player);
+        when(players.findByUserId(1L)).thenReturn(Optional.of(player));
         when(rooms.findById(100L)).thenReturn(Optional.of(room));
         return player;
     }
@@ -49,7 +49,7 @@ class TakeCommandServiceTest {
         takeCommandService.take(new TakeCommand(1L, "철검", 0));
 
         verify(sendMessageToUserPort).messageToUser(eq(1L), contains("올바른 번호"));
-        verifyNoInteractions(gameWorldService);
+        verifyNoInteractions(players);
     }
 
     @Test
