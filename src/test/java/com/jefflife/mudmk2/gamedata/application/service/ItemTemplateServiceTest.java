@@ -95,9 +95,40 @@ class ItemTemplateServiceTest {
 
     @Test
     void delete_whenNotFound_shouldThrowNoSuchElementException() {
-        when(itemTemplateRepository.existsById(999L)).thenReturn(false);
+        when(itemTemplateRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(999L))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void update_food_shouldCallUpdateOnTemplate() {
+        FoodTemplate existing = FoodTemplate.builder()
+            .name("만두").description("찐만두").weight(1).stackable(true)
+            .hpRecovery(10).mpRecovery(0).apRecovery(5).build();
+        when(itemTemplateRepository.findById(1L)).thenReturn(Optional.of(existing));
+        ItemTemplateRequest updateRequest = new ItemTemplateRequest(
+            ItemType.FOOD, "왕만두", "큰 만두", 2, true,
+            20, 5, 10, null, null, null, null, null, null, null
+        );
+
+        ItemTemplate result = service.update(1L, updateRequest);
+
+        assertThat(result).isSameAs(existing);
+        assertThat(result.getName()).isEqualTo("왕만두");
+        assertThat(((FoodTemplate) result).getHpRecovery()).isEqualTo(20);
+    }
+
+    @Test
+    void update_whenNotFound_shouldThrowNoSuchElementException() {
+        when(itemTemplateRepository.findById(999L)).thenReturn(Optional.empty());
+
+        ItemTemplateRequest request = new ItemTemplateRequest(
+            ItemType.FOOD, "만두", "찐만두", 1, true,
+            10, 0, 5, null, null, null, null, null, null, null
+        );
+
+        assertThatThrownBy(() -> service.update(999L, request))
             .isInstanceOf(NoSuchElementException.class);
     }
 }

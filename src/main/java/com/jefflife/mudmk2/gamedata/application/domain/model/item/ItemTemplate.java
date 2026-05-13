@@ -44,4 +44,6 @@ public abstract class ItemTemplate {
         this.weight = weight;
         this.stackable = stackable;
     }
+
+    public abstract void update(com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest request);
 }

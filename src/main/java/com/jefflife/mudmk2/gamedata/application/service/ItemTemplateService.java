@@ -7,7 +7,6 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemTemplateRep
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,9 +29,8 @@ public class ItemTemplateService implements
     @Override
     @Transactional(readOnly = true)
     public List<ItemTemplate> findAll() {
-        List<ItemTemplate> result = new ArrayList<>();
-        itemTemplateRepository.findAll().forEach(result::add);
-        return result;
+        return java.util.stream.StreamSupport.stream(itemTemplateRepository.findAll().spliterator(), false)
+            .toList();
     }
 
     @Override
@@ -58,21 +56,15 @@ public class ItemTemplateService implements
     public ItemTemplate update(Long id, ItemTemplateRequest request) {
         ItemTemplate template = itemTemplateRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("ItemTemplate not found: " + id));
-        if (template instanceof FoodTemplate f) f.update(request);
-        else if (template instanceof WeaponTemplate w) w.update(request);
-        else if (template instanceof EquipmentTemplate e) e.update(request);
-        else if (template instanceof AccessoryTemplate a) a.update(request);
-        else if (template instanceof MartialArtsBookTemplate m) m.update(request);
-        else if (template instanceof MissionItemTemplate mi) mi.update(request);
+        template.update(request);
         return template;
     }
 
     @Override
     public void delete(Long id) {
-        if (!itemTemplateRepository.existsById(id)) {
-            throw new NoSuchElementException("ItemTemplate not found: " + id);
-        }
-        itemTemplateRepository.deleteById(id);
+        ItemTemplate template = itemTemplateRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("ItemTemplate not found: " + id));
+        itemTemplateRepository.delete(template);
     }
 
     private ItemTemplate buildTemplate(ItemTemplateRequest request) {
