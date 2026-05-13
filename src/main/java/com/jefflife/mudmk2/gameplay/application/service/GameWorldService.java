@@ -6,6 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.event.PartyCreatedEvent;
 import com.jefflife.mudmk2.gamedata.application.event.PartyDisbandedEvent;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,54 +16,26 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class GameWorldService {
     private final static Logger logger = LoggerFactory.getLogger(GameWorldService.class);
 
     private final ApplicationEventPublisher eventPublisher;
+    private final ActivePlayerRepository players;
 
-    public GameWorldService(final ApplicationEventPublisher eventPublisher) {
+    public GameWorldService(
+            final ApplicationEventPublisher eventPublisher,
+            final ActivePlayerRepository players
+    ) {
         this.eventPublisher = eventPublisher;
+        this.players = players;
     }
 
-    private final Map<UUID, PlayerCharacter> activePlayers = new ConcurrentHashMap<>();
-    private final Map<Long, PlayerCharacter> activePlayersByUserId = new ConcurrentHashMap<>();
     private final Map<UUID, NonPlayerCharacter> activeNpcs = new ConcurrentHashMap<>();
     private final Map<UUID, Monster> activeMonsters = new ConcurrentHashMap<>(); // Monster ID(UUID) -> Monster
     private final Map<UUID, Party> parties = new ConcurrentHashMap<>();
-
-    public void loadPlayers(final Iterable<PlayerCharacter> players) {
-        players.forEach(playerCharacter -> {
-            playerCharacter.initializeAssociatedEntities(); // PlayerCharacter 객체 내부에서 연관 객체 초기화
-            activePlayers.put(playerCharacter.getId(), playerCharacter);
-            activePlayersByUserId.put(playerCharacter.getUserId(), playerCharacter);
-        });
-        logger.info("Loaded {} players", this.activePlayers.size());
-    }
-
-    /**
-     * 새로 생성된 플레이어 캐릭터를 인메모리 캐시에 추가합니다.
-     * @param playerCharacter 추가할 플레이어 캐릭터
-     */
-    public void addPlayer(final PlayerCharacter playerCharacter) {
-        activePlayers.put(playerCharacter.getId(), playerCharacter);
-        activePlayersByUserId.put(playerCharacter.getUserId(), playerCharacter);
-        logger.debug("Player added to game world: {} (ID: {}, User ID: {})",
-                playerCharacter.getNickname(), playerCharacter.getId(), playerCharacter.getUserId());
-    }
-
-    /**
-     * 플레이어 캐릭터를 인메모리 캐시에서 제거합니다.
-     * @param userId 제거할 플레이어의 사용자 ID
-     */
-    public void removePlayer(final Long userId) {
-        PlayerCharacter player = activePlayersByUserId.remove(userId);
-        if (player != null) {
-            activePlayers.remove(player.getId());
-            logger.debug("Player removed from game world: userId={}", userId);
-        }
-    }
 
     /**
      * 게임에 NPC를 로드합니다.
@@ -195,22 +168,11 @@ public class GameWorldService {
      * @param roomId 방 ID
      * @return 방에 있는 플레이어 캐릭터 목록
      */
+    // TODO(phase6): RoomOccupancyQuery.playersIn(roomId)으로 이전 — 위치 기반 조회는 Read Model로 분리
     public List<PlayerCharacter> getPlayersInRoom(Long roomId) {
-        return activePlayers.values().stream()
+        return StreamSupport.stream(players.findAll().spliterator(), false)
                 .filter(pc -> pc.getCurrentRoomId().equals(roomId))
                 .collect(Collectors.toList());
-    }
-
-    public PlayerCharacter getPlayerByUserId(Long userId) {
-        final PlayerCharacter playerCharacter = activePlayersByUserId.get(userId);
-        if (playerCharacter == null) {
-            throw new IllegalArgumentException("Player character not found for user ID: " + userId);
-        }
-        return playerCharacter;
-    }
-
-    public Iterable<PlayerCharacter> getActivePlayers() {
-        return activePlayers.values();
     }
 
     /**
@@ -260,19 +222,6 @@ public class GameWorldService {
         }
     }
 
-    /**
-     * 캐릭터 ID로 사용자 ID를 찾습니다.
-     * @param characterId 캐릭터 ID
-     * @return 사용자 ID
-     */
-    public Long getUserIdByCharacterId(UUID characterId) {
-        PlayerCharacter pc = activePlayers.get(characterId);
-        if (pc == null) {
-            throw new IllegalArgumentException("Character not found for ID: " + characterId);
-        }
-        return pc.getUserId();
-    }
-
     public boolean isInParty(UUID characterId) {
         return parties.values()
                 .stream()
@@ -307,19 +256,11 @@ public class GameWorldService {
                 .findFirst();
     }
 
+    // TODO(phase6): CreatureLookupQuery.findPlayerByName(name)으로 이전 — 이름 기반 조회는 Read Model로 분리
     public PlayerCharacter getPlayerByName(String name) {
-        return activePlayers.values().stream()
+        return StreamSupport.stream(players.findAll().spliterator(), false)
                 .filter(playerCharacter -> StringUtils.equalsIgnoreCase(playerCharacter.getName(), name))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * ID로 플레이어를 찾습니다.
-     * @param characterId 플레이어 캐릭터 ID
-     * @return 찾은 플레이어, 없으면 empty Optional
-     */
-    public Optional<PlayerCharacter> getPlayerById(UUID characterId) {
-        return Optional.ofNullable(activePlayers.get(characterId));
     }
 }

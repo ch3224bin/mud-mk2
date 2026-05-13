@@ -213,7 +213,7 @@ class SpeakCommandServiceTest {
     // Fake implementation of GameWorldService
     static class FakeGameWorldService extends GameWorldService {
         public FakeGameWorldService() {
-            super(event -> {});
+            super(event -> {}, new FakeActivePlayerRepository());
         }
 
         private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
