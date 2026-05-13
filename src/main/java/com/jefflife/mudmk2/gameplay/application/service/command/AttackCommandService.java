@@ -4,7 +4,9 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.AttackCommand;
+import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.AttackUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.CombatService;
 import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
@@ -20,18 +22,26 @@ public class AttackCommandService implements AttackUseCase {
     private static final Logger logger = LoggerFactory.getLogger(AttackCommandService.class);
 
     private final GameWorldService gameWorldService;
+    private final ActivePlayerRepository players;
     private final CombatService combatService;
     private final SendMessageToUserPort sendMessageToUserPort;
 
-    public AttackCommandService(final GameWorldService gameWorldService, final CombatService combatService, final SendMessageToUserPort sendMessageToUserPort) {
+    public AttackCommandService(
+            final GameWorldService gameWorldService,
+            final ActivePlayerRepository players,
+            final CombatService combatService,
+            final SendMessageToUserPort sendMessageToUserPort
+    ) {
         this.gameWorldService = gameWorldService;
+        this.players = players;
         this.combatService = combatService;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
     public void attack(final AttackCommand command) {
-        PlayerCharacter player = gameWorldService.getPlayerByUserId(command.userId());
+        PlayerCharacter player = players.findByUserId(command.userId())
+                .orElseThrow(() -> new PlayerNotFoundException(command.userId()));
         Long playerRoomId = player.getCurrentRoomId();
 
         Statable target = getMonsterInRoom(command, playerRoomId);

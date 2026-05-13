@@ -2,8 +2,10 @@ package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
+import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.CreatureInfo;
@@ -21,26 +23,25 @@ public class RoomInfoService implements RoomDescriber {
 
     private final GameWorldService gameWorldService;
     private final ActiveRoomRepository rooms;
+    private final ActivePlayerRepository players;
     private final SendRoomInfoMessagePort sendRoomInfoMessagePort;
 
     public RoomInfoService(
             final GameWorldService gameWorldService,
             final ActiveRoomRepository rooms,
+            final ActivePlayerRepository players,
             final SendRoomInfoMessagePort sendRoomInfoMessagePort
     ) {
         this.gameWorldService = gameWorldService;
         this.rooms = rooms;
+        this.players = players;
         this.sendRoomInfoMessagePort = sendRoomInfoMessagePort;
     }
 
     @Override
     public void describe(Long userId) {
-        final PlayerCharacter character = gameWorldService.getPlayerByUserId(userId);
-
-        if (character == null) {
-            logger.info("Player character not found for user {}. Room info will not be displayed.", userId);
-            return;
-        }
+        final PlayerCharacter character = players.findByUserId(userId)
+                .orElseThrow(() -> new PlayerNotFoundException(userId));
 
         final Room currentRoom = rooms.findById(character.getCurrentRoomId())
                 .orElseThrow(() -> new RoomNotFoundException(character.getCurrentRoomId()));
