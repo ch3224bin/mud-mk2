@@ -29,15 +29,11 @@ public class ItemSearchStrategy implements TargetSearchStrategy {
         Room currentRoom = gameWorldService.getRoom(player.getCurrentRoomId());
 
         List<MatchedItem> matches = new ArrayList<>();
-        for (ItemInstance item : currentRoom.getFloorItems()) {
-            if (item.getTemplate().getName().equals(targetName)) {
-                matches.add(new MatchedItem(item, ItemLookable.ItemLocation.ROOM));
-            }
+        for (ItemInstance item : currentRoom.findFloorItemsByName(targetName)) {
+            matches.add(new MatchedItem(item, ItemLookable.ItemLocation.ROOM));
         }
-        for (ItemInstance item : player.getInventory().getItems()) {
-            if (item.getTemplate().getName().equals(targetName)) {
-                matches.add(new MatchedItem(item, ItemLookable.ItemLocation.INVENTORY));
-            }
+        for (ItemInstance item : player.getInventory().findItemsByName(targetName)) {
+            matches.add(new MatchedItem(item, ItemLookable.ItemLocation.INVENTORY));
         }
 
         if (index > matches.size()) {
