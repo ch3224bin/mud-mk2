@@ -74,6 +74,10 @@ public class NonPlayerCharacter implements Combatable, Statable {
         return baseCharacterInfo.getRoomId();
     }
 
+    public void moveTo(final Long roomId) {
+        baseCharacterInfo.moveTo(roomId);
+    }
+
     @Override
     public CharacterStats getStats() {
         return this.baseCharacterInfo.getStats();

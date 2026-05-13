@@ -53,6 +53,13 @@ public class BaseCharacter {
         this.roomId = roomId;
     }
 
+    public void moveTo(final Long roomId) {
+        if (roomId == null) {
+            throw new IllegalArgumentException("roomId must not be null");
+        }
+        this.roomId = roomId;
+    }
+
     public CharacterStats getStats() {
         return new CharacterStats(
                 hp, mp, ap,
