@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,5 +25,11 @@ public class MissionItemTemplate extends ItemTemplate {
         super(name, description, weight, ItemType.MISSION, stackable);
         this.missionItemType = missionItemType;
         this.targetRef = targetRef;
+    }
+
+    public void update(ItemTemplateRequest request) {
+        updateCommon(request.name(), request.description(), request.weight(), request.stackable());
+        this.missionItemType = request.missionItemType();
+        this.targetRef = request.targetRef();
     }
 }

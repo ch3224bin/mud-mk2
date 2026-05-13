@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -26,5 +27,12 @@ public class FoodTemplate extends ItemTemplate {
         this.hpRecovery = hpRecovery;
         this.mpRecovery = mpRecovery;
         this.apRecovery = apRecovery;
+    }
+
+    public void update(ItemTemplateRequest request) {
+        updateCommon(request.name(), request.description(), request.weight(), request.stackable());
+        this.hpRecovery = request.hpRecovery() != null ? request.hpRecovery() : 0;
+        this.mpRecovery = request.mpRecovery() != null ? request.mpRecovery() : 0;
+        this.apRecovery = request.apRecovery() != null ? request.apRecovery() : 0;
     }
 }

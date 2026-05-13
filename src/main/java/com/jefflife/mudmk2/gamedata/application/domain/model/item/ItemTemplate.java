@@ -37,4 +37,11 @@ public abstract class ItemTemplate {
         this.itemType = itemType;
         this.stackable = stackable;
     }
+
+    protected void updateCommon(String name, String description, int weight, boolean stackable) {
+        this.name = name;
+        this.description = description;
+        this.weight = weight;
+        this.stackable = stackable;
+    }
 }

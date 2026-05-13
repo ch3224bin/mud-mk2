@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -22,5 +23,10 @@ public class MartialArtsBookTemplate extends ItemTemplate {
                                    String skillRef) {
         super(name, description, weight, ItemType.MARTIAL_ARTS_BOOK, stackable);
         this.skillRef = skillRef;
+    }
+
+    public void update(ItemTemplateRequest request) {
+        updateCommon(request.name(), request.description(), request.weight(), request.stackable());
+        this.skillRef = request.skillRef();
     }
 }

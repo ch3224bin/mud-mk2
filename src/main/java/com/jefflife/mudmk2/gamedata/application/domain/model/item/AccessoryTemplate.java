@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,6 +31,15 @@ public class AccessoryTemplate extends ItemTemplate {
         this.accessoryType = accessoryType;
         if (statModifiers != null) {
             this.statModifiers.addAll(statModifiers);
+        }
+    }
+
+    public void update(ItemTemplateRequest request) {
+        updateCommon(request.name(), request.description(), request.weight(), request.stackable());
+        this.accessoryType = request.accessoryType();
+        this.statModifiers.clear();
+        if (request.statModifiers() != null) {
+            request.statModifiers().forEach(sm -> this.statModifiers.add(sm.toDomain()));
         }
     }
 }
