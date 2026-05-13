@@ -72,6 +72,7 @@ class LookCommandServiceTest {
 
             // Then
             verify(roomDescriber, never()).describe(any());
+            verify(lookTargetProcessor).processLookTarget(userId, "도토리", 1);
         }
     }
 }
