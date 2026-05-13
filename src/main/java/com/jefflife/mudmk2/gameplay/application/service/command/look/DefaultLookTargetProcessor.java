@@ -14,8 +14,8 @@ public class DefaultLookTargetProcessor implements LookTargetProcessor {
     private final SendMessageToUserPort sendMessageToUserPort;
     
     @Override
-    public void processLookTarget(Long userId, String targetName) {
-        Optional<Lookable> targetOpt = targetFinder.findTargetInRoom(userId, targetName);
+    public void processLookTarget(Long userId, String targetName, int index) {
+        Optional<Lookable> targetOpt = targetFinder.findTargetInRoom(userId, targetName, index);
         
         if (targetOpt.isEmpty()) {
             sendTargetNotFoundMessage(userId, targetName);

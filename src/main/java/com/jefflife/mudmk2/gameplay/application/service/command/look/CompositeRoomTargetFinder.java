@@ -17,9 +17,9 @@ public class CompositeRoomTargetFinder implements LookableTargetFinder {
     }
 
     @Override
-    public Optional<Lookable> findTargetInRoom(Long userId, String targetName) {
+    public Optional<Lookable> findTargetInRoom(Long userId, String targetName, int index) {
         return searchStrategies.stream()
-                .map(strategy -> strategy.search(userId, targetName))
+                .map(strategy -> strategy.search(userId, targetName, index))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();

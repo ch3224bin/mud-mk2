@@ -40,14 +40,14 @@ record LookableTargetFinderTest(LookableTargetFinder targetFinder, GameWorldServ
 
     @Test
     void findNoTarget() {
-        Optional<Lookable> result = targetFinder.findTargetInRoom(TEST_USER_ID, "없는 것");
+        Optional<Lookable> result = targetFinder.findTargetInRoom(TEST_USER_ID, "없는 것", 1);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void findDirection() {
-        Optional<Lookable> result = targetFinder.findTargetInRoom(TEST_USER_ID, "동");
+        Optional<Lookable> result = targetFinder.findTargetInRoom(TEST_USER_ID, "동", 1);
 
         assertThat(result).isNotEmpty();
         assertThat(result.get()).isInstanceOf(DirectionLookable.class);

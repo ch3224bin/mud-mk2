@@ -54,7 +54,7 @@ class DirectionSearchStrategyTest {
         when(gameWorldService.getRoom(roomId)).thenReturn(currentRoom);
 
         // Act
-        Optional<Lookable> result = directionSearchStrategy.search(userId, "동");
+        Optional<Lookable> result = directionSearchStrategy.search(userId, "동", 1);
 
         // Assert
         assertThat(result).isPresent();
@@ -72,7 +72,7 @@ class DirectionSearchStrategyTest {
         when(gameWorldService.getRoom(roomId)).thenReturn(currentRoom);
 
         // Act - Try to go NORTH where there's no room
-        Optional<Lookable> result = directionSearchStrategy.search(userId, "북");
+        Optional<Lookable> result = directionSearchStrategy.search(userId, "북", 1);
 
         // Assert
         assertThat(result).isEmpty();
@@ -82,7 +82,7 @@ class DirectionSearchStrategyTest {
     @DisplayName("유효하지 않은 방향이 주어졌을 때 빈 Optional을 반환한다")
     void search_InvalidDirection_ReturnsEmptyOptional() {
         // Act
-        Optional<Lookable> result = directionSearchStrategy.search(userId, "invalid");
+        Optional<Lookable> result = directionSearchStrategy.search(userId, "invalid", 1);
 
         // Assert
         assertThat(result).isEmpty();

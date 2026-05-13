@@ -20,7 +20,7 @@ public class DirectionSearchStrategy implements TargetSearchStrategy {
     }
     
     @Override
-    public Optional<Lookable> search(Long userId, String targetName) {
+    public Optional<Lookable> search(Long userId, String targetName, int index) {
         if (!Direction.contains(targetName)) {
             return Optional.empty();
         }

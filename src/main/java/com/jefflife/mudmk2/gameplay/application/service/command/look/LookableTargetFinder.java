@@ -17,5 +17,5 @@ public interface LookableTargetFinder {
      * @param targetName 검색할 대상의 이름
      * @return 검색된 Lookable 객체를 포함하는 Optional 객체. 대상이 없을 경우 비어 있는 Optional을 반환
      */
-    Optional<Lookable> findTargetInRoom(Long userId, String targetName);
+    Optional<Lookable> findTargetInRoom(Long userId, String targetName, int index);
 }

@@ -32,6 +32,6 @@ public class LookCommandService implements LookUseCase {
             return;
         }
 
-        lookTargetProcessor.processLookTarget(command.userId(), command.target());
+        lookTargetProcessor.processLookTarget(command.userId(), command.target(), command.index());
     }
 }
