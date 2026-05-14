@@ -7,7 +7,7 @@ import com.jefflife.mudmk2.gameplay.application.service.NpcLocationService;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveNpcRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.query.PartyMembershipQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -24,20 +24,20 @@ import java.util.UUID;
 public class PartyMemberMoveListener {
     private static final Logger logger = LoggerFactory.getLogger(PartyMemberMoveListener.class);
 
-    private final GameWorldService gameWorldService;
+    private final PartyMembershipQuery partyMembership;
     private final ActivePlayerRepository players;
     private final ActiveNpcRepository npcs;
     private final NpcLocationService npcLocations;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public PartyMemberMoveListener(
-            GameWorldService gameWorldService,
+            PartyMembershipQuery partyMembership,
             ActivePlayerRepository players,
             ActiveNpcRepository npcs,
             NpcLocationService npcLocations,
             SendMessageToUserPort sendMessageToUserPort
     ) {
-        this.gameWorldService = gameWorldService;
+        this.partyMembership = partyMembership;
         this.players = players;
         this.npcs = npcs;
         this.npcLocations = npcLocations;
@@ -51,7 +51,7 @@ public class PartyMemberMoveListener {
         Long toRoomId = event.toRoomId();
 
         // 파티가 있는지 확인하고, 리더인지 확인
-        Optional<Party> partyOpt = gameWorldService.getPartyByPlayerId(characterId);
+        Optional<Party> partyOpt = partyMembership.findByMemberId(characterId);
         if (partyOpt.isEmpty()) {
             return;
         }
