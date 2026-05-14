@@ -6,6 +6,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.combat.*;
+import com.jefflife.mudmk2.gameplay.application.service.query.PartyMembershipQuery;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.tick.TickListener;
@@ -20,16 +21,16 @@ public class CombatService implements TickListener {
 
     private final Map<UUID, ATBCombat> combatMap = new ConcurrentHashMap<>();
 
-    private final GameWorldService gameWorldService;
+    private final PartyMembershipQuery partyMembership;
     private final ActiveRoomRepository rooms;
     private final SendMessageToUserPort sendMessageToUserPort;
     private final CombatNarrativeFormatter narrativeFormatter;
 
-    public CombatService(GameWorldService gameWorldService,
+    public CombatService(PartyMembershipQuery partyMembership,
                          ActiveRoomRepository rooms,
                          SendMessageToUserPort sendMessageToUserPort,
                          CombatNarrativeFormatter narrativeFormatter) {
-        this.gameWorldService = gameWorldService;
+        this.partyMembership = partyMembership;
         this.rooms = rooms;
         this.sendMessageToUserPort = sendMessageToUserPort;
         this.narrativeFormatter = narrativeFormatter;
@@ -55,7 +56,7 @@ public class CombatService implements TickListener {
     public void startCombat(PlayerCharacter attacker, Combatable defender) {
         List<ATBCombatParticipant> participants = new ArrayList<>();
 
-        Party party = gameWorldService.getPartyByPlayerId(attacker.getId()).orElse(null);
+        Party party = partyMembership.findByMemberId(attacker.getId()).orElse(null);
         if (party != null) {
             party.getMembers().getMembers().stream()
                 .filter(m -> m instanceof Combatable)
