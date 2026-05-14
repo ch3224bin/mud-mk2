@@ -9,7 +9,7 @@ import com.jefflife.mudmk2.gameplay.application.service.provided.AttackUseCase;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import com.jefflife.mudmk2.gameplay.application.service.CombatService;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
+import com.jefflife.mudmk2.gameplay.application.service.query.RoomOccupancyQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,18 +21,18 @@ import java.util.List;
 public class AttackCommandService implements AttackUseCase {
     private static final Logger logger = LoggerFactory.getLogger(AttackCommandService.class);
 
-    private final GameWorldService gameWorldService;
+    private final RoomOccupancyQuery roomOccupancy;
     private final ActivePlayerRepository players;
     private final CombatService combatService;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public AttackCommandService(
-            final GameWorldService gameWorldService,
+            final RoomOccupancyQuery roomOccupancy,
             final ActivePlayerRepository players,
             final CombatService combatService,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
-        this.gameWorldService = gameWorldService;
+        this.roomOccupancy = roomOccupancy;
         this.players = players;
         this.combatService = combatService;
         this.sendMessageToUserPort = sendMessageToUserPort;
@@ -66,7 +66,7 @@ public class AttackCommandService implements AttackUseCase {
     }
 
     private Statable getMonsterInRoom(final AttackCommand command, final Long playerRoomId) {
-        return gameWorldService.getMonstersInRoom(playerRoomId)
+        return roomOccupancy.monstersIn(playerRoomId)
                 .stream()
                 .filter(monster -> monster.getName().startsWith(command.target()))
                 .min(sortNormalStateFirst())
@@ -74,7 +74,7 @@ public class AttackCommandService implements AttackUseCase {
     }
 
     private Statable getNpcInRoom(final AttackCommand command, final Long playerRoomId) {
-        return gameWorldService.getNpcsInRoom(playerRoomId)
+        return roomOccupancy.npcsIn(playerRoomId)
                 .stream()
                 .filter(npc -> npc.getName().startsWith(command.target()))
                 .filter(Statable::isAttackableTarget)
@@ -94,7 +94,7 @@ public class AttackCommandService implements AttackUseCase {
     }
 
     private void sendAttackNoticeOtherPlayersInRoom(Long playerRoomId, PlayerCharacter player, Statable target) {
-        List<PlayerCharacter> playersInRoom = gameWorldService.getPlayersInRoom(playerRoomId);
+        List<PlayerCharacter> playersInRoom = roomOccupancy.playersIn(playerRoomId);
         String message = String.format("%s이(가) %s을(를) 공격합니다!", player.getName(), target.getName());
         for (PlayerCharacter playerInRoom : playersInRoom) {
             sendMessageToUserPort.messageToUser(playerInRoom.getUserId(), message);
