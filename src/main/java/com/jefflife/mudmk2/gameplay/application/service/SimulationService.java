@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gameplay.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gameplay.adapter.in.webapi.dto.SimulationSpawnRequest;
 import com.jefflife.mudmk2.gameplay.adapter.in.webapi.dto.SpawnedMonsterResponse;
+import com.jefflife.mudmk2.gameplay.application.service.required.ActiveMonsterRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SimulationService {
 
-    private final GameWorldService gameWorldService;
+    private final ActiveMonsterRepository monsters;
     private final Map<UUID, Monster> spawnedMonsters = new ConcurrentHashMap<>();
 
     @Value("${simulation.room-id:1}")
     private Long simulationRoomId;
 
-    public SimulationService(GameWorldService gameWorldService) {
-        this.gameWorldService = gameWorldService;
+    public SimulationService(ActiveMonsterRepository monsters) {
+        this.monsters = monsters;
     }
 
     public SpawnedMonsterResponse spawn(SimulationSpawnRequest request) {
@@ -36,7 +37,7 @@ public class SimulationService {
             simulationRoomId
         );
         spawnedMonsters.put(monster.getId(), monster);
-        gameWorldService.addMonster(monster);
+        monsters.add(monster);
         return SpawnedMonsterResponse.from(monster);
     }
 
@@ -49,7 +50,7 @@ public class SimulationService {
     public boolean remove(UUID monsterId) {
         Monster removed = spawnedMonsters.remove(monsterId);
         if (removed != null) {
-            gameWorldService.removeMonster(monsterId);
+            monsters.remove(monsterId);
             return true;
         }
         return false;
