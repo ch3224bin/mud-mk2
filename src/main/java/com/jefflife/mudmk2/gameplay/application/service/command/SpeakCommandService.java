@@ -6,15 +6,17 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Statable;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
 import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.SpeakUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.query.CreatureLookupQuery;
+import com.jefflife.mudmk2.gameplay.application.service.query.RoomOccupancyQuery;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service implementation for the SpeakUseCase.
@@ -24,16 +26,19 @@ import java.util.List;
 public class SpeakCommandService implements SpeakUseCase {
     private static final Logger logger = LoggerFactory.getLogger(SpeakCommandService.class);
 
-    private final GameWorldService gameWorldService;
+    private final RoomOccupancyQuery roomOccupancy;
+    private final CreatureLookupQuery creatureLookup;
     private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public SpeakCommandService(
-            final GameWorldService gameWorldService,
+            final RoomOccupancyQuery roomOccupancy,
+            final CreatureLookupQuery creatureLookup,
             final ActivePlayerRepository players,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
-        this.gameWorldService = gameWorldService;
+        this.roomOccupancy = roomOccupancy;
+        this.creatureLookup = creatureLookup;
         this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
@@ -53,7 +58,7 @@ public class SpeakCommandService implements SpeakUseCase {
             }
         }
 
-        List<PlayerCharacter> playersInRoom = gameWorldService.getPlayersInRoom(roomId);
+        List<PlayerCharacter> playersInRoom = roomOccupancy.playersIn(roomId);
         for (PlayerCharacter playerInRoom : playersInRoom) {
             String message = createMessageForPlayer(command, playerInRoom, speaker, speakTarget);
             sendMessageToUser(playerInRoom.getUserId(), message);
@@ -79,14 +84,14 @@ public class SpeakCommandService implements SpeakUseCase {
     }
 
     private Statable findTarget(String target, Long roomId) {
-        PlayerCharacter targetPlayer = gameWorldService.getPlayerByName(target);
-        if (targetPlayer != null && isInSameRoom(targetPlayer.getCurrentRoomId(), roomId)) {
-            return targetPlayer;
+        Optional<PlayerCharacter> targetPlayer = creatureLookup.findPlayerByName(target);
+        if (targetPlayer.isPresent() && isInSameRoom(targetPlayer.get().getCurrentRoomId(), roomId)) {
+            return targetPlayer.get();
         }
 
-        NonPlayerCharacter targetNpc = gameWorldService.getNpcByName(target);
-        if (targetNpc != null && isInSameRoom(targetNpc.getCurrentRoomId(), roomId)) {
-            return targetNpc;
+        Optional<NonPlayerCharacter> targetNpc = creatureLookup.findNpcByName(target);
+        if (targetNpc.isPresent() && isInSameRoom(targetNpc.get().getCurrentRoomId(), roomId)) {
+            return targetNpc.get();
         }
 
         return null;

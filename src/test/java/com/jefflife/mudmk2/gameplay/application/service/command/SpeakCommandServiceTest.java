@@ -5,14 +5,12 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,17 +27,19 @@ class SpeakCommandServiceTest {
     private static final String NPC_NAME = "NPC";
     private static final String MESSAGE = "안녕하세요";
 
-    private FakeGameWorldService gameWorldService;
+    private FakeRoomOccupancyQuery roomOccupancy;
+    private FakeCreatureLookupQuery creatureLookup;
     private FakeActivePlayerRepository players;
     private FakeMessageSender messageSender;
     private SpeakCommandService speakCommandService;
 
     @BeforeEach
     void setUp() {
-        gameWorldService = new FakeGameWorldService();
+        roomOccupancy = new FakeRoomOccupancyQuery();
+        creatureLookup = new FakeCreatureLookupQuery();
         players = new FakeActivePlayerRepository();
         messageSender = new FakeMessageSender();
-        speakCommandService = new SpeakCommandService(gameWorldService, players, messageSender);
+        speakCommandService = new SpeakCommandService(roomOccupancy, creatureLookup, players, messageSender);
     }
 
     @Nested
@@ -59,9 +59,11 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
 
             players.addPlayer(player);
-            gameWorldService.indexPlayer(player);
+            roomOccupancy.indexPlayer(player);
+            creatureLookup.indexPlayer(player);
             players.addPlayer(otherPlayer);
-            gameWorldService.indexPlayer(otherPlayer);
+            roomOccupancy.indexPlayer(otherPlayer);
+            creatureLookup.indexPlayer(otherPlayer);
 
             SpeakCommand command = new SpeakCommand(USER_ID, null, MESSAGE);
 
@@ -95,10 +97,12 @@ class SpeakCommandServiceTest {
             FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID);
 
             players.addPlayer(player);
-            gameWorldService.indexPlayer(player);
+            roomOccupancy.indexPlayer(player);
+            creatureLookup.indexPlayer(player);
             players.addPlayer(otherPlayer);
-            gameWorldService.indexPlayer(otherPlayer);
-            gameWorldService.addNpc(npc);
+            roomOccupancy.indexPlayer(otherPlayer);
+            creatureLookup.indexPlayer(otherPlayer);
+            creatureLookup.addNpc(npc);
 
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
 
@@ -131,9 +135,11 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter otherPlayer = new FakePlayerCharacter(OTHER_PLAYER_ID, OTHER_PLAYER_NAME, OTHER_USER_ID, ROOM_ID);
 
             players.addPlayer(player);
-            gameWorldService.indexPlayer(player);
+            roomOccupancy.indexPlayer(player);
+            creatureLookup.indexPlayer(player);
             players.addPlayer(otherPlayer);
-            gameWorldService.indexPlayer(otherPlayer);
+            roomOccupancy.indexPlayer(otherPlayer);
+            creatureLookup.indexPlayer(otherPlayer);
 
             SpeakCommand command = new SpeakCommand(USER_ID, OTHER_PLAYER_NAME, MESSAGE);
 
@@ -166,7 +172,8 @@ class SpeakCommandServiceTest {
             FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, PLAYER_NAME, USER_ID, ROOM_ID);
 
             players.addPlayer(player);
-            gameWorldService.indexPlayer(player);
+            roomOccupancy.indexPlayer(player);
+            creatureLookup.indexPlayer(player);
 
             SpeakCommand command = new SpeakCommand(USER_ID, targetName, MESSAGE);
 
@@ -191,8 +198,9 @@ class SpeakCommandServiceTest {
             FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, NPC_NAME, ROOM_ID + 1); // 다른 방
 
             players.addPlayer(player);
-            gameWorldService.indexPlayer(player);
-            gameWorldService.addNpc(npc);
+            roomOccupancy.indexPlayer(player);
+            creatureLookup.indexPlayer(player);
+            creatureLookup.addNpc(npc);
 
             SpeakCommand command = new SpeakCommand(USER_ID, NPC_NAME, MESSAGE);
 
@@ -210,18 +218,34 @@ class SpeakCommandServiceTest {
         }
     }
 
-    // Fake implementation of GameWorldService
-    static class FakeGameWorldService extends GameWorldService {
-        public FakeGameWorldService() {
-            super(event -> {}, new FakeActivePlayerRepository(), null, null);
-        }
-
-        private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
+    static class FakeRoomOccupancyQuery implements com.jefflife.mudmk2.gameplay.application.service.query.RoomOccupancyQuery {
         private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
-        private final Map<String, PlayerCharacter> playersByName = new HashMap<>();
 
         public void indexPlayer(PlayerCharacter player) {
             playersByRoomId.computeIfAbsent(player.getCurrentRoomId(), k -> new ArrayList<>()).add(player);
+        }
+
+        @Override
+        public List<PlayerCharacter> playersIn(Long roomId) {
+            return playersByRoomId.getOrDefault(roomId, Collections.emptyList());
+        }
+
+        @Override
+        public List<NonPlayerCharacter> npcsIn(Long roomId) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster> monstersIn(Long roomId) {
+            return Collections.emptyList();
+        }
+    }
+
+    static class FakeCreatureLookupQuery implements com.jefflife.mudmk2.gameplay.application.service.query.CreatureLookupQuery {
+        private final Map<String, PlayerCharacter> playersByName = new HashMap<>();
+        private final Map<String, NonPlayerCharacter> npcsByName = new HashMap<>();
+
+        public void indexPlayer(PlayerCharacter player) {
             playersByName.put(player.getName(), player);
         }
 
@@ -230,18 +254,18 @@ class SpeakCommandServiceTest {
         }
 
         @Override
-        public PlayerCharacter getPlayerByName(String name) {
-            return playersByName.get(name);
+        public Optional<PlayerCharacter> findPlayerByName(String name) {
+            return Optional.ofNullable(playersByName.get(name));
         }
 
         @Override
-        public NonPlayerCharacter getNpcByName(String name) {
-            return npcsByName.get(name);
+        public Optional<NonPlayerCharacter> findNpcByName(String name) {
+            return Optional.ofNullable(npcsByName.get(name));
         }
 
         @Override
-        public List<PlayerCharacter> getPlayersInRoom(Long roomId) {
-            return playersByRoomId.getOrDefault(roomId, Collections.emptyList());
+        public List<com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster> findMonstersByType(Long monsterTypeId) {
+            return Collections.emptyList();
         }
     }
 
