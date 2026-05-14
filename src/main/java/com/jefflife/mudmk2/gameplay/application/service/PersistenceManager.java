@@ -5,11 +5,9 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawn
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PartyRepository;
-import com.jefflife.mudmk2.gameplay.application.service.sync.BatchSyncable;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +23,15 @@ public class PersistenceManager {
     private final MonsterTypeRepository monsterTypeRepository;
     private final GameWorldService gameWorldService;
     private final PartyRepository partyRepository;
-    private final List<BatchSyncable> batchSyncables;
 
     public PersistenceManager(
             final MonsterTypeRepository monsterTypeRepository,
             final GameWorldService gameWorldService,
-            final PartyRepository partyRepository,
-            final List<BatchSyncable> batchSyncables
+            final PartyRepository partyRepository
     ) {
         this.monsterTypeRepository = monsterTypeRepository;
         this.gameWorldService = gameWorldService;
         this.partyRepository = partyRepository;
-        this.batchSyncables = batchSyncables;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -75,20 +70,4 @@ public class PersistenceManager {
         logger.info("Created and loaded {} monsters from {} monster types", monsters.size(), monsterTypes.spliterator().estimateSize());
     }
 
-    @Transactional
-    @Scheduled(fixedDelay = 60_000) // 1분마다 저장
-    public void persistGameState() {
-        batchSyncables.forEach(BatchSyncable::syncToDb);
-    }
-
-    /**
-     * 몬스터 리스폰 처리
-     */
-    @Scheduled(fixedDelay = 5_000) // 5초마다 실행
-    public void checkMonsterRespawn() {
-        int respawnCount = gameWorldService.respawnMonsters();
-        if (respawnCount > 0) {
-            logger.debug("Respawned {} monsters", respawnCount);
-        }
-    }
 }
