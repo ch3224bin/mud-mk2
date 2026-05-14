@@ -4,7 +4,6 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -113,7 +113,7 @@ class InMemoryMonsterRepositoryTest {
     void syncToDb_isNoOp_andDoesNotThrow() {
         repository.add(simpleMonster(10L));
 
-        Assertions.assertThatNoException().isThrownBy(() -> repository.syncToDb());
+        assertThatNoException().isThrownBy(() -> repository.syncToDb());
 
         // 캐시는 변경되지 않음 (Monster는 JPA 영속 대상이 아님)
         assertThat(toList(repository.findAll())).hasSize(1);

@@ -2,6 +2,7 @@ package com.jefflife.mudmk2.gameplay.adapter.out.cache;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Monster;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRoom;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterSpawnRooms;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.MonsterType;
 import com.jefflife.mudmk2.gamedata.application.service.required.MonsterTypeRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveMonsterRepository;
@@ -37,10 +38,11 @@ public class InMemoryMonsterRepository implements ActiveMonsterRepository, Batch
         long typeCount = 0;
         for (MonsterType type : monsterTypes.findAll()) {
             typeCount++;
-            if (type.getMonsterSpawnRooms() == null || type.getMonsterSpawnRooms().getSpawnRooms() == null) {
+            MonsterSpawnRooms spawnRooms = type.getMonsterSpawnRooms();
+            if (spawnRooms == null || spawnRooms.getSpawnRooms() == null || spawnRooms.getSpawnRooms().isEmpty()) {
                 continue;
             }
-            for (MonsterSpawnRoom spawnRoom : type.getMonsterSpawnRooms().getSpawnRooms()) {
+            for (MonsterSpawnRoom spawnRoom : spawnRooms.getSpawnRooms()) {
                 for (int i = 0; i < spawnRoom.getSpawnCount(); i++) {
                     int level = 1 + random.nextInt(5);
                     Monster monster = Monster.createFromType(type, level, spawnRoom.getRoomId());
