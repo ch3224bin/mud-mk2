@@ -4,9 +4,11 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.party.Party;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
+import com.jefflife.mudmk2.gameplay.application.service.PartyService;
+import com.jefflife.mudmk2.gameplay.application.service.query.CreatureLookupQuery;
+import com.jefflife.mudmk2.gameplay.application.service.query.PartyMembershipQuery;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +29,13 @@ import static org.mockito.Mockito.*;
 class RecruitCommandServiceTest {
 
     @Mock
-    private GameWorldService gameWorldService;
+    private CreatureLookupQuery creatureLookup;
+
+    @Mock
+    private PartyMembershipQuery partyMembership;
+
+    @Mock
+    private PartyService partyService;
 
     @Mock
     private ActivePlayerRepository players;
@@ -51,7 +59,7 @@ class RecruitCommandServiceTest {
 
     @BeforeEach
     void setUp() {
-        recruitCommandService = new RecruitCommandService(gameWorldService, players, sendMessageToUserPort);
+        recruitCommandService = new RecruitCommandService(creatureLookup, partyMembership, partyService, players, sendMessageToUserPort);
     }
 
     @Nested
@@ -75,7 +83,7 @@ class RecruitCommandServiceTest {
             lenient().when(player.getId()).thenReturn(PLAYER_ID);
             lenient().when(player.getCurrentRoomId()).thenReturn(ROOM_ID);
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(null);
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.empty());
 
             // when
             recruitCommandService.recruit(command);
@@ -101,7 +109,7 @@ class RecruitCommandServiceTest {
             lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID + 1); // 다른 방
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
 
             // when
             recruitCommandService.recruit(command);
@@ -127,8 +135,8 @@ class RecruitCommandServiceTest {
             lenient().when(npc.getCurrentRoomId()).thenReturn(ROOM_ID); // 같은 방
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(true); // 이미 파티에 속해 있음
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(true); // 이미 파티에 속해 있음
 
             // when
             recruitCommandService.recruit(command);
@@ -156,9 +164,9 @@ class RecruitCommandServiceTest {
             lenient().when(party.isLeader(PLAYER_ID)).thenReturn(false); // 리더가 아님
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
-            lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(false);
+            lenient().when(partyMembership.findByMemberId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
             recruitCommandService.recruit(command);
@@ -187,9 +195,9 @@ class RecruitCommandServiceTest {
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.PARTY_FULL);
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
-            lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(false);
+            lenient().when(partyMembership.findByMemberId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
             recruitCommandService.recruit(command);
@@ -218,9 +226,9 @@ class RecruitCommandServiceTest {
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.ALREADY_IN_SAME_PARTY);
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
-            lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(false);
+            lenient().when(partyMembership.findByMemberId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
             recruitCommandService.recruit(command);
@@ -249,9 +257,9 @@ class RecruitCommandServiceTest {
             lenient().when(party.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.SUCCESS);
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
-            lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.of(party));
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(false);
+            lenient().when(partyMembership.findByMemberId(PLAYER_ID)).thenReturn(Optional.of(party));
 
             // when
             recruitCommandService.recruit(command);
@@ -280,9 +288,9 @@ class RecruitCommandServiceTest {
             lenient().when(newParty.addMember(NPC_ID)).thenReturn(Party.AddPartyMemberResult.SUCCESS);
 
             lenient().when(players.findByUserId(USER_ID)).thenReturn(Optional.of(player));
-            lenient().when(gameWorldService.getNpcByName(NPC_NAME)).thenReturn(npc);
-            lenient().when(gameWorldService.isInParty(NPC_ID)).thenReturn(false);
-            lenient().when(gameWorldService.getPartyByPlayerId(PLAYER_ID)).thenReturn(Optional.empty()); // 파티 없음
+            lenient().when(creatureLookup.findNpcByName(NPC_NAME)).thenReturn(Optional.of(npc));
+            lenient().when(partyMembership.isInParty(NPC_ID)).thenReturn(false);
+            lenient().when(partyMembership.findByMemberId(PLAYER_ID)).thenReturn(Optional.empty()); // 파티 없음
 
             // void 메서드이므로 doAnswer().when() 패턴을 사용
             try (var partyMockedStatic = mockStatic(Party.class)) {
@@ -292,7 +300,7 @@ class RecruitCommandServiceTest {
                 recruitCommandService.recruit(command);
 
                 // then
-                verify(gameWorldService).addParty(newParty);
+                verify(partyService).create(newParty);
                 verify(sendMessageToUserPort).messageToUser(userIdCaptor.capture(), messageCaptor.capture());
                 assertThat(userIdCaptor.getValue()).isEqualTo(USER_ID);
                 assertThat(messageCaptor.getValue()).contains("가 당신의 파티에 합류했습니다");

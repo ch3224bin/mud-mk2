@@ -5,30 +5,39 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.NonPlayerCha
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.RecruitCommand;
 import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
+import com.jefflife.mudmk2.gameplay.application.service.PartyService;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RecruitUseCase;
+import com.jefflife.mudmk2.gameplay.application.service.query.CreatureLookupQuery;
+import com.jefflife.mudmk2.gameplay.application.service.query.PartyMembershipQuery;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
-import com.jefflife.mudmk2.gameplay.application.service.GameWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class RecruitCommandService implements RecruitUseCase {
     private static final Logger logger = LoggerFactory.getLogger(RecruitCommandService.class);
 
-    private final GameWorldService gameWorldService;
+    private final CreatureLookupQuery creatureLookup;
+    private final PartyMembershipQuery partyMembership;
+    private final PartyService partyService;
     private final ActivePlayerRepository players;
     private final SendMessageToUserPort sendMessageToUserPort;
 
     public RecruitCommandService(
-            final GameWorldService gameWorldService,
+            final CreatureLookupQuery creatureLookup,
+            final PartyMembershipQuery partyMembership,
+            final PartyService partyService,
             final ActivePlayerRepository players,
             final SendMessageToUserPort sendMessageToUserPort
     ) {
-        this.gameWorldService = gameWorldService;
+        this.creatureLookup = creatureLookup;
+        this.partyMembership = partyMembership;
+        this.partyService = partyService;
         this.players = players;
         this.sendMessageToUserPort = sendMessageToUserPort;
     }
@@ -42,14 +51,15 @@ public class RecruitCommandService implements RecruitUseCase {
         Long playerRoomId = player.getCurrentRoomId();
 
         // 2. 초대할 NPC 찾기
-        NonPlayerCharacter targetNpc = gameWorldService.getNpcByName(recruitCommand.npcName());
-        if (targetNpc == null) {
+        Optional<NonPlayerCharacter> targetNpcOpt = creatureLookup.findNpcByName(recruitCommand.npcName());
+        if (targetNpcOpt.isEmpty()) {
             sendMessageToUserPort.messageToUser(
                     recruitCommand.userId(),
                     "대상을 찾을 수 없습니다: " + recruitCommand.npcName()
             );
             return;
         }
+        NonPlayerCharacter targetNpc = targetNpcOpt.get();
 
         // 3. NPC가 같은 방에 있는지 확인
         if (!targetNpc.getCurrentRoomId().equals(playerRoomId)) {
@@ -62,7 +72,7 @@ public class RecruitCommandService implements RecruitUseCase {
 
         // 4. NPC가 이미 다른 파티에 속해 있는지 확인 (NPC ID를 사용)
         UUID npcId = targetNpc.getId();
-        if (gameWorldService.isInParty(npcId)) {
+        if (partyMembership.isInParty(npcId)) {
             sendMessageToUserPort.messageToUser(
                     recruitCommand.userId(),
                     targetNpc.getName() + "는 이미 다른 파티에 속해 있습니다."
@@ -70,10 +80,8 @@ public class RecruitCommandService implements RecruitUseCase {
             return;
         }
 
-        // worldService에 등록된 party는 주기적으로 PersistenceManager를 통해 저장됨
-        // 서버가 시작될때 PersistenceManager에서 worldService에 DB에 저장되어 있던 party를 등록시킴
         // 5. 플레이어의 파티가 있는지 확인, 없으면 생성
-        Party party = gameWorldService.getPartyByPlayerId(playerId)
+        Party party = partyMembership.findByMemberId(playerId)
                 .orElseGet(() -> createParty(playerId));
 
         if (!party.isLeader(playerId)) {
@@ -117,7 +125,7 @@ public class RecruitCommandService implements RecruitUseCase {
 
     private Party createParty(UUID playerId) {
         Party newParty = Party.createParty(playerId);
-        gameWorldService.addParty(newParty);
+        partyService.create(newParty);
         logger.info("Created new party for player {}", playerId);
         return newParty;
     }
