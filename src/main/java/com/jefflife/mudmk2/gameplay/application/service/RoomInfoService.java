@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.service.provided.RoomDescriber;
+import com.jefflife.mudmk2.gameplay.application.service.query.RoomOccupancyQuery;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendRoomInfoMessagePort;
@@ -21,18 +22,18 @@ import java.util.List;
 public class RoomInfoService implements RoomDescriber {
     private static final Logger logger = LoggerFactory.getLogger(RoomInfoService.class);
 
-    private final GameWorldService gameWorldService;
+    private final RoomOccupancyQuery roomOccupancy;
     private final ActiveRoomRepository rooms;
     private final ActivePlayerRepository players;
     private final SendRoomInfoMessagePort sendRoomInfoMessagePort;
 
     public RoomInfoService(
-            final GameWorldService gameWorldService,
+            final RoomOccupancyQuery roomOccupancy,
             final ActiveRoomRepository rooms,
             final ActivePlayerRepository players,
             final SendRoomInfoMessagePort sendRoomInfoMessagePort
     ) {
-        this.gameWorldService = gameWorldService;
+        this.roomOccupancy = roomOccupancy;
         this.rooms = rooms;
         this.players = players;
         this.sendRoomInfoMessagePort = sendRoomInfoMessagePort;
@@ -47,20 +48,20 @@ public class RoomInfoService implements RoomDescriber {
                 .orElseThrow(() -> new RoomNotFoundException(character.getCurrentRoomId()));
 
         // 현재 방에 있는 NPC 목록 가져오기
-        List<CreatureInfo> npcsInRoom = gameWorldService.getNpcsInRoom(currentRoom.getId())
+        List<CreatureInfo> npcsInRoom = roomOccupancy.npcsIn(currentRoom.getId())
                 .stream()
                 .map(npc -> new CreatureInfo(npc.getName(), npc.getState()))
                 .toList();
 
         // 현재 방에 있는 다른 플레이어 캐릭터 목록 가져오기
-        List<CreatureInfo> otherPlayersInRoom = gameWorldService.getPlayersInRoom(currentRoom.getId())
+        List<CreatureInfo> otherPlayersInRoom = roomOccupancy.playersIn(currentRoom.getId())
                 .stream()
                 .filter(pc -> !pc.getId().equals(character.getId())) // 자신 제외
                 .map(pc -> new CreatureInfo(pc.getNickname(), pc.getState()))
                 .toList();
 
         // 현재 방에 있는 몬스터 목록 가져오기
-        List<CreatureInfo> monstersInRoom = gameWorldService.getMonstersInRoom(currentRoom.getId())
+        List<CreatureInfo> monstersInRoom = roomOccupancy.monstersIn(currentRoom.getId())
                 .stream()
                 .map(monster -> new CreatureInfo(
                         monster.getName() + " (레벨 " + monster.getLevel() + ")",
