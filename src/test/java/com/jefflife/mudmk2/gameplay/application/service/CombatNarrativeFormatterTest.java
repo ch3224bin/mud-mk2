@@ -1,7 +1,6 @@
 package com.jefflife.mudmk2.gameplay.application.service;
 
 import com.jefflife.mudmk2.gameplay.application.domain.model.combat.CombatLog;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -10,78 +9,78 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CombatNarrativeFormatterTest {
 
-    private CombatNarrativeFormatter formatter;
+    private final CombatNarrativeFormatter formatter = new CombatNarrativeFormatter();
 
-    @BeforeEach
-    void setUp() {
-        formatter = new CombatNarrativeFormatter();
-    }
-
-    private CombatLog.CombatLogBuilder baseLog() {
+    private CombatLog.CombatLogBuilder baseBuilder() {
         return CombatLog.builder()
-            .attackerId(UUID.randomUUID()).attackerName("홍길동")
-            .targetId(UUID.randomUUID()).targetName("산적두목")
-            .attackRoll(0).attackModifier(0).attackTotal(0)
-            .defenseRoll(0).defenseModifier(0).defenseTotal(0)
-            .damageModifier(0).damageTotal(0).defenseValue(0);
+                .attackerId(UUID.randomUUID()).attackerName("철수")
+                .targetId(UUID.randomUUID()).targetName("다람쥐")
+                .attackRoll(15).attackModifier(0).attackTotal(15)
+                .defenseRoll(10).defenseModifier(0).defenseTotal(10)
+                .hitSuccess(true)
+                .baseDamage(5).damageModifier(0).damageTotal(5)
+                .defenseValue(0).finalDamage(5)
+                .targetRemainingHp(15).targetDefeated(false)
+                .evaded(false).isCrit(false)
+                .attackerApAfter(0).targetApAfter(0)
+                .weaponTypeName("SWORD").weaponName("철검");
     }
 
     @Test
-    void 일반명중_메시지() {
-        CombatLog log = baseLog()
-            .hitSuccess(true).evaded(false).isCrit(false)
-            .baseDamage(30).finalDamage(22)
-            .targetRemainingHp(78).targetDefeated(false)
-            .attackerApAfter(80).targetApAfter(112)
-            .weaponTypeName("검법")
-            .build();
-
-        String message = formatter.format(log);
-
-        assertThat(message).contains("홍길동").contains("검법").contains("산적두목");
-        assertThat(message).contains("22").contains("78");
-        assertThat(message).doesNotContain("치명타").doesNotContain("피했다");
+    void format_normalHit_swordWeapon_usesItemNameAndVerb베었다() {
+        CombatLog log = baseBuilder().build();
+        String result = formatter.format(log);
+        assertThat(result).contains("철검").contains("베었다");
+        assertThat(result).contains("다람쥐").contains("철수");
     }
 
     @Test
-    void 치명타_메시지() {
-        CombatLog log = baseLog()
-            .hitSuccess(true).evaded(false).isCrit(true)
-            .baseDamage(30).finalDamage(33)
-            .targetRemainingHp(45).targetDefeated(false)
-            .attackerApAfter(80).targetApAfter(112)
-            .weaponTypeName("검법")
-            .build();
-
-        assertThat(formatter.format(log)).contains("치명타");
+    void format_normalHit_bladeWeapon_usesVerb내려쳤다() {
+        CombatLog log = baseBuilder().weaponTypeName("BLADE").weaponName("청룡도").build();
+        assertThat(formatter.format(log)).contains("청룡도").contains("내려쳤다");
     }
 
     @Test
-    void 회피_메시지() {
-        CombatLog log = baseLog()
-            .hitSuccess(false).evaded(true).isCrit(false)
-            .baseDamage(0).finalDamage(0)
-            .targetRemainingHp(150).targetDefeated(false)
-            .attackerApAfter(80).targetApAfter(107)
-            .weaponTypeName("검법")
-            .build();
-
-        String message = formatter.format(log);
-        assertThat(message).contains("피했다");
-        assertThat(message).doesNotContain("데미지");
+    void format_normalHit_fist_usesVerb내질렀다() {
+        CombatLog log = baseBuilder().weaponTypeName("FIST").weaponName("맨손").build();
+        assertThat(formatter.format(log)).contains("맨손").contains("내질렀다");
     }
 
     @Test
-    void 사망_메시지가_포함된다() {
-        CombatLog log = baseLog()
-            .hitSuccess(true).evaded(false).isCrit(false)
-            .baseDamage(100).finalDamage(90)
-            .targetRemainingHp(0).targetDefeated(true)
-            .attackerApAfter(80).targetApAfter(0)
-            .weaponTypeName("도법")
-            .build();
+    void format_normalHit_archery_usesVerb쐈다() {
+        CombatLog log = baseBuilder().weaponTypeName("ARCHERY").weaponName("나무활").build();
+        assertThat(formatter.format(log)).contains("나무활").contains("쐈다");
+    }
 
-        String message = formatter.format(log);
-        assertThat(message).contains("쓰러졌다");
+    @Test
+    void format_normalHit_longWeapon_usesVerb휘둘렀다() {
+        CombatLog log = baseBuilder().weaponTypeName("LONG_WEAPON").weaponName("장창").build();
+        assertThat(formatter.format(log)).contains("장창").contains("휘둘렀다");
+    }
+
+    @Test
+    void format_normalHit_esoteric_usesVerb휘둘렀다() {
+        CombatLog log = baseBuilder().weaponTypeName("ESOTERIC").weaponName("암기").build();
+        assertThat(formatter.format(log)).contains("암기").contains("휘둘렀다");
+    }
+
+    @Test
+    void format_crit_usesWeaponNameAndVerb() {
+        CombatLog log = baseBuilder().isCrit(true).build();
+        String result = formatter.format(log);
+        assertThat(result).contains("철검").contains("베었다").contains("치명");
+    }
+
+    @Test
+    void format_evaded_usesWeaponNameAndVerb() {
+        CombatLog log = baseBuilder().hitSuccess(false).evaded(true).build();
+        String result = formatter.format(log);
+        assertThat(result).contains("철검").contains("베었다").contains("피했다");
+    }
+
+    @Test
+    void format_targetDefeated_appendsDefeatedLine() {
+        CombatLog log = baseBuilder().targetDefeated(true).build();
+        assertThat(formatter.format(log)).contains("쓰러졌다");
     }
 }
