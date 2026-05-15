@@ -1,10 +1,18 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.EquipmentSlot;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTemplate;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTypeMapping;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Combatable;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Combat {
@@ -99,19 +107,16 @@ public class Combat {
             Combatable targetCombatable = target.getParticipant();
 
             // 장착 무기·무공 결정
-            com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType weaponType =
-                    com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.FIST;
+            WeaponType weaponType = WeaponType.FIST;
             String weaponName = "맨손";
             if (attackerCombatable instanceof PlayerCharacter pc) {
-                java.util.Optional<com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance> wOpt =
-                        pc.getEquippedItems().getSlot(com.jefflife.mudmk2.gamedata.application.domain.model.item.EquipmentSlot.WEAPON);
-                if (wOpt.isPresent() && wOpt.get().getTemplate() instanceof com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTemplate wt) {
+                Optional<ItemInstance> wOpt = pc.getEquippedItems().getSlot(EquipmentSlot.WEAPON);
+                if (wOpt.isPresent() && wOpt.get().getTemplate() instanceof WeaponTemplate wt) {
                     weaponType = wt.getWeaponType();
                     weaponName = wt.getName();
                 }
             }
-            com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType skillType =
-                    com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTypeMapping.weaponSkillFor(weaponType);
+            StatType skillType = WeaponTypeMapping.weaponSkillFor(weaponType);
             int skillValue = readSkillStat(attackerCombatable.getStats(), skillType);
             int diceMax = Math.max(1, skillValue);
 
@@ -257,8 +262,7 @@ public class Combat {
         return allyGroup.getUsers();
     }
 
-    private static int readSkillStat(com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats stats,
-                                     com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType type) {
+    private static int readSkillStat(CharacterStats stats, StatType type) {
         return switch (type) {
             case VIGOR -> stats.vigor();
             case PHYSIQUE -> stats.physique();
