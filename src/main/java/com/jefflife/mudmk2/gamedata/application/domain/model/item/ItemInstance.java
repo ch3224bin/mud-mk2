@@ -21,6 +21,15 @@ public class ItemInstance {
 
     private int quantity;
 
+    // EquippedItems → ItemInstance 단방향 매핑(@JoinColumn + @MapKeyEnumerated)을 위한 컬럼.
+    // 직접 setter 노출하지 않음 — EquippedItems의 @OneToMany 관계가 채워 넣는다.
+    @Column(name = "equipped_items_id", insertable = false, updatable = false)
+    private java.util.UUID equippedItemsId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "equipped_slot", insertable = false, updatable = false)
+    private EquipmentSlot equippedSlot;
+
     public ItemInstance(ItemTemplate template, int quantity) {
         this.template = template;
         this.quantity = quantity;
