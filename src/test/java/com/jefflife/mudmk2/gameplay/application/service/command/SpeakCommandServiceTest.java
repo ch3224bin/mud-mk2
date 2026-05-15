@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.SpeakCommand;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -285,16 +286,16 @@ class SpeakCommandServiceTest {
         @Override
         public Optional<PlayerCharacter> findPlayerByName(String name) {
             return playersByName.entrySet().stream()
-                    .filter(e -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(e.getKey(), name))
-                    .map(java.util.Map.Entry::getValue)
+                    .filter(e -> StringUtils.equalsIgnoreCase(e.getKey(), name))
+                    .map(Map.Entry::getValue)
                     .findFirst();
         }
 
         @Override
         public Optional<NonPlayerCharacter> findNpcByName(String name) {
             return npcsByName.entrySet().stream()
-                    .filter(e -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(e.getKey(), name))
-                    .map(java.util.Map.Entry::getValue)
+                    .filter(e -> StringUtils.equalsIgnoreCase(e.getKey(), name))
+                    .map(Map.Entry::getValue)
                     .findFirst();
         }
 
