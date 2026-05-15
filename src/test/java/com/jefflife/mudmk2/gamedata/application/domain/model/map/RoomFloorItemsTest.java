@@ -28,6 +28,17 @@ class RoomFloorItemsTest {
     }
 
     @Test
+    void addFloorItem_callsInitializeAssociatedEntitiesOnItem() {
+        // detached cache invariant: 애그리거트는 자기에 담기는 아이템의 LAZY 그래프를
+        // 강제 초기화한다. 호출자가 까먹어도 invariant 유지.
+        ItemInstance item = org.mockito.Mockito.spy(new ItemInstance(swordTemplate, 1));
+
+        room.addFloorItem(item);
+
+        org.mockito.Mockito.verify(item).initializeAssociatedEntities();
+    }
+
+    @Test
     void removeFloorItem_removesItemFromFloor() {
         ItemInstance item = new ItemInstance(swordTemplate, 1);
         room.addFloorItem(item);

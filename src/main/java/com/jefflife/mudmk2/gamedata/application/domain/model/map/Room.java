@@ -141,7 +141,13 @@ public class Room {
 		return Collections.unmodifiableList(floorItems);
 	}
 
+	/**
+	 * 방 바닥에 아이템을 추가한다. detached 캐시 invariant 를 위해 아이템의 LAZY 그래프를
+	 * 강제 초기화한 뒤 컬렉션에 담는다 — 이 메서드를 통과한 아이템은 세션 없이도
+	 * template / 하위 그래프에 안전히 접근할 수 있음이 보장된다.
+	 */
 	public void addFloorItem(ItemInstance item) {
+		item.initializeAssociatedEntities();
 		this.floorItems.add(item);
 	}
 
