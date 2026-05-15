@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.service;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.EquippedItems;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayableCharacter;
@@ -80,15 +81,16 @@ public class PlayerCharacterService implements PlayerCharacterFinder {
 
         // Create player character
         final PlayerCharacter playerCharacter = new PlayerCharacter(
-                null, // ID will be generated
+                null,
                 baseCharacter,
                 playableCharacter,
                 userId,
-                name, // Use the same name as nickname
+                name,
                 characterClass,
-                true, // Online
-                LocalDateTime.now(), // Last active now
-                inventory
+                true,
+                LocalDateTime.now(),
+                inventory,
+                EquippedItems.create()
         );
 
         // Save character

@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,23 +29,21 @@ public class PlayerCharacter implements Combatable, Statable {
     private PlayableCharacter playableCharacterInfo;
 
     private Long userId;
-    
-    // 플레이어 고유 속성
     private String nickname;
-    
-    // 직업/클래스 (추후 확장 가능)
+
     @Enumerated(EnumType.STRING)
     private CharacterClass characterClass;
-    
-    // 온라인 상태
+
     private boolean online = false;
-    
-    // 최근 접속 시간
     private LocalDateTime lastActiveAt;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "equipped_items_id")
+    private EquippedItems equippedItems;
 
     public PlayerCharacter(
             final UUID id,
@@ -54,7 +54,8 @@ public class PlayerCharacter implements Combatable, Statable {
             final CharacterClass characterClass,
             final boolean online,
             final LocalDateTime lastActiveAt,
-            final Inventory inventory
+            final Inventory inventory,
+            final EquippedItems equippedItems
     ) {
         this.id = id;
         this.baseCharacterInfo = baseCharacterInfo;
@@ -65,11 +66,12 @@ public class PlayerCharacter implements Combatable, Statable {
         this.online = online;
         this.lastActiveAt = lastActiveAt;
         this.inventory = inventory;
+        this.equippedItems = equippedItems;
     }
 
     public void initializeAssociatedEntities() {
-        // inventory LAZY 프록시 + 그 안의 items + 각 item의 template 그래프 초기화
         this.inventory.initializeAssociatedEntities();
+        this.equippedItems.initializeAssociatedEntities();
     }
 
     public MoveResult move(final Room currentRoom, final Direction direction) {
@@ -102,9 +104,32 @@ public class PlayerCharacter implements Combatable, Statable {
         return this.nickname;
     }
 
+    public CharacterStats getBaseStats() {
+        return this.baseCharacterInfo.getStats();
+    }
+
     @Override
     public CharacterStats getStats() {
-        return this.baseCharacterInfo.getStats();
+        CharacterStats base = baseCharacterInfo.getStats();
+        Map<StatType, Integer> mods = equippedItems.sumStatModifiers();
+        return new CharacterStats(
+                base.hp(), base.mp(), base.ap(),
+                base.vigor()            + mods.getOrDefault(StatType.VIGOR, 0),
+                base.physique()         + mods.getOrDefault(StatType.PHYSIQUE, 0),
+                base.agility()          + mods.getOrDefault(StatType.AGILITY, 0),
+                base.intellect()        + mods.getOrDefault(StatType.INTELLECT, 0),
+                base.will()             + mods.getOrDefault(StatType.WILL, 0),
+                base.meridian()         + mods.getOrDefault(StatType.MERIDIAN, 0),
+                base.innerPower()       + mods.getOrDefault(StatType.INNER_POWER, 0),
+                base.specialTechnique() + mods.getOrDefault(StatType.SPECIAL_TECHNIQUE, 0),
+                base.lightStep()        + mods.getOrDefault(StatType.LIGHT_STEP, 0),
+                base.fistsAndPalms()    + mods.getOrDefault(StatType.FISTS_AND_PALMS, 0),
+                base.swordMethod()      + mods.getOrDefault(StatType.SWORD_METHOD, 0),
+                base.bladeMethod()      + mods.getOrDefault(StatType.BLADE_METHOD, 0),
+                base.longWeapon()       + mods.getOrDefault(StatType.LONG_WEAPON, 0),
+                base.esotericWeapon()   + mods.getOrDefault(StatType.ESOTERIC_WEAPON, 0),
+                base.archery()          + mods.getOrDefault(StatType.ARCHERY, 0)
+        );
     }
 
     @Override
@@ -138,4 +163,3 @@ public class PlayerCharacter implements Combatable, Statable {
         FAILED
     }
 }
-
