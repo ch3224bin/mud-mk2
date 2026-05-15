@@ -15,7 +15,7 @@ import java.util.List;
 @DiscriminatorValue("ACCESSORY")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccessoryTemplate extends ItemTemplate {
+public class AccessoryTemplate extends ItemTemplate implements EquippableItemTemplate {
 
     @Enumerated(EnumType.STRING)
     private AccessoryType accessoryType;

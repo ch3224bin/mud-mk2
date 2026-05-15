@@ -15,7 +15,7 @@ import java.util.List;
 @DiscriminatorValue("WEAPON")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WeaponTemplate extends ItemTemplate {
+public class WeaponTemplate extends ItemTemplate implements EquippableItemTemplate {
 
     @Enumerated(EnumType.STRING)
     private WeaponType weaponType;
