@@ -18,11 +18,11 @@ import java.util.Optional;
 public class EquipCommandService implements EquipUseCase {
 
     private final ActivePlayerRepository players;
-    private final SendMessageToUserPort sender;
+    private final SendMessageToUserPort sendMessageToUserPort;
 
-    public EquipCommandService(ActivePlayerRepository players, SendMessageToUserPort sender) {
+    public EquipCommandService(ActivePlayerRepository players, SendMessageToUserPort sendMessageToUserPort) {
         this.players = players;
-        this.sender = sender;
+        this.sendMessageToUserPort = sendMessageToUserPort;
     }
 
     @Override
@@ -36,14 +36,14 @@ public class EquipCommandService implements EquipUseCase {
         List<ItemInstance> matches = inventory.findItemsByName(command.itemName());
         int idx = command.index();
         if (matches.size() < idx) {
-            sender.messageToUser(command.userId(), command.itemName() + "을(를) 가지고 있지 않습니다.");
+            sendMessageToUserPort.messageToUser(command.userId(), command.itemName() + "을(를) 가지고 있지 않습니다.");
             return;
         }
         ItemInstance instance = matches.get(idx - 1);
 
         ItemTemplate template = instance.getTemplate();
         if (!(template instanceof EquippableItemTemplate)) {
-            sender.messageToUser(command.userId(), template.getName() + "은(는) 장착할 수 없습니다.");
+            sendMessageToUserPort.messageToUser(command.userId(), template.getName() + "은(는) 장착할 수 없습니다.");
             return;
         }
 
@@ -57,7 +57,7 @@ public class EquipCommandService implements EquipUseCase {
             int weightAfterRemove = inventory.currentWeight() - template.getWeight() * instance.getQuantity();
             int weightAfterSwap = weightAfterRemove + current.getTemplate().getWeight() * current.getQuantity();
             if (weightAfterSwap > inventory.getMaxWeightCapacity()) {
-                sender.messageToUser(command.userId(),
+                sendMessageToUserPort.messageToUser(command.userId(),
                         template.getName() + "을(를) 장착하려면 " + current.getTemplate().getName()
                                 + "을(를) 해제해야 하지만 소지품 무게가 부족합니다.");
                 return;
@@ -69,11 +69,11 @@ public class EquipCommandService implements EquipUseCase {
         swapped.ifPresent(inventory::addItem);
 
         if (swapped.isPresent()) {
-            sender.messageToUser(command.userId(),
+            sendMessageToUserPort.messageToUser(command.userId(),
                     "기존 " + swapped.get().getTemplate().getName()
                             + "을(를) 해제하고 " + template.getName() + "을(를) 장착했다.");
         } else {
-            sender.messageToUser(command.userId(), template.getName() + "을(를) 장착했다.");
+            sendMessageToUserPort.messageToUser(command.userId(), template.getName() + "을(를) 장착했다.");
         }
     }
 
