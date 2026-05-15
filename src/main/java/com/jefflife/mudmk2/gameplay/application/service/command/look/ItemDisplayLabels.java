@@ -36,6 +36,10 @@ public final class ItemDisplayLabels {
             case GLOVES -> "장갑";
             case BOOTS -> "신발";
             case BELT -> "허리띠";
+            case WEAPON -> "무기";
+            case NECKLACE -> "목걸이";
+            case RING_LEFT -> "왼손 반지";
+            case RING_RIGHT -> "오른손 반지";
         };
     }
 
