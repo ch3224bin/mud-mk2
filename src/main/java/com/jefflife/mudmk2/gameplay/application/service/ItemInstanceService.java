@@ -52,7 +52,6 @@ public class ItemInstanceService implements ItemInstancePlacer {
             .orElseThrow(() -> new NoSuchElementException("ItemTemplate not found: " + request.templateId()));
 
         ItemInstance instance = itemInstanceRepository.save(new ItemInstance(template, request.quantity()));
-        instance.initializeAssociatedEntities();
 
         if (request.locationType() == LocationType.ROOM) {
             long roomId;
