@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
+import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Inventory;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
@@ -39,5 +40,17 @@ class PlayerCharacterServiceTest {
         assertThat(saved.getInventory()).isNotNull();
         assertThat(saved.getInventory().getMaxWeightCapacity())
                 .isEqualTo(Inventory.DEFAULT_MAX_WEIGHT_CAPACITY);
+    }
+
+    @Test
+    void createCharacter_attachesNonNullEquippedItems() {
+        ArgumentCaptor<PlayerCharacter> captor = ArgumentCaptor.forClass(PlayerCharacter.class);
+        when(playerCharacterRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
+
+        playerCharacterService.createCharacter(1L, "철수", CharacterClass.WARRIOR, Gender.MALE);
+
+        PlayerCharacter saved = captor.getValue();
+        assertThat(saved.getEquippedItems()).isNotNull();
+        assertThat(saved.getEquippedItems().getSlots()).isEmpty();
     }
 }
