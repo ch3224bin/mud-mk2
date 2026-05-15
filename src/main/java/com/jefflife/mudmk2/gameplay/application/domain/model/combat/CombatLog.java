@@ -46,7 +46,8 @@ public record CombatLog(
     boolean isCrit,
     int attackerApAfter,
     int targetApAfter,
-    String weaponTypeName
+    String weaponTypeName,
+    String weaponName
 ) {
     @Builder
     public CombatLog {
