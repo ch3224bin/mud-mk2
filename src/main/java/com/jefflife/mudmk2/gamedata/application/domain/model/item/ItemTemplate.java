@@ -48,7 +48,7 @@ public abstract class ItemTemplate {
     public abstract void update(com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest request);
 
     /**
-     * GameWorldService 캐시 적재 시점에 서브클래스별 LAZY 컬렉션을 강제 초기화한다.
+     * 인메모리 캐시 적재 시점에 서브클래스별 LAZY 컬렉션을 강제 초기화한다.
      * Hibernate 프록시 호출 시 실제 서브클래스 구현이 polymorphic dispatch 된다.
      */
     public abstract void initializeAssociatedEntities();
