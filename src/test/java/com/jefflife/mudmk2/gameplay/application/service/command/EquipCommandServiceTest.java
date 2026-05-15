@@ -187,22 +187,40 @@ class EquipCommandServiceTest {
 
     @Test
     void equip_swapWouldExceedInventoryWeight_rejected() {
-        Inventory small = Inventory.create(6);
+        WeaponTemplate lightSwordTemplate = WeaponTemplate.builder()
+                .name("목검").description("d").weight(1).stackable(false)
+                .weaponType(WeaponType.SWORD)
+                .statModifiers(List.of()).build();
+        WeaponTemplate heavySwordTemplate = WeaponTemplate.builder()
+                .name("대검").description("d").weight(5).stackable(false)
+                .weaponType(WeaponType.SWORD)
+                .statModifiers(List.of()).build();
+
+        Inventory small = Inventory.create(5);
         equipped = EquippedItems.create();
         player = new PlayerCharacter(null, player.getBaseCharacterInfo(), player.getPlayableCharacterInfo(), 1L,
                 "철수", CharacterClass.WARRIOR, true, LocalDateTime.now(), small, equipped);
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
-        ItemInstance sword1 = new ItemInstance(swordTemplate, 1); // 5kg
-        small.addItem(sword1);
-        service.equip(new EquipCommand(1L, "철검", 1)); // 무기 슬롯 점유, 인벤 비움
+        // 슬롯에 5kg 대검 장착
+        ItemInstance heavy = new ItemInstance(heavySwordTemplate, 1);
+        small.addItem(heavy);
+        service.equip(new EquipCommand(1L, "대검", 1));  // 슬롯 = 대검, 인벤 = 0
 
-        ItemInstance sword2 = new ItemInstance(swordTemplate, 1); // 5kg
-        small.addItem(sword2); // 인벤토리 5/6
-        // sword2 장착 시 sword1이 인벤토리에 돌아와야 하는데 5+5>6 → 거부
-        service.equip(new EquipCommand(1L, "철검", 1));
+        // 인벤토리에 1kg 목검 + 4kg 중검 채워서 5/5
+        ItemInstance light = new ItemInstance(lightSwordTemplate, 1);
+        small.addItem(light); // 인벤 = 1kg
+        WeaponTemplate midSwordTemplate = WeaponTemplate.builder()
+                .name("중검").description("d").weight(4).stackable(false)
+                .weaponType(WeaponType.SWORD)
+                .statModifiers(List.of()).build();
+        ItemInstance mid = new ItemInstance(midSwordTemplate, 1);
+        small.addItem(mid); // 인벤 = 1+4 = 5kg (꽉)
 
-        assertThat(equipped.getSlot(EquipmentSlot.WEAPON)).contains(sword1);
+        // 목검 장착 시도 → 슬롯의 대검(5kg)이 인벤으로 와야 함. 인벤 무게: 5 - 1 + 5 = 9 > 5 → 거부
+        service.equip(new EquipCommand(1L, "목검", 1));
+
+        assertThat(equipped.getSlot(EquipmentSlot.WEAPON)).contains(heavy);  // 여전히 대검
         verify(sender, atLeastOnce()).messageToUser(eq(1L), contains("무게가 부족"));
     }
 }

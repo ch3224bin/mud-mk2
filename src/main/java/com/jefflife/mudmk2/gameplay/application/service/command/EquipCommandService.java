@@ -50,11 +50,12 @@ public class EquipCommandService implements EquipUseCase {
         EquipmentSlot targetSlot = resolveSlot(template, equipped);
 
         // swap 시 인벤토리 무게 사전 검사
-        // 현재 인벤토리 무게(장착 예정 아이템 포함) + 반환될 기존 장착 아이템 무게가 용량 초과 여부 확인
+        // instance 제거 후 무게 + 반환될 기존 장착 아이템 무게가 용량 초과 여부 확인
         Optional<ItemInstance> currentOpt = equipped.getSlot(targetSlot);
         if (currentOpt.isPresent()) {
             ItemInstance current = currentOpt.get();
-            int weightAfterSwap = inventory.currentWeight() + current.getTemplate().getWeight() * current.getQuantity();
+            int weightAfterRemove = inventory.currentWeight() - template.getWeight() * instance.getQuantity();
+            int weightAfterSwap = weightAfterRemove + current.getTemplate().getWeight() * current.getQuantity();
             if (weightAfterSwap > inventory.getMaxWeightCapacity()) {
                 sender.messageToUser(command.userId(),
                         template.getName() + "을(를) 장착하려면 " + current.getTemplate().getName()
