@@ -54,7 +54,13 @@ public class Inventory {
                 .sum();
     }
 
+    /**
+     * 인벤토리에 아이템을 추가한다. detached 캐시 invariant 를 위해 아이템의 LAZY 그래프를
+     * 강제 초기화한 뒤 처리한다 (stackable merge / 새 인스턴스 추가 두 경로 모두에서) —
+     * 이 메서드를 통과한 아이템은 세션 없이도 template / 하위 그래프에 안전히 접근할 수 있음이 보장된다.
+     */
     public void addItem(ItemInstance instance) {
+        instance.initializeAssociatedEntities();
         if (instance.getTemplate().isStackable()) {
             Optional<ItemInstance> existing = items.stream()
                     .filter(i -> i.getTemplate() == instance.getTemplate())
