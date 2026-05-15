@@ -218,6 +218,35 @@ class SpeakCommandServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("FakeCreatureLookupQuery 계약 회귀 테스트")
+    class FakeCreatureLookupQueryContractTests {
+
+        @Test
+        @DisplayName("findPlayerByName 은 case-insensitive 매칭이어야 한다 (프로덕션 DefaultCreatureLookupQuery 와 일치)")
+        void findPlayerByName_isCaseInsensitive() {
+            FakePlayerCharacter player = new FakePlayerCharacter(PLAYER_ID, "Alice", USER_ID, ROOM_ID);
+            FakeCreatureLookupQuery query = new FakeCreatureLookupQuery();
+            query.indexPlayer(player);
+
+            assertThat(query.findPlayerByName("alice")).contains(player);
+            assertThat(query.findPlayerByName("ALICE")).contains(player);
+            assertThat(query.findPlayerByName("Alice")).contains(player);
+        }
+
+        @Test
+        @DisplayName("findNpcByName 은 case-insensitive 매칭이어야 한다 (프로덕션 DefaultCreatureLookupQuery 와 일치)")
+        void findNpcByName_isCaseInsensitive() {
+            FakeNonPlayerCharacter npc = new FakeNonPlayerCharacter(NPC_ID, "Goblin", ROOM_ID);
+            FakeCreatureLookupQuery query = new FakeCreatureLookupQuery();
+            query.addNpc(npc);
+
+            assertThat(query.findNpcByName("goblin")).contains(npc);
+            assertThat(query.findNpcByName("GOBLIN")).contains(npc);
+            assertThat(query.findNpcByName("Goblin")).contains(npc);
+        }
+    }
+
     static class FakeRoomOccupancyQuery implements com.jefflife.mudmk2.gameplay.application.service.query.RoomOccupancyQuery {
         private final Map<Long, List<PlayerCharacter>> playersByRoomId = new HashMap<>();
 
@@ -255,12 +284,18 @@ class SpeakCommandServiceTest {
 
         @Override
         public Optional<PlayerCharacter> findPlayerByName(String name) {
-            return Optional.ofNullable(playersByName.get(name));
+            return playersByName.entrySet().stream()
+                    .filter(e -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(e.getKey(), name))
+                    .map(java.util.Map.Entry::getValue)
+                    .findFirst();
         }
 
         @Override
         public Optional<NonPlayerCharacter> findNpcByName(String name) {
-            return Optional.ofNullable(npcsByName.get(name));
+            return npcsByName.entrySet().stream()
+                    .filter(e -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(e.getKey(), name))
+                    .map(java.util.Map.Entry::getValue)
+                    .findFirst();
         }
 
         @Override
