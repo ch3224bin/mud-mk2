@@ -98,6 +98,23 @@ public class Combat {
             Combatable attackerCombatable = attacker.getParticipant();
             Combatable targetCombatable = target.getParticipant();
 
+            // 장착 무기·무공 결정
+            com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType weaponType =
+                    com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.FIST;
+            String weaponName = "맨손";
+            if (attackerCombatable instanceof PlayerCharacter pc) {
+                java.util.Optional<com.jefflife.mudmk2.gamedata.application.domain.model.item.ItemInstance> wOpt =
+                        pc.getEquippedItems().getSlot(com.jefflife.mudmk2.gamedata.application.domain.model.item.EquipmentSlot.WEAPON);
+                if (wOpt.isPresent() && wOpt.get().getTemplate() instanceof com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTemplate wt) {
+                    weaponType = wt.getWeaponType();
+                    weaponName = wt.getName();
+                }
+            }
+            com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType skillType =
+                    com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponTypeMapping.weaponSkillFor(weaponType);
+            int skillValue = readSkillStat(attackerCombatable.getStats(), skillType);
+            int diceMax = Math.max(1, skillValue);
+
             // 2. Attack Execution
             // 2-1. Hit Check
             int attackRoll = diceRoller.roll(1, 20);
@@ -121,7 +138,7 @@ public class Combat {
 
             if (hitSuccess) {
                 // 2-2. Damage Calculation
-                baseDamage = diceRoller.roll(1, 6); // Simulate weapon damage (1d6)
+                baseDamage = diceRoller.roll(1, diceMax);
                 damageModifier = getStrengthModifier(attackerCombatable.getStats().vigor());
                 damageTotal = baseDamage + damageModifier;
 
@@ -144,7 +161,8 @@ public class Combat {
                 hitSuccess,
                 baseDamage, damageModifier, damageTotal,
                 defenseValue, finalDamage,
-                targetRemainingHp, targetDefeated
+                targetRemainingHp, targetDefeated,
+                weaponType.name(), weaponName
             );
 
             // Add the combat log to the list
@@ -171,7 +189,8 @@ public class Combat {
             boolean hitSuccess,
             int baseDamage, int damageModifier, int damageTotal,
             int defenseValue, int finalDamage,
-            int targetRemainingHp, boolean targetDefeated) {
+            int targetRemainingHp, boolean targetDefeated,
+            String weaponTypeName, String weaponName) {
 
         CombatLog.CombatLogBuilder logBuilder = CombatLog.builder()
                 .attackerId(attacker.getId())
@@ -191,7 +210,9 @@ public class Combat {
                 .defenseValue(defenseValue)
                 .finalDamage(finalDamage)
                 .targetRemainingHp(targetRemainingHp)
-                .targetDefeated(targetDefeated);
+                .targetDefeated(targetDefeated)
+                .weaponTypeName(weaponTypeName)
+                .weaponName(weaponName);
 
         return logBuilder.build();
     }
@@ -234,5 +255,26 @@ public class Combat {
 
     public List<PlayerCharacter> getAllyUsers() {
         return allyGroup.getUsers();
+    }
+
+    private static int readSkillStat(com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats stats,
+                                     com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType type) {
+        return switch (type) {
+            case VIGOR -> stats.vigor();
+            case PHYSIQUE -> stats.physique();
+            case AGILITY -> stats.agility();
+            case INTELLECT -> stats.intellect();
+            case WILL -> stats.will();
+            case MERIDIAN -> stats.meridian();
+            case INNER_POWER -> stats.innerPower();
+            case SPECIAL_TECHNIQUE -> stats.specialTechnique();
+            case LIGHT_STEP -> stats.lightStep();
+            case FISTS_AND_PALMS -> stats.fistsAndPalms();
+            case SWORD_METHOD -> stats.swordMethod();
+            case BLADE_METHOD -> stats.bladeMethod();
+            case LONG_WEAPON -> stats.longWeapon();
+            case ESOTERIC_WEAPON -> stats.esotericWeapon();
+            case ARCHERY -> stats.archery();
+        };
     }
 }
