@@ -156,6 +156,13 @@ public class PlayerCharacter implements Combatable, Statable {
         return baseCharacterInfo.isAlive();
     }
 
+    public void heal(int hp, int mp, int ap) {
+        CharacterStats stats = getStats();
+        baseCharacterInfo.healHp(hp, stats.maxHp());
+        baseCharacterInfo.healMp(mp, stats.maxMp());
+        baseCharacterInfo.healAp(ap, stats.maxAp());
+    }
+
     public void fullRestore() {
         baseCharacterInfo.fullRestore();
     }
