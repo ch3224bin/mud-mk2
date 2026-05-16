@@ -108,6 +108,10 @@ public class PlayerCharacter implements Combatable, Statable {
         return this.baseCharacterInfo.getStats();
     }
 
+    public Map<StatType, Integer> getStatModifiers() {
+        return equippedItems.sumStatModifiers();
+    }
+
     @Override
     public CharacterStats getStats() {
         CharacterStats base = baseCharacterInfo.getStats();
