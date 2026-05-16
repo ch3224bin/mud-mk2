@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mental Method Template Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #0a0b10; color: #e4e4e7; font-family: 'IBM Plex Mono', monospace; }
+        .page-header { background: #0d0e14; border-bottom: 1px solid #1e2030; padding: 12px 20px; }
+        .table-dark { --bs-table-bg: #0d0e14; --bs-table-border-color: #1e2030; }
+        .form-panel { background: #0d0e14; border: 1px solid #1e2030; border-radius: 6px; padding: 20px; }
+        .level-block { border: 1px solid #1e3a5f; padding: 10px; margin-bottom: 6px; border-radius: 4px; background: #111320; }
+        .stat-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .btn-green { background: #4ade80; color: #000; border: none; font-weight: bold; }
+        .btn-green:hover { background: #22c55e; color: #000; }
+        input, select, textarea { background: #1a1c24 !important; color: #e4e4e7 !important; border-color: #333 !important; }
+    </style>
+</head>
+<body>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <span style="color:#4ade80;font-weight:bold;">🧘 MENTAL METHOD TEMPLATE MANAGEMENT</span>
+    <a href="/admin" style="color:#aaa;font-size:12px;">← Admin 메뉴</a>
+</div>
+
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-green btn-sm" onclick="showCreateForm()">+ 새 심법</button>
+        <select id="kindFilter" class="form-select form-select-sm" style="width:200px" onchange="loadList()">
+            <option value="">모든 종류</option>
+            <option value="INNER_POWER">내공 (INNER_POWER)</option>
+            <option value="LIGHT_STEP">경공 (LIGHT_STEP)</option>
+            <option value="SPECIAL_TECHNIQUE">절기 (SPECIAL_TECHNIQUE)</option>
+        </select>
+    </div>
+
+    <table class="table table-dark table-sm table-bordered mb-4">
+        <thead><tr style="color:#4ade80">
+            <th>ID</th><th>이름</th><th>종류</th><th>최대 레벨</th><th>작업</th>
+        </tr></thead>
+        <tbody id="listBody"></tbody>
+    </table>
+
+    <div id="formPanel" class="form-panel" style="display:none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="color:#4ade80;font-weight:bold;" id="formTitle">◆ 새 심법</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="hideForm()">취소</button>
+        </div>
+        <input type="hidden" id="editId">
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label small">이름 *</label>
+                <input id="name" class="form-control form-control-sm" placeholder="천뢰신공">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">종류 *</label>
+                <select id="kind" class="form-select form-select-sm">
+                    <option value="INNER_POWER">INNER_POWER (내공)</option>
+                    <option value="LIGHT_STEP">LIGHT_STEP (경공)</option>
+                    <option value="SPECIAL_TECHNIQUE">SPECIAL_TECHNIQUE (절기)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">최대 레벨 *</label>
+                <input type="number" id="maxLevel" class="form-control form-control-sm" min="1" value="1" onchange="syncLevels()">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small">설명</label>
+            <textarea id="description" class="form-control form-control-sm" rows="2"></textarea>
+        </div>
+
+        <div id="levelsContainer"></div>
+
+        <div class="mt-3">
+            <button class="btn btn-green btn-sm" onclick="save()">저장</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const BASE = '/api/v1/mental-method-templates';
+const STAT_TYPES = ['VIGOR','PHYSIQUE','AGILITY','INTELLECT','WILL','MERIDIAN',
+    'INNER_POWER','SPECIAL_TECHNIQUE','LIGHT_STEP',
+    'FISTS_AND_PALMS','SWORD_METHOD','BLADE_METHOD',
+    'LONG_WEAPON','ESOTERIC_WEAPON','ARCHERY'];
+
+async function loadList() {
+    const kind = document.getElementById('kindFilter').value;
+    const url = kind ? `${BASE}?kind=${kind}` : BASE;
+    const res = await fetch(url);
+    const items = await res.json();
+    const tbody = document.getElementById('listBody');
+    tbody.innerHTML = items.map(t => `
+        <tr>
+            <td>${t.id}</td><td>${t.name}</td><td>${t.kind}</td><td>${t.maxLevel}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-info" onclick="loadForEdit(${t.id})">편집</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="del(${t.id})">삭제</button>
+            </td>
+        </tr>`).join('');
+}
+
+function showCreateForm() {
+    document.getElementById('editId').value = '';
+    document.getElementById('formTitle').textContent = '◆ 새 심법';
+    document.getElementById('name').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('kind').value = 'INNER_POWER';
+    document.getElementById('maxLevel').value = 1;
+    document.getElementById('levelsContainer').innerHTML = '';
+    syncLevels();
+    document.getElementById('formPanel').style.display = 'block';
+}
+
+function hideForm() { document.getElementById('formPanel').style.display = 'none'; }
+
+function syncLevels() {
+    const max = parseInt(document.getElementById('maxLevel').value) || 1;
+    const container = document.getElementById('levelsContainer');
+    const current = container.children.length;
+    if (max > current) {
+        for (let l = current + 1; l <= max; l++) container.appendChild(makeLevelBlock(l));
+    } else if (max < current) {
+        for (let i = current - 1; i >= max; i--) container.removeChild(container.children[i]);
+    }
+}
+
+function makeLevelBlock(level) {
+    const div = document.createElement('div');
+    div.className = 'level-block';
+    div.innerHTML = `
+        <div style="color:#4ade80;margin-bottom:6px">레벨 ${level}</div>
+        <div class="stat-rows"></div>
+        <button class="btn btn-sm btn-outline-success" onclick="addStat(this)">+ 스탯 추가</button>
+    `;
+    div.dataset.level = level;
+    return div;
+}
+
+function addStat(btn) {
+    const container = btn.previousElementSibling;
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `
+        <select class="form-select form-select-sm" style="width:200px">
+            ${STAT_TYPES.map(s => `<option>${s}</option>`).join('')}
+        </select>
+        <input type="number" class="form-control form-control-sm" style="width:100px" value="0">
+        <button class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()">x</button>`;
+    container.appendChild(row);
+}
+
+function collectPayload() {
+    const levels = Array.from(document.getElementById('levelsContainer').children).map(div => {
+        const level = parseInt(div.dataset.level);
+        const statModifiers = Array.from(div.querySelectorAll('.stat-row')).map(r => ({
+            statType: r.children[0].value,
+            value: parseInt(r.children[1].value) || 0
+        }));
+        return { level, statModifiers };
+    });
+    return {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        kind: document.getElementById('kind').value,
+        maxLevel: parseInt(document.getElementById('maxLevel').value) || 1,
+        levelEffects: levels
+    };
+}
+
+async function save() {
+    const id = document.getElementById('editId').value;
+    const payload = collectPayload();
+    const url = id ? `${BASE}/${id}` : BASE;
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+        method, headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) { alert('저장 실패: ' + res.status); return; }
+    hideForm();
+    loadList();
+}
+
+async function loadForEdit(id) {
+    const res = await fetch(`${BASE}/${id}`);
+    const t = await res.json();
+    document.getElementById('editId').value = t.id;
+    document.getElementById('formTitle').textContent = `◆ 편집: ${t.name}`;
+    document.getElementById('name').value = t.name;
+    document.getElementById('description').value = t.description || '';
+    document.getElementById('kind').value = t.kind;
+    document.getElementById('maxLevel').value = t.maxLevel;
+    document.getElementById('levelsContainer').innerHTML = '';
+    syncLevels();
+    t.levelEffects.forEach((le, idx) => {
+        const block = document.getElementById('levelsContainer').children[idx];
+        const rows = block.querySelector('.stat-rows');
+        le.statModifiers.forEach(sm => {
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            row.innerHTML = `
+                <select class="form-select form-select-sm" style="width:200px">
+                    ${STAT_TYPES.map(s => `<option ${s === sm.statType ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
+                <input type="number" class="form-control form-control-sm" style="width:100px" value="${sm.value}">
+                <button class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()">x</button>`;
+            rows.appendChild(row);
+        });
+    });
+    document.getElementById('formPanel').style.display = 'block';
+}
+
+async function del(id) {
+    if (!confirm(`ID ${id} 삭제?`)) return;
+    const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+    if (res.status === 409) { alert('학습된 캐릭터가 있어 삭제할 수 없습니다.'); return; }
+    if (!res.ok) { alert('삭제 실패: ' + res.status); return; }
+    loadList();
+}
+
+loadList();
+</script>
+</body>
+</html>
