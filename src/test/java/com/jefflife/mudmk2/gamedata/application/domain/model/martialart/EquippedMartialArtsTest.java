@@ -1,6 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.martialart;
 
-import com.jefflife.mudmk2.gamedata.application.service.exception.MartialArtSlotFullException;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.MartialArtSlotFullException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

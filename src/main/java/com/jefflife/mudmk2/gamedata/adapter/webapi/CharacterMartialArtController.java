@@ -3,7 +3,7 @@ package com.jefflife.mudmk2.gamedata.adapter.webapi;
 import com.jefflife.mudmk2.gamedata.adapter.webapi.response.CharacterMartialArtResponse;
 import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.MentalMethodKind;
 import com.jefflife.mudmk2.gamedata.application.service.exception.AlreadyLearnedException;
-import com.jefflife.mudmk2.gamedata.application.service.exception.MartialArtSlotFullException;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.MartialArtSlotFullException;
 import com.jefflife.mudmk2.gamedata.application.service.exception.NotLearnedException;
 import com.jefflife.mudmk2.gamedata.application.service.provided.ExternalArtTemplateFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.LearnedMartialArtFinder;
