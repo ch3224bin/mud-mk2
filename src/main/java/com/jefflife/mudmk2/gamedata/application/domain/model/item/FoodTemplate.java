@@ -40,4 +40,9 @@ public class FoodTemplate extends ItemTemplate {
     public void initializeAssociatedEntities() {
         // 초기화할 LAZY 컬렉션 없음
     }
+
+    @Override
+    public boolean requiresImmediateDeletion() {
+        return false;
+    }
 }

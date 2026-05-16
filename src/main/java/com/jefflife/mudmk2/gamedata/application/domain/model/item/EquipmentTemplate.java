@@ -47,4 +47,9 @@ public class EquipmentTemplate extends ItemTemplate implements EquippableItemTem
     public void initializeAssociatedEntities() {
         this.statModifiers.size();
     }
+
+    @Override
+    public boolean requiresImmediateDeletion() {
+        return false;
+    }
 }
