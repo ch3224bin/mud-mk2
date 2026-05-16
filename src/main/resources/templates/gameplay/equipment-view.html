@@ -1,0 +1,24 @@
+<div th:fragment="equipmentView" class="equipment-view font-terminal">
+    <div class="msg-room-title">[ 장비 ]</div>
+    <div class="line" th:each="slot : ${slots}">
+        <span class="label" th:text="${slot.slotLabel + ': '}"></span>
+        <span th:if="${slot.itemName == null}">(없음)</span>
+        <span th:if="${slot.itemName != null}">
+            <span th:text="${slot.itemName}"></span>
+            <span th:if="${not #lists.isEmpty(slot.modifiers)}">
+                (<th:block th:each="m, st : ${slot.modifiers}"
+                    ><span th:text="${(m.value >= 0 ? '+' : '') + m.value + ' ' + m.label}"></span
+                    ><span th:if="${not st.last}">, </span></th:block>)
+            </span>
+        </span>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(statDiffs)}">
+        <div class="line-spacer"></div>
+        <div class="msg-room-title">[ 적용 스탯 ] (base → effective)</div>
+        <div class="line" th:each="d : ${statDiffs}">
+            <span class="label" th:text="${d.label + ': '}"></span>
+            <span th:text="${d.base + ' → ' + d.effective}"></span>
+        </div>
+    </div>
+</div>
