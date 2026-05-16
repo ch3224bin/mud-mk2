@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ class PlayerCharacterStatModifiersTest {
         PlayableCharacter playable = PlayableCharacter.builder()
                 .level(1).experience(0).nextLevelExp(100).conversable(true).build();
         return new PlayerCharacter(null, base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), equipped);
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), equipped, EquippedMartialArts.create());
     }
 
     @Test

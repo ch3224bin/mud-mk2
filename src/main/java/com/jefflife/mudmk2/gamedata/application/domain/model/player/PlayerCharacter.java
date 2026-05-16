@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -45,6 +46,10 @@ public class PlayerCharacter implements Combatable, Statable {
     @JoinColumn(name = "equipped_items_id")
     private EquippedItems equippedItems;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "equipped_martial_arts_id")
+    private EquippedMartialArts equippedMartialArts;
+
     public PlayerCharacter(
             final UUID id,
             final BaseCharacter baseCharacterInfo,
@@ -55,7 +60,8 @@ public class PlayerCharacter implements Combatable, Statable {
             final boolean online,
             final LocalDateTime lastActiveAt,
             final Inventory inventory,
-            final EquippedItems equippedItems
+            final EquippedItems equippedItems,
+            final EquippedMartialArts equippedMartialArts
     ) {
         this.id = id;
         this.baseCharacterInfo = baseCharacterInfo;
@@ -67,11 +73,13 @@ public class PlayerCharacter implements Combatable, Statable {
         this.lastActiveAt = lastActiveAt;
         this.inventory = inventory;
         this.equippedItems = equippedItems;
+        this.equippedMartialArts = equippedMartialArts;
     }
 
     public void initializeAssociatedEntities() {
         this.inventory.initializeAssociatedEntities();
         this.equippedItems.initializeAssociatedEntities();
+        this.equippedMartialArts.initializeAssociatedEntities();
     }
 
     public MoveResult move(final Room currentRoom, final Direction direction) {

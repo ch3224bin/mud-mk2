@@ -3,6 +3,7 @@ package com.jefflife.mudmk2.common.fixture;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Direction;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.map.WayOuts;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.EquippedItems;
@@ -58,7 +59,8 @@ public class GameTestFixture {
                 true,
                 LocalDateTime.now(),
                 Inventory.create(Inventory.DEFAULT_MAX_WEIGHT_CAPACITY),
-                EquippedItems.create());
+                EquippedItems.create(),
+                EquippedMartialArts.create());
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.domain.model.combat;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ class CombatWeaponTest {
                 .statModifiers(List.of()).build();
         equipped.equip(EquipmentSlot.WEAPON, new ItemInstance(sword, 1));
         return new PlayerCharacter(UUID.randomUUID(), base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), equipped);
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), equipped, EquippedMartialArts.create());
     }
 
     private PlayerCharacter playerBareHanded(int fistSkill) {
@@ -45,7 +46,7 @@ class CombatWeaponTest {
         PlayableCharacter playable = PlayableCharacter.builder()
                 .level(1).experience(0).nextLevelExp(100).conversable(true).build();
         return new PlayerCharacter(UUID.randomUUID(), base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), EquippedItems.create());
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), Inventory.create(100), EquippedItems.create(), EquippedMartialArts.create());
     }
 
     private Combatable dummyEnemy() {

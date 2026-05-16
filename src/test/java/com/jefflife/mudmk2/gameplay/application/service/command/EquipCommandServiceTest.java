@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.EquipCommand;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
@@ -50,7 +51,7 @@ class EquipCommandServiceTest {
         PlayableCharacter playable = PlayableCharacter.builder()
                 .level(1).experience(0).nextLevelExp(100).conversable(true).build();
         player = new PlayerCharacter(null, base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped);
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped, EquippedMartialArts.create());
 
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
@@ -199,7 +200,7 @@ class EquipCommandServiceTest {
         Inventory small = Inventory.create(5);
         equipped = EquippedItems.create();
         player = new PlayerCharacter(null, player.getBaseCharacterInfo(), player.getPlayableCharacterInfo(), 1L,
-                "철수", CharacterClass.WARRIOR, true, LocalDateTime.now(), small, equipped);
+                "철수", CharacterClass.WARRIOR, true, LocalDateTime.now(), small, equipped, EquippedMartialArts.create());
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
         // 슬롯에 5kg 대검 장착

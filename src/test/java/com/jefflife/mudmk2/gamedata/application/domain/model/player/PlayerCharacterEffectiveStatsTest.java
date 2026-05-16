@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class PlayerCharacterEffectiveStatsTest {
         Inventory inventory = Inventory.create(100);
         equipped = EquippedItems.create();
         player = new PlayerCharacter(null, base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped);
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped, EquippedMartialArts.create());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.player;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.StatType;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -32,7 +33,8 @@ class PlayerCharacterHealTest {
                 false,
                 null,
                 inventory,
-                equipped
+                equipped,
+                EquippedMartialArts.create()
         );
     }
 

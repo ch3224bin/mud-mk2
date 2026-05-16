@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.UnequipCommand;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
@@ -46,7 +47,7 @@ class UnequipCommandServiceTest {
         PlayableCharacter playable = PlayableCharacter.builder()
                 .level(1).experience(0).nextLevelExp(100).conversable(true).build();
         player = new PlayerCharacter(null, base, playable, 1L, "철수",
-                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped);
+                CharacterClass.WARRIOR, true, LocalDateTime.now(), inventory, equipped, EquippedMartialArts.create());
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
         swordTemplate = WeaponTemplate.builder()
@@ -79,7 +80,7 @@ class UnequipCommandServiceTest {
         Inventory small = Inventory.create(5);
         equipped = EquippedItems.create();
         player = new PlayerCharacter(null, player.getBaseCharacterInfo(), player.getPlayableCharacterInfo(),
-                1L, "철수", CharacterClass.WARRIOR, true, LocalDateTime.now(), small, equipped);
+                1L, "철수", CharacterClass.WARRIOR, true, LocalDateTime.now(), small, equipped, EquippedMartialArts.create());
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
         ItemInstance sword = new ItemInstance(swordTemplate, 1); // 5kg

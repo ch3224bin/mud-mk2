@@ -1,5 +1,6 @@
 package com.jefflife.mudmk2.gamedata.application.service;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.BaseCharacter;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterClass;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterStats;
@@ -90,7 +91,8 @@ public class PlayerCharacterService implements PlayerCharacterFinder {
                 true,
                 LocalDateTime.now(),
                 inventory,
-                EquippedItems.create()
+                EquippedItems.create(),
+                EquippedMartialArts.create()
         );
 
         // Save character
