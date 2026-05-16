@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Character Martial Art Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #0a0b10; color: #e4e4e7; font-family: 'IBM Plex Mono', monospace; }
+        .page-header { background: #0d0e14; border-bottom: 1px solid #1e2030; padding: 12px 20px; }
+        .panel { background: #0d0e14; border: 1px solid #1e2030; border-radius: 6px; padding: 16px; height: 100%; }
+        .table-dark { --bs-table-bg: #0d0e14; --bs-table-border-color: #1e2030; }
+        .slot { display: inline-block; padding: 4px 8px; margin: 2px; background: #111320; border: 1px solid #1e3a5f; border-radius: 4px; }
+        input, select { background: #1a1c24 !important; color: #e4e4e7 !important; border-color: #333 !important; }
+        .btn-green { background: #4ade80; color: #000; border: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <span style="color:#4ade80;font-weight:bold;">🎓 CHARACTER MARTIAL ART MANAGEMENT</span>
+    <a href="/admin" style="color:#aaa;font-size:12px;">← Admin 메뉴</a>
+</div>
+
+<div class="container-fluid p-4">
+    <div class="row g-3 mb-3">
+        <div class="col-md-5">
+            <div class="panel">
+                <h6 style="color:#4ade80">캐릭터 검색</h6>
+                <input id="charSearch" class="form-control form-control-sm mb-2" placeholder="닉네임 일부..." oninput="searchChars()">
+                <table class="table table-dark table-sm">
+                    <thead><tr><th>ID</th><th>닉네임</th><th>클래스</th><th></th></tr></thead>
+                    <tbody id="charList"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="panel">
+                <h6 style="color:#4ade80">선택 캐릭터 상태</h6>
+                <div id="charStatus">캐릭터를 선택하세요.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h6 style="color:#4ade80">템플릿 검색 → 학습 부여</h6>
+        <ul class="nav nav-tabs mb-2">
+            <li class="nav-item"><a class="nav-link active" href="#" onclick="setTab('mental', event);return false">심법</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="setTab('external', event);return false">외공</a></li>
+        </ul>
+        <input id="tplSearch" class="form-control form-control-sm mb-2" placeholder="이름 일부..." oninput="searchTpls()">
+        <table class="table table-dark table-sm">
+            <thead id="tplHead"></thead>
+            <tbody id="tplList"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let selectedPc = null;
+let tab = 'mental';
+
+// PlayerCharacterController: GET /api/v1/player-characters/search?nickname=...
+const CHAR_SEARCH_URL = (q) => `/api/v1/player-characters/search?nickname=${encodeURIComponent(q)}`;
+
+async function searchChars() {
+    const q = document.getElementById('charSearch').value;
+    if (!q) { document.getElementById('charList').innerHTML = ''; return; }
+    const res = await fetch(CHAR_SEARCH_URL(q));
+    if (!res.ok) { document.getElementById('charList').innerHTML = '<tr><td colspan="4">검색 실패</td></tr>'; return; }
+    const items = await res.json();
+    document.getElementById('charList').innerHTML = items.map(c => `
+        <tr>
+            <td style="font-size:10px">${c.id}</td>
+            <td>${c.nickname}</td>
+            <td>${c.characterClass || ''}</td>
+            <td><button class="btn btn-sm btn-green" onclick="selectChar('${c.id}','${c.nickname}')">선택</button></td>
+        </tr>`).join('');
+}
+
+async function selectChar(id, nickname) {
+    selectedPc = id;
+    await refreshStatus(nickname);
+}
+
+async function refreshStatus(nickname) {
+    if (!selectedPc) return;
+    const res = await fetch(`/api/v1/player-characters/${selectedPc}/martial-arts`);
+    if (!res.ok) { document.getElementById('charStatus').textContent = '조회 실패'; return; }
+    const v = await res.json();
+    const mentalRows = v.learnedMentalMethods.map(l => `
+        <tr><td>${l.templateName}</td><td>${l.kind}</td><td>Lv${l.currentLevel}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-info" onclick="equipMental('${l.id}')">장착</button>
+        </td></tr>`).join('') || '<tr><td colspan="4">없음</td></tr>';
+    const externalRows = v.learnedExternalArts.map(l => `
+        <tr><td>${l.templateName}</td><td>${l.weaponType}</td><td>Lv${l.currentLevel}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-info" onclick="equipExternal('${l.id}')">장착</button>
+        </td></tr>`).join('') || '<tr><td colspan="4">없음</td></tr>';
+    const mentalSlots = Object.entries(v.equippedMentalSlots || {}).map(([k, id]) => `
+        <span class="slot">${k}: ${id.substring(0,8)}
+            <button class="btn btn-sm btn-link p-0 ms-1" style="color:#f87171" onclick="unequipMental('${k}')">x</button>
+        </span>`).join('') || '<span class="text-muted">없음</span>';
+    const externalSlots = (v.equippedExternalSlots || []).map(id => `
+        <span class="slot">${id.substring(0,8)}
+            <button class="btn btn-sm btn-link p-0 ms-1" style="color:#f87171" onclick="unequipExternal('${id}')">x</button>
+        </span>`).join('') || '<span class="text-muted">없음</span>';
+
+    document.getElementById('charStatus').innerHTML = `
+        <div class="mb-2"><b>${nickname || selectedPc}</b></div>
+        <div class="mb-2"><b style="color:#4ade80">심법 슬롯:</b> ${mentalSlots}</div>
+        <div class="mb-3"><b style="color:#4ade80">외공 슬롯 (${(v.equippedExternalSlots||[]).length}/6):</b> ${externalSlots}</div>
+        <div class="mb-2"><b style="color:#60a5fa">학습한 심법</b>
+            <table class="table table-dark table-sm"><thead><tr><th>이름</th><th>종류</th><th>레벨</th><th></th></tr></thead><tbody>${mentalRows}</tbody></table>
+        </div>
+        <div><b style="color:#60a5fa">학습한 외공</b>
+            <table class="table table-dark table-sm"><thead><tr><th>이름</th><th>무기</th><th>레벨</th><th></th></tr></thead><tbody>${externalRows}</tbody></table>
+        </div>
+    `;
+    window._lastNick = nickname;
+}
+
+function setTab(t, evt) {
+    tab = t;
+    document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+    evt.target.classList.add('active');
+    searchTpls();
+}
+
+async function searchTpls() {
+    const q = document.getElementById('tplSearch').value;
+    const base = tab === 'mental' ? '/api/v1/mental-method-templates' : '/api/v1/external-art-templates';
+    const url = q ? `${base}?name=${encodeURIComponent(q)}` : base;
+    const items = await (await fetch(url)).json();
+    if (tab === 'mental') {
+        document.getElementById('tplHead').innerHTML = '<tr><th>ID</th><th>이름</th><th>종류</th><th>최대레벨</th><th></th></tr>';
+        document.getElementById('tplList').innerHTML = items.map(t => `
+            <tr><td>${t.id}</td><td>${t.name}</td><td>${t.kind}</td><td>${t.maxLevel}</td>
+            <td><button class="btn btn-sm btn-green" onclick="learnMental(${t.id})">학습시키기</button></td></tr>`).join('');
+    } else {
+        document.getElementById('tplHead').innerHTML = '<tr><th>ID</th><th>이름</th><th>무기</th><th>최대레벨</th><th></th></tr>';
+        document.getElementById('tplList').innerHTML = items.map(t => `
+            <tr><td>${t.id}</td><td>${t.name}</td><td>${t.weaponType}</td><td>${t.maxLevel}</td>
+            <td><button class="btn btn-sm btn-green" onclick="learnExternal(${t.id})">학습시키기</button></td></tr>`).join('');
+    }
+}
+
+async function postJson(url, body) {
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(body || {})
+    });
+    return res;
+}
+
+async function learnMental(tplId) {
+    if (!selectedPc) { alert('캐릭터를 먼저 선택하세요'); return; }
+    const res = await postJson(`/api/v1/player-characters/${selectedPc}/martial-arts/mental-methods/learn`, {templateId: tplId});
+    if (res.status === 409) { alert('이미 학습했습니다'); return; }
+    if (!res.ok) { alert('실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+async function learnExternal(tplId) {
+    if (!selectedPc) { alert('캐릭터를 먼저 선택하세요'); return; }
+    const res = await postJson(`/api/v1/player-characters/${selectedPc}/martial-arts/external-arts/learn`, {templateId: tplId});
+    if (res.status === 409) { alert('이미 학습했습니다'); return; }
+    if (!res.ok) { alert('실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+async function equipMental(learnedId) {
+    const res = await postJson(`/api/v1/player-characters/${selectedPc}/martial-arts/mental-methods/equip`, {learnedId});
+    if (!res.ok) { alert('장착 실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+async function equipExternal(learnedId) {
+    const res = await postJson(`/api/v1/player-characters/${selectedPc}/martial-arts/external-arts/equip`, {learnedId});
+    if (res.status === 409) { alert('슬롯이 가득 찼습니다 (최대 6)'); return; }
+    if (!res.ok) { alert('장착 실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+async function unequipMental(kind) {
+    const res = await fetch(`/api/v1/player-characters/${selectedPc}/martial-arts/mental-methods/${kind}`, {method:'DELETE'});
+    if (!res.ok) { alert('해제 실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+async function unequipExternal(learnedId) {
+    const res = await fetch(`/api/v1/player-characters/${selectedPc}/martial-arts/external-arts/${learnedId}`, {method:'DELETE'});
+    if (!res.ok) { alert('해제 실패: ' + res.status); return; }
+    refreshStatus(window._lastNick);
+}
+
+searchTpls();
+</script>
+</body>
+</html>
