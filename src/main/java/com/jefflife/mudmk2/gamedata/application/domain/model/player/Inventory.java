@@ -80,8 +80,7 @@ public class Inventory {
     public boolean consumeOne(ItemInstance instance) {
         instance.decreaseQuantity(1);
         if (instance.getQuantity() <= 0) {
-            items.remove(instance);
-            return true;
+            return items.remove(instance);
         }
         return false;
     }
