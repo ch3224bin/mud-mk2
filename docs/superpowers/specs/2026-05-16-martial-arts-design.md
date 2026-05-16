@@ -177,9 +177,12 @@ private EquippedMartialArts equippedMartialArts;
 - `MartialArtLearner.learnExternalArt(UUID pcId, Long templateId)` — 동일
 
 **장착**
-- `MartialArtEquipper.equipMentalMethod(UUID pcId, UUID learnedId)` — kind 자동 인식 → 같은 kind 슬롯 자동 교체
+- `MartialArtEquipper.equipMentalMethod(UUID pcId, UUID learnedId)`
+  - 서비스에서 `LearnedMentalMethod` → `MentalMethodTemplate.kind` 를 조회해
+    `EquippedMartialArts.equipMental(kind, learnedId)` 호출. 같은 kind 슬롯은 자동 교체.
 - `MartialArtEquipper.unequipMentalMethod(UUID pcId, MentalMethodKind kind)`
-- `MartialArtEquipper.equipExternalArt(UUID pcId, UUID learnedId)` — 6슬롯 차면 `MartialArtSlotFullException`
+- `MartialArtEquipper.equipExternalArt(UUID pcId, UUID learnedId)` — 6슬롯 차면 `MartialArtSlotFullException`,
+  동일 learnedId가 이미 장착돼 있으면 no-op (HTTP 200)
 - `MartialArtEquipper.unequipExternalArt(UUID pcId, UUID learnedId)`
 
 **조회**
