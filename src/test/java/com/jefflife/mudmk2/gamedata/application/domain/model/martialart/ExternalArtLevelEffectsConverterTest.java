@@ -34,6 +34,8 @@ class ExternalArtLevelEffectsConverterTest {
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new ExternalArtLevelEffect(1, 1.0, 5, 5, -1))
                 .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ExternalArtLevelEffect(0, 1.0, 5, 5, 0))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
