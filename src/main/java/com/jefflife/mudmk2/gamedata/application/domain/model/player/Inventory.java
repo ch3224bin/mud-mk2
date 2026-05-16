@@ -77,6 +77,15 @@ public class Inventory {
         items.remove(instance);
     }
 
+    public boolean consumeOne(ItemInstance instance) {
+        instance.decreaseQuantity(1);
+        if (instance.getQuantity() <= 0) {
+            items.remove(instance);
+            return true;
+        }
+        return false;
+    }
+
     public List<ItemInstance> findItemsByName(String name) {
         return items.stream()
                 .filter(i -> i.getTemplate().getName().equals(name))

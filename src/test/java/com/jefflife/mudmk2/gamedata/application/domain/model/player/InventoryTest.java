@@ -98,4 +98,28 @@ class InventoryTest {
         inventory.addItem(new ItemInstance(foodTemplate, 3));  // 1 * 3 = 3
         assertThat(inventory.currentWeight()).isEqualTo(8);
     }
+
+    @Test
+    void consumeOne_quantityGreaterThanOne_decrementsAndReturnsFalse() {
+        ItemInstance instance = new ItemInstance(foodTemplate, 2);
+        inventory.addItem(instance);
+
+        boolean removed = inventory.consumeOne(instance);
+
+        assertThat(removed).isFalse();
+        assertThat(instance.getQuantity()).isEqualTo(1);
+        assertThat(inventory.getItems()).hasSize(1);
+    }
+
+    @Test
+    void consumeOne_quantityOne_removesAndReturnsTrue() {
+        ItemInstance instance = new ItemInstance(foodTemplate, 1);
+        inventory.addItem(instance);
+
+        boolean removed = inventory.consumeOne(instance);
+
+        assertThat(removed).isTrue();
+        assertThat(instance.getQuantity()).isEqualTo(0);
+        assertThat(inventory.getItems()).isEmpty();
+    }
 }
