@@ -39,6 +39,10 @@ public class ItemInstance {
         this.quantity += amount;
     }
 
+    public void decreaseQuantity(int amount) {
+        this.quantity = Math.max(0, this.quantity - amount);
+    }
+
     /**
      * 인메모리 캐시 적재 시점에 LAZY 관계를 강제 초기화한다.
      * detached 상태에서 template 접근 시 LazyInitializationException을 방지.

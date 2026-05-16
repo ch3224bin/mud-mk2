@@ -27,4 +27,20 @@ class ItemInstanceTest {
         instance.addQuantity(3);
         assertThat(instance.getQuantity()).isEqualTo(4);
     }
+
+    @Test
+    void decreaseQuantity_decreasesQuantity() {
+        FoodTemplate food = makeFood();
+        ItemInstance instance = new ItemInstance(food, 5);
+        instance.decreaseQuantity(2);
+        assertThat(instance.getQuantity()).isEqualTo(3);
+    }
+
+    @Test
+    void decreaseQuantity_clampsAtZero() {
+        FoodTemplate food = makeFood();
+        ItemInstance instance = new ItemInstance(food, 1);
+        instance.decreaseQuantity(5);
+        assertThat(instance.getQuantity()).isEqualTo(0);
+    }
 }
