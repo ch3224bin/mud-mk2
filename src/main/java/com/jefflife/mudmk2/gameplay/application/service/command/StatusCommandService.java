@@ -44,9 +44,10 @@ public class StatusCommandService implements StatusUseCase {
         Long currentRoomId = player.getCurrentRoomId();
         Room currentRoom = rooms.findById(currentRoomId)
                 .orElseThrow(() -> new RoomNotFoundException(currentRoomId));
-        
-        CharacterStats stats = player.getStats();
-        
+
+        CharacterStats base = player.getBaseStats();
+        CharacterStats total = player.getStats();
+
         StatusVariables statusVariables = new StatusVariables(
                 player.getUserId(),
                 player.getName(),
@@ -56,30 +57,30 @@ public class StatusCommandService implements StatusUseCase {
                 player.getPlayableCharacterInfo().getLevel(),
                 player.getPlayableCharacterInfo().getExperience(),
                 player.getPlayableCharacterInfo().getNextLevelExp(),
-                stats.hp(),
-                stats.maxHp(),
-                stats.mp(),
-                stats.maxMp(),
-                stats.ap(),
-                stats.maxAp(),
-                stats.vigor(),
-                stats.physique(),
-                stats.agility(),
-                stats.intellect(),
-                stats.will(),
-                stats.meridian(),
-                stats.innerPower(),
-                stats.specialTechnique(),
-                stats.lightStep(),
-                stats.fistsAndPalms(),
-                stats.swordMethod(),
-                stats.bladeMethod(),
-                stats.longWeapon(),
-                stats.esotericWeapon(),
-                stats.archery(),
+                total.hp(),
+                total.maxHp(),
+                total.mp(),
+                total.maxMp(),
+                total.ap(),
+                total.maxAp(),
+                new StatusVariables.StatValue(base.vigor(),            total.vigor()            - base.vigor()),
+                new StatusVariables.StatValue(base.physique(),         total.physique()         - base.physique()),
+                new StatusVariables.StatValue(base.agility(),          total.agility()          - base.agility()),
+                new StatusVariables.StatValue(base.intellect(),        total.intellect()        - base.intellect()),
+                new StatusVariables.StatValue(base.will(),             total.will()             - base.will()),
+                new StatusVariables.StatValue(base.meridian(),         total.meridian()         - base.meridian()),
+                new StatusVariables.StatValue(base.innerPower(),       total.innerPower()       - base.innerPower()),
+                new StatusVariables.StatValue(base.specialTechnique(), total.specialTechnique() - base.specialTechnique()),
+                new StatusVariables.StatValue(base.lightStep(),        total.lightStep()        - base.lightStep()),
+                new StatusVariables.StatValue(base.fistsAndPalms(),    total.fistsAndPalms()    - base.fistsAndPalms()),
+                new StatusVariables.StatValue(base.swordMethod(),      total.swordMethod()      - base.swordMethod()),
+                new StatusVariables.StatValue(base.bladeMethod(),      total.bladeMethod()      - base.bladeMethod()),
+                new StatusVariables.StatValue(base.longWeapon(),       total.longWeapon()       - base.longWeapon()),
+                new StatusVariables.StatValue(base.esotericWeapon(),   total.esotericWeapon()   - base.esotericWeapon()),
+                new StatusVariables.StatValue(base.archery(),          total.archery()          - base.archery()),
                 currentRoom.getName()
         );
-        
+
         sendStatusMessagePort.sendMessage(statusVariables);
         logger.debug("Sent status message for player: {}", player.getName());
     }
