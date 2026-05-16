@@ -10,10 +10,13 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRepository;
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.EatCommand;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.EatSuccessVariables;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendEatSuccessMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,6 +50,9 @@ class EatCommandServiceTest {
     @Mock
     private SendMessageToUserPort sendMessageToUserPort;
 
+    @Mock
+    private SendEatSuccessMessagePort sendEatSuccessMessagePort;
+
     @InjectMocks
     private EatCommandService eatCommandService;
 
@@ -68,6 +75,7 @@ class EatCommandServiceTest {
         eatCommandService.eat(new EatCommand(1L, "사과", 0));
 
         verify(sendMessageToUserPort).messageToUser(eq(1L), contains("올바른 번호"));
+        verify(sendEatSuccessMessagePort, never()).sendMessage(any());
         verifyNoInteractions(players);
     }
 
@@ -80,6 +88,7 @@ class EatCommandServiceTest {
         eatCommandService.eat(new EatCommand(1L, "사과", 1));
 
         verify(sendMessageToUserPort).messageToUser(eq(1L), contains("가지고 있지 않습니다"));
+        verify(sendEatSuccessMessagePort, never()).sendMessage(any());
         verify(inventory, never()).consumeOne(any());
         verifyNoInteractions(itemInstanceRepository);
     }
@@ -94,6 +103,7 @@ class EatCommandServiceTest {
         eatCommandService.eat(new EatCommand(1L, "사과", 5));
 
         verify(sendMessageToUserPort).messageToUser(eq(1L), contains("찾을 수 없습니다"));
+        verify(sendEatSuccessMessagePort, never()).sendMessage(any());
         verify(inventory, never()).consumeOne(any());
     }
 
@@ -111,6 +121,7 @@ class EatCommandServiceTest {
         eatCommandService.eat(new EatCommand(1L, "철검", 1));
 
         verify(sendMessageToUserPort).messageToUser(eq(1L), contains("먹을 수 없습니다"));
+        verify(sendEatSuccessMessagePort, never()).sendMessage(any());
         verify(inventory, never()).consumeOne(any());
     }
 
@@ -129,7 +140,14 @@ class EatCommandServiceTest {
         verify(inventory).consumeOne(item);
         verify(itemInstanceRepository, never()).delete(any());
         verify(playerCharacterRepository, never()).save(any());
-        verify(sendMessageToUserPort).messageToUser(eq(1L), contains("사과"));
+
+        ArgumentCaptor<EatSuccessVariables> captor = ArgumentCaptor.forClass(EatSuccessVariables.class);
+        verify(sendEatSuccessMessagePort).sendMessage(captor.capture());
+        EatSuccessVariables vars = captor.getValue();
+        assertThat(vars.userId()).isEqualTo(1L);
+        assertThat(vars.itemName()).isEqualTo("사과");
+        assertThat(vars.hpRecovery()).isEqualTo(30);
+        assertThat(vars.mpRecovery()).isEqualTo(10);
     }
 
     @Test
@@ -146,6 +164,7 @@ class EatCommandServiceTest {
         verify(inventory).consumeOne(item);
         verify(itemInstanceRepository).delete(item);
         verify(playerCharacterRepository, never()).save(any());  // FoodTemplate 은 false
+        verify(sendEatSuccessMessagePort).sendMessage(any());
     }
 
     @Test
@@ -169,5 +188,6 @@ class EatCommandServiceTest {
 
         verify(itemInstanceRepository).delete(item);
         verify(playerCharacterRepository).save(player);
+        verify(sendEatSuccessMessagePort).sendMessage(any());
     }
 }

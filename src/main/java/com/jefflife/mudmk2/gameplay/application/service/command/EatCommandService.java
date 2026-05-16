@@ -9,32 +9,38 @@ import com.jefflife.mudmk2.gamedata.application.service.required.ItemInstanceRep
 import com.jefflife.mudmk2.gamedata.application.service.required.PlayerCharacterRepository;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.EatCommand;
 import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.EatSuccessVariables;
 import com.jefflife.mudmk2.gameplay.application.service.provided.EatUseCase;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
+import com.jefflife.mudmk2.gameplay.application.service.required.SendEatSuccessMessagePort;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendMessageToUserPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class EatCommandService implements EatUseCase {
 
     private final ActivePlayerRepository players;
     private final ItemInstanceRepository itemInstanceRepository;
     private final PlayerCharacterRepository playerCharacterRepository;
     private final SendMessageToUserPort sendMessageToUserPort;
+    private final SendEatSuccessMessagePort sendEatSuccessMessagePort;
 
     public EatCommandService(
             ActivePlayerRepository players,
             ItemInstanceRepository itemInstanceRepository,
             PlayerCharacterRepository playerCharacterRepository,
-            SendMessageToUserPort sendMessageToUserPort
+            SendMessageToUserPort sendMessageToUserPort,
+            SendEatSuccessMessagePort sendEatSuccessMessagePort
     ) {
         this.players = players;
         this.itemInstanceRepository = itemInstanceRepository;
         this.playerCharacterRepository = playerCharacterRepository;
         this.sendMessageToUserPort = sendMessageToUserPort;
+        this.sendEatSuccessMessagePort = sendEatSuccessMessagePort;
     }
 
     @Override
@@ -78,15 +84,12 @@ public class EatCommandService implements EatUseCase {
             playerCharacterRepository.save(player);
         }
 
-        sendMessageToUserPort.messageToUser(command.userId(),
-                food.getName() + "을(를) 먹어 " + buildRecoveryMessage(food) + "이(가) 회복되었다.");
-    }
-
-    private String buildRecoveryMessage(FoodTemplate food) {
-        List<String> parts = new ArrayList<>();
-        if (food.getHpRecovery() > 0) parts.add("hp " + food.getHpRecovery());
-        if (food.getMpRecovery() > 0) parts.add("mp " + food.getMpRecovery());
-        if (food.getApRecovery() > 0) parts.add("ap " + food.getApRecovery());
-        return String.join(", ", parts);
+        sendEatSuccessMessagePort.sendMessage(new EatSuccessVariables(
+                command.userId(),
+                food.getName(),
+                food.getHpRecovery(),
+                food.getMpRecovery(),
+                food.getApRecovery()
+        ));
     }
 }

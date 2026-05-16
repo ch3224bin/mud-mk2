@@ -1,0 +1,7 @@
+<div class="eat-success-message font-terminal">
+    <span th:text="${itemName}"></span>을(를) 먹어
+    <span th:if="${hpRecovery > 0}">hp <span th:text="${hpRecovery}"></span></span><span th:if="${hpRecovery > 0 and (mpRecovery > 0 or apRecovery > 0)}">, </span>
+    <span th:if="${mpRecovery > 0}">mp <span th:text="${mpRecovery}"></span></span><span th:if="${mpRecovery > 0 and apRecovery > 0}">, </span>
+    <span th:if="${apRecovery > 0}">ap <span th:text="${apRecovery}"></span></span>
+    이(가) 회복되었다.
+</div>
