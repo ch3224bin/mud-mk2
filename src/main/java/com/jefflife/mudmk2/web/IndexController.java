@@ -147,4 +147,34 @@ public class IndexController {
         }
         return "web/item-instance-management";
     }
+
+    @GetMapping("/mental-method-template-management")
+    public String mentalMethodTemplateManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/mental-method-template-management";
+    }
+
+    @GetMapping("/external-art-template-management")
+    public String externalArtTemplateManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/external-art-template-management";
+    }
+
+    @GetMapping("/character-martial-art-management")
+    public String characterMartialArtManagement(Model model, @LoginUser SessionUser user) {
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+            model.addAttribute("userEmail", user.getEmail());
+            model.addAttribute("userPicture", user.getPicture());
+        }
+        return "web/character-martial-art-management";
+    }
 }
