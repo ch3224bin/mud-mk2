@@ -9,7 +9,8 @@ public enum CommandDictionary {
     INVENTORY("소지품", "가방", "인벤"),
     EQUIP("장착", "착용", "입어", "입고", "차다", "차고", "끼다", "껴"),
     UNEQUIP("해제", "벗어", "벗고", "빼다", "빼"),
-    EQUIPMENT_VIEW("장비", "장비창");
+    EQUIPMENT_VIEW("장비", "장비창"),
+    EAT("먹다", "먹어", "먹");
 
     private final Set<String> aliases;
 

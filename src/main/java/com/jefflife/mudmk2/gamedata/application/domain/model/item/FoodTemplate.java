@@ -1,5 +1,9 @@
 package com.jefflife.mudmk2.gamedata.application.domain.model.item;
 
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.effect.ApRestoreEffect;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.effect.EatEffect;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.effect.HpRestoreEffect;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.effect.MpRestoreEffect;
 import com.jefflife.mudmk2.gamedata.application.service.model.request.ItemTemplateRequest;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -8,6 +12,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "food_template")
@@ -36,8 +43,21 @@ public class FoodTemplate extends ItemTemplate {
         this.apRecovery = request.apRecovery() != null ? request.apRecovery() : 0;
     }
 
+    public List<EatEffect> getEatEffects() {
+        List<EatEffect> effects = new ArrayList<>();
+        if (hpRecovery > 0) effects.add(new HpRestoreEffect(hpRecovery));
+        if (mpRecovery > 0) effects.add(new MpRestoreEffect(mpRecovery));
+        if (apRecovery > 0) effects.add(new ApRestoreEffect(apRecovery));
+        return effects;
+    }
+
     @Override
     public void initializeAssociatedEntities() {
         // 초기화할 LAZY 컬렉션 없음
+    }
+
+    @Override
+    public boolean requiresImmediateDeletion() {
+        return false;
     }
 }

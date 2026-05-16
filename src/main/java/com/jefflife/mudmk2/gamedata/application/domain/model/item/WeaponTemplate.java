@@ -47,4 +47,9 @@ public class WeaponTemplate extends ItemTemplate implements EquippableItemTempla
     public void initializeAssociatedEntities() {
         this.statModifiers.size();
     }
+
+    @Override
+    public boolean requiresImmediateDeletion() {
+        return false;
+    }
 }

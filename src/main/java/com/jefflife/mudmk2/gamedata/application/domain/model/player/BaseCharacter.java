@@ -88,4 +88,16 @@ public class BaseCharacter {
             this.state = CharacterState.DEAD;
         }
     }
+
+    public void healHp(int amount, int maxHp) {
+        this.hp = Math.min(this.hp + amount, maxHp);
+    }
+
+    public void healMp(int amount, int maxMp) {
+        this.mp = Math.min(this.mp + amount, maxMp);
+    }
+
+    public void healAp(int amount, int maxAp) {
+        this.ap = Math.min(this.ap + amount, maxAp);
+    }
 }
