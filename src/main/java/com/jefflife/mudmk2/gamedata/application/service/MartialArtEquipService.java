@@ -71,11 +71,13 @@ public class MartialArtEquipService implements MartialArtEquipper, LearnedMartia
     @Transactional(readOnly = true)
     public CharacterMartialArtView findByCharacter(UUID pcId) {
         PlayerCharacter pc = requirePc(pcId);
+        EquippedMartialArts equipped = pc.getEquippedMartialArts();
+        equipped.initializeAssociatedEntities();
         return new CharacterMartialArtView(
                 pcId,
                 mentalRepo.findAllByPlayerCharacterId(pcId),
                 externalRepo.findAllByPlayerCharacterId(pcId),
-                pc.getEquippedMartialArts()
+                equipped
         );
     }
 
