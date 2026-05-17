@@ -4,6 +4,8 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterCla
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.CharacterState;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.Gender;
 
+import java.util.List;
+
 /**
  * Variables for the status message template.
  * 각 능력치/무예는 base 값과 장비/심법으로부터 누적된 bonus 값을 함께 보유한다.
@@ -41,11 +43,39 @@ public record StatusVariables(
         StatValue longWeapon,
         StatValue esotericWeapon,
         StatValue archery,
-        String roomName
+        String roomName,
+        EquippedMartialArtsView equippedMartialArts
 ) {
     public record StatValue(int base, int bonus) {
         public int total() {
             return base + bonus;
         }
     }
+
+    public record EquippedMartialArtsView(
+            List<MentalSlotLine> mentalSlots,
+            List<ExternalSlotLine> externalSlots
+    ) {}
+
+    public record MentalSlotLine(
+            String kindLabel,
+            String name,
+            Integer currentLevel,
+            Integer maxLevel,
+            List<StatModLine> effects
+    ) {}
+
+    public record ExternalSlotLine(
+            int slotNumber,
+            String name,
+            String weaponLabel,
+            Integer currentLevel,
+            Integer maxLevel,
+            Double damageMultiplier,
+            Integer cooldownSeconds,
+            Integer apCost,
+            Integer mpCost
+    ) {}
+
+    public record StatModLine(String label, int value) {}
 }

@@ -90,7 +90,8 @@ class StatusMessageSenderTemplateTest {
                 DEFAULT_STAT,   // longWeapon
                 DEFAULT_STAT,   // esotericWeapon
                 DEFAULT_STAT,   // archery
-                "수련장"         // roomName
+                "수련장",         // roomName
+                emptyEquipped()
         );
     }
 
@@ -104,7 +105,7 @@ class StatusMessageSenderTemplateTest {
                 d.physique(), d.agility(), d.intellect(), d.will(), d.meridian(),
                 d.innerPower(), d.specialTechnique(), d.lightStep(), d.fistsAndPalms(),
                 d.swordMethod(), d.bladeMethod(), d.longWeapon(), d.esotericWeapon(),
-                d.archery(), d.roomName()
+                d.archery(), d.roomName(), d.equippedMartialArts()
         );
     }
 
@@ -190,5 +191,19 @@ class StatusMessageSenderTemplateTest {
         assertThat(html).contains("장병기술");
         assertThat(html).contains("암기술");
         assertThat(html).contains("궁술");
+    }
+
+    private StatusVariables.EquippedMartialArtsView emptyEquipped() {
+        java.util.List<StatusVariables.MentalSlotLine> mental = java.util.List.of(
+                new StatusVariables.MentalSlotLine("내공", null, null, null, java.util.List.of()),
+                new StatusVariables.MentalSlotLine("경공", null, null, null, java.util.List.of()),
+                new StatusVariables.MentalSlotLine("특기", null, null, null, java.util.List.of())
+        );
+        java.util.List<StatusVariables.ExternalSlotLine> external = new java.util.ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            external.add(new StatusVariables.ExternalSlotLine(
+                    i, null, null, null, null, null, null, null, null));
+        }
+        return new StatusVariables.EquippedMartialArtsView(mental, external);
     }
 }

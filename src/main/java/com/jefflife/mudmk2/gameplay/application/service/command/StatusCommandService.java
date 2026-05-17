@@ -78,7 +78,8 @@ public class StatusCommandService implements StatusUseCase {
                 new StatusVariables.StatValue(base.longWeapon(),       total.longWeapon()       - base.longWeapon()),
                 new StatusVariables.StatValue(base.esotericWeapon(),   total.esotericWeapon()   - base.esotericWeapon()),
                 new StatusVariables.StatValue(base.archery(),          total.archery()          - base.archery()),
-                currentRoom.getName()
+                currentRoom.getName(),
+                null
         );
 
         sendStatusMessagePort.sendMessage(statusVariables);
