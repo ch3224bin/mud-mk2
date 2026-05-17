@@ -5,7 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.StatusCommand;
-import MartialArtViewMapper;
+import com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
