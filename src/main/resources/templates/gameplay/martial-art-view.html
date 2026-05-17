@@ -1,0 +1,43 @@
+<div th:fragment="martialArtView" class="martial-art-view font-terminal">
+    <div th:if="${#lists.isEmpty(mentalGroups) and #lists.isEmpty(externalGroups)}">
+        <div class="line">배운 무공이 없습니다.</div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(mentalGroups)}">
+        <div class="msg-room-title">[ 심법 ]</div>
+        <div th:each="g : ${mentalGroups}">
+            <div class="line">〈<span th:text="${g.kindLabel}"></span>〉</div>
+            <div class="line" th:each="m : ${g.items}">
+                &nbsp;&nbsp;- <span th:text="${m.name}"></span>
+                Lv.<span th:text="${m.currentLevel}"></span>/<span th:text="${m.maxLevel}"></span>
+                <span th:if="${m.atMax}">[MAX]</span>
+                &nbsp;&nbsp;Exp <span th:text="${m.currentExp}"></span>
+                <span th:if="${not #lists.isEmpty(m.effects)}">
+                    &nbsp;&nbsp;<th:block th:each="e, st : ${m.effects}"
+                        ><span th:text="${(e.value >= 0 ? '+' : '') + e.value + ' ' + e.label}"></span
+                        ><span th:if="${not st.last}">, </span></th:block>
+                </span>
+                <span th:if="${m.equipped}"> ☆</span>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(externalGroups)}">
+        <div class="line-spacer"></div>
+        <div class="msg-room-title">[ 외공 ]</div>
+        <div th:each="g : ${externalGroups}">
+            <div class="line">〈<span th:text="${g.weaponLabel}"></span>〉</div>
+            <div class="line" th:each="x : ${g.items}">
+                &nbsp;&nbsp;- <span th:text="${x.name}"></span>
+                Lv.<span th:text="${x.currentLevel}"></span>/<span th:text="${x.maxLevel}"></span>
+                <span th:if="${x.atMax}">[MAX]</span>
+                &nbsp;&nbsp;Exp <span th:text="${x.currentExp}"></span>
+                &nbsp;&nbsp;×<span th:text="${#numbers.formatDecimal(x.damageMultiplier, 1, 2)}"></span>
+                &nbsp;쿨<span th:text="${x.cooldownSeconds}"></span>s
+                &nbsp;AP<span th:text="${x.apCost}"></span>
+                &nbsp;MP<span th:text="${x.mpCost}"></span>
+                <span th:if="${x.equipped}"> ☆</span>
+            </div>
+        </div>
+    </div>
+</div>
