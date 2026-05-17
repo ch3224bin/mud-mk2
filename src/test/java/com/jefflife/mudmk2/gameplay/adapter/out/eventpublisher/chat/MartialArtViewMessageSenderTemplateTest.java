@@ -71,7 +71,7 @@ class MartialArtViewMessageSenderTemplateTest {
         MartialArtViewVariables.ExternalGroup external = new MartialArtViewVariables.ExternalGroup(
                 "검",
                 List.of(new MartialArtViewVariables.LearnedExternalLine(
-                        "천뢰검법", 1, 2, 0L, false, false, 1.5, 4, 3, 2)));
+                        "천뢰검법", 7, 9, 0L, false, false, 1.5, 8, 5, 4)));
 
         String html = captureHtml(new MartialArtViewVariables(
                 1L, List.of(mental), List.of(external)));
@@ -88,11 +88,15 @@ class MartialArtViewMessageSenderTemplateTest {
         assertThat(html).contains("[ 외공 ]");
         assertThat(html).contains("〈").contains("검").contains("〉");
         assertThat(html).contains("천뢰검법");
-        assertThat(html).contains(">1<").contains(">2<");
+        assertThat(html).contains(">7<").contains(">9<");
         assertThat(html).contains("×").contains("1.50");
-        assertThat(html).contains("쿨").contains(">4<").contains("s");
-        assertThat(html).contains("AP").contains(">3<");
-        assertThat(html).contains("MP").contains(">2<");
+        assertThat(html).contains("쿨").contains(">8<").contains("s");
+        assertThat(html).contains("AP").contains(">5<");
+        assertThat(html).contains("MP").contains(">4<");
+
+        // external item has atMax=false and equipped=false — verify single [MAX]/☆ from mental
+        assertThat(html).containsOnlyOnce("[MAX]");
+        assertThat(html).containsOnlyOnce("☆");
     }
 
     @Test
