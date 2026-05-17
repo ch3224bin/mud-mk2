@@ -51,6 +51,7 @@ public class StatusMessageSender implements SendStatusMessagePort {
         context.setVariable("esotericWeapon", statusVariables.esotericWeapon());
         context.setVariable("archery", statusVariables.archery());
         context.setVariable("roomName", statusVariables.roomName());
+        context.setVariable("equippedMartialArts", statusVariables.equippedMartialArts());
 
         String htmlContent = templateEngine.process("gameplay/status", context);
         chatEventPublisher.messageToUser(statusVariables.userId(), htmlContent);

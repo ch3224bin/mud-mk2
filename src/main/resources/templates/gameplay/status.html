@@ -82,4 +82,39 @@
     <div class="line">
         <span class="label">궁술: </span><span th:text="${archery.base}"></span><span th:if="${archery.bonus != 0}" th:text="${' (' + (archery.bonus > 0 ? '+' : '') + archery.bonus + ')'}"></span>
     </div>
+
+    <div class="line-spacer"></div>
+    <div class="msg-room-title">[ 장착 무공 ]</div>
+
+    <div class="line"><span class="label">심법</span></div>
+    <div class="line" th:each="slot : ${equippedMartialArts.mentalSlots}">
+        &nbsp;&nbsp;<span class="label" th:text="${slot.kindLabel + ': '}"></span>
+        <span th:if="${slot.name == null}">(없음)</span>
+        <span th:if="${slot.name != null}">
+            <span th:text="${slot.name}"></span>
+            Lv.<span th:text="${slot.currentLevel}"></span>
+            <span th:if="${slot.currentLevel == slot.maxLevel}"> MAX</span>
+            <span th:if="${not #lists.isEmpty(slot.effects)}">
+                &nbsp;&nbsp;<th:block th:each="e, st : ${slot.effects}"
+                    ><span th:text="${(e.value >= 0 ? '+' : '') + e.value + ' ' + e.label}"></span
+                    ><span th:if="${not st.last}">, </span></th:block>
+            </span>
+        </span>
+    </div>
+
+    <div class="line"><span class="label">외공</span></div>
+    <div class="line" th:each="slot : ${equippedMartialArts.externalSlots}">
+        &nbsp;&nbsp;<span class="label" th:text="${slot.slotNumber + '. '}"></span>
+        <span th:if="${slot.name == null}">(없음)</span>
+        <span th:if="${slot.name != null}">
+            <span th:text="${slot.name}"></span>
+            (<span th:text="${slot.weaponLabel}"></span>)
+            Lv.<span th:text="${slot.currentLevel}"></span>
+            <span th:if="${slot.currentLevel == slot.maxLevel}"> MAX</span>
+            &nbsp;&nbsp;배율 <span th:text="${#numbers.formatDecimal(slot.damageMultiplier, 1, 2)}"></span>
+            &nbsp;쿨<span th:text="${slot.cooldownSeconds}"></span>s
+            &nbsp;AP<span th:text="${slot.apCost}"></span>
+            &nbsp;MP<span th:text="${slot.mpCost}"></span>
+        </span>
+    </div>
 </div>

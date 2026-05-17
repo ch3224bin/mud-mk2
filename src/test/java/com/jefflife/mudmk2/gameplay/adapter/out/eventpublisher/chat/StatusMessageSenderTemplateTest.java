@@ -196,6 +196,105 @@ class StatusMessageSenderTemplateTest {
         assertThat(html).contains("궁술");
     }
 
+    @Test
+    void render_emptyEquippedMartialArts_emitsSectionHeaderAndEmptySlots() {
+        String html = captureHtml(defaultVariables());
+        assertThat(html).contains("[ 장착 무공 ]");
+        assertThat(html).contains("심법");
+        assertThat(html).contains("외공");
+        // 빈 슬롯은 모두 (없음)
+        assertThat(html).contains("내공:");
+        assertThat(html).contains("경공:");
+        assertThat(html).contains("특기:");
+        assertThat(html).contains("(없음)");
+    }
+
+    @Test
+    void render_withEquippedMental_emitsNameLevelAndEffect() {
+        StatusVariables d = defaultVariables();
+        StatusVariables.EquippedMartialArtsView populated = new StatusVariables.EquippedMartialArtsView(
+                List.of(
+                        new StatusVariables.MentalSlotLine("내공", "천뢰신공", 2, 3,
+                                List.of(new StatusVariables.StatModLine("내공", 3))),
+                        new StatusVariables.MentalSlotLine("경공", null, null, null, List.of()),
+                        new StatusVariables.MentalSlotLine("특기", null, null, null, List.of())),
+                d.equippedMartialArts().externalSlots());
+        StatusVariables vars = new StatusVariables(
+                d.userId(), d.playerName(), d.characterClass(), d.gender(), d.state(),
+                d.level(), d.experience(), d.nextLevelExp(),
+                d.hp(), d.maxHp(), d.mp(), d.maxMp(), d.ap(), d.maxAp(),
+                d.vigor(), d.physique(), d.agility(), d.intellect(), d.will(), d.meridian(),
+                d.innerPower(), d.specialTechnique(), d.lightStep(), d.fistsAndPalms(),
+                d.swordMethod(), d.bladeMethod(), d.longWeapon(), d.esotericWeapon(),
+                d.archery(), d.roomName(), populated);
+
+        String html = captureHtml(vars);
+
+        assertThat(html).contains("천뢰신공");
+        assertThat(html).contains("Lv.");
+        assertThat(html).contains(">2<");
+        assertThat(html).contains("+3 내공");
+        assertThat(html).doesNotContain(" MAX");  // currentLevel != maxLevel
+    }
+
+    @Test
+    void render_atMaxMental_emitsMaxLabel() {
+        StatusVariables d = defaultVariables();
+        StatusVariables.EquippedMartialArtsView populated = new StatusVariables.EquippedMartialArtsView(
+                List.of(
+                        new StatusVariables.MentalSlotLine("내공", "천뢰신공", 3, 3, List.of()),
+                        new StatusVariables.MentalSlotLine("경공", null, null, null, List.of()),
+                        new StatusVariables.MentalSlotLine("특기", null, null, null, List.of())),
+                d.equippedMartialArts().externalSlots());
+        StatusVariables vars = new StatusVariables(
+                d.userId(), d.playerName(), d.characterClass(), d.gender(), d.state(),
+                d.level(), d.experience(), d.nextLevelExp(),
+                d.hp(), d.maxHp(), d.mp(), d.maxMp(), d.ap(), d.maxAp(),
+                d.vigor(), d.physique(), d.agility(), d.intellect(), d.will(), d.meridian(),
+                d.innerPower(), d.specialTechnique(), d.lightStep(), d.fistsAndPalms(),
+                d.swordMethod(), d.bladeMethod(), d.longWeapon(), d.esotericWeapon(),
+                d.archery(), d.roomName(), populated);
+
+        String html = captureHtml(vars);
+
+        assertThat(html).contains("Lv.");
+        assertThat(html).contains(">3<");
+        assertThat(html).contains("MAX");
+    }
+
+    @Test
+    void render_withEquippedExternal_emitsWeaponAndStats() {
+        StatusVariables d = defaultVariables();
+        List<StatusVariables.ExternalSlotLine> externals = new ArrayList<>();
+        externals.add(new StatusVariables.ExternalSlotLine(
+                1, "천뢰검법", "검", 1, 2, 1.5, 4, 3, 2));
+        for (int i = 2; i <= 6; i++) {
+            externals.add(new StatusVariables.ExternalSlotLine(
+                    i, null, null, null, null, null, null, null, null));
+        }
+        StatusVariables.EquippedMartialArtsView populated = new StatusVariables.EquippedMartialArtsView(
+                d.equippedMartialArts().mentalSlots(), externals);
+        StatusVariables vars = new StatusVariables(
+                d.userId(), d.playerName(), d.characterClass(), d.gender(), d.state(),
+                d.level(), d.experience(), d.nextLevelExp(),
+                d.hp(), d.maxHp(), d.mp(), d.maxMp(), d.ap(), d.maxAp(),
+                d.vigor(), d.physique(), d.agility(), d.intellect(), d.will(), d.meridian(),
+                d.innerPower(), d.specialTechnique(), d.lightStep(), d.fistsAndPalms(),
+                d.swordMethod(), d.bladeMethod(), d.longWeapon(), d.esotericWeapon(),
+                d.archery(), d.roomName(), populated);
+
+        String html = captureHtml(vars);
+
+        assertThat(html).contains("1.");
+        assertThat(html).contains("천뢰검법");
+        assertThat(html).contains(">검<");
+        assertThat(html).contains("Lv.");
+        assertThat(html).contains("배율").contains("1.50");
+        assertThat(html).contains("쿨").contains(">4<").contains("s");
+        assertThat(html).contains("AP").contains(">3<");
+        assertThat(html).contains("MP").contains(">2<");
+    }
+
     private static StatusVariables.EquippedMartialArtsView emptyEquipped() {
         List<StatusVariables.MentalSlotLine> mental = List.of(
                 new StatusVariables.MentalSlotLine("내공", null, null, null, List.of()),
