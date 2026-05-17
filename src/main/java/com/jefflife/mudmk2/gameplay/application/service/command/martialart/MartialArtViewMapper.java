@@ -10,26 +10,29 @@ import com.jefflife.mudmk2.gameplay.application.service.command.look.ItemDisplay
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class MartialArtViewMapper {
 
-    private final LearnedMartialArtFinder finder;
+    private final LearnedMartialArtFinder learnedFinder;
     private final MentalMethodTemplateFinder mentalTplFinder;
     private final ExternalArtTemplateFinder externalTplFinder;
 
-    public MartialArtViewMapper(LearnedMartialArtFinder finder,
+    public MartialArtViewMapper(LearnedMartialArtFinder learnedFinder,
                                 MentalMethodTemplateFinder mentalTplFinder,
                                 ExternalArtTemplateFinder externalTplFinder) {
-        this.finder = finder;
+        this.learnedFinder = learnedFinder;
         this.mentalTplFinder = mentalTplFinder;
         this.externalTplFinder = externalTplFinder;
     }
 
     public StatusVariables.EquippedMartialArtsView toEquippedView(PlayerCharacter pc) {
-        LearnedMartialArtFinder.CharacterMartialArtView v = finder.findByCharacter(pc.getId());
+        LearnedMartialArtFinder.CharacterMartialArtView v = learnedFinder.findByCharacter(pc.getId());
 
         Map<UUID, LearnedMentalMethod> mentalById = v.learnedMentalMethods().stream()
                 .collect(Collectors.toMap(LearnedMentalMethod::getId, m -> m));
@@ -58,6 +61,10 @@ public class MartialArtViewMapper {
             return new StatusVariables.MentalSlotLine(label, null, null, null, List.of());
         }
         LearnedMentalMethod learned = mentalById.get(learnedId);
+        if (learned == null) {
+            throw new IllegalStateException(
+                    "Equipped mental slot references unknown learnedId " + learnedId);
+        }
         MentalMethodTemplate tpl = mentalTplFinder.findById(learned.getMentalMethodTemplateId());
         MentalMethodLevelEffect effect = tpl.effectAt(learned.getCurrentLevel());
         List<StatusVariables.StatModLine> effects = effect.statModifiers().stream()
@@ -74,6 +81,10 @@ public class MartialArtViewMapper {
                     slotNumber, null, null, null, null, null, null, null, null);
         }
         LearnedExternalArt learned = externalById.get(learnedId);
+        if (learned == null) {
+            throw new IllegalStateException(
+                    "Equipped external slot references unknown learnedId " + learnedId);
+        }
         ExternalArtTemplate tpl = externalTplFinder.findById(learned.getExternalArtTemplateId());
         ExternalArtLevelEffect effect = tpl.effectAt(learned.getCurrentLevel());
         return new StatusVariables.ExternalSlotLine(
