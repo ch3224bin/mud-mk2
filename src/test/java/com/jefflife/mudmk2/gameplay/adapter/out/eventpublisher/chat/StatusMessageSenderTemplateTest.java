@@ -14,6 +14,9 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.springframework.context.support.StaticApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -193,13 +196,13 @@ class StatusMessageSenderTemplateTest {
         assertThat(html).contains("궁술");
     }
 
-    private StatusVariables.EquippedMartialArtsView emptyEquipped() {
-        java.util.List<StatusVariables.MentalSlotLine> mental = java.util.List.of(
-                new StatusVariables.MentalSlotLine("내공", null, null, null, java.util.List.of()),
-                new StatusVariables.MentalSlotLine("경공", null, null, null, java.util.List.of()),
-                new StatusVariables.MentalSlotLine("특기", null, null, null, java.util.List.of())
+    private static StatusVariables.EquippedMartialArtsView emptyEquipped() {
+        List<StatusVariables.MentalSlotLine> mental = List.of(
+                new StatusVariables.MentalSlotLine("내공", null, null, null, List.of()),
+                new StatusVariables.MentalSlotLine("경공", null, null, null, List.of()),
+                new StatusVariables.MentalSlotLine("특기", null, null, null, List.of())
         );
-        java.util.List<StatusVariables.ExternalSlotLine> external = new java.util.ArrayList<>();
+        List<StatusVariables.ExternalSlotLine> external = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
             external.add(new StatusVariables.ExternalSlotLine(
                     i, null, null, null, null, null, null, null, null));
