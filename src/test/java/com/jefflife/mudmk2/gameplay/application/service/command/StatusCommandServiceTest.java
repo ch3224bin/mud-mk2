@@ -5,6 +5,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.map.Room;
 import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.EquippedMartialArts;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.*;
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.StatusCommand;
+import MartialArtViewMapper;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
@@ -26,7 +27,7 @@ class StatusCommandServiceTest {
     private ActivePlayerRepository players;
     private ActiveRoomRepository rooms;
     private SendStatusMessagePort sender;
-    private com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper mapper;
+    private MartialArtViewMapper mapper;
     private StatusCommandService service;
     private PlayerCharacter player;
     private EquippedItems equipped;
@@ -36,7 +37,7 @@ class StatusCommandServiceTest {
         players = mock(ActivePlayerRepository.class);
         rooms = mock(ActiveRoomRepository.class);
         sender = mock(SendStatusMessagePort.class);
-        mapper = mock(com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper.class);
+        mapper = mock(MartialArtViewMapper.class);
         service = new StatusCommandService(rooms, players, sender, mapper);
 
         equipped = EquippedItems.create();
@@ -59,7 +60,7 @@ class StatusCommandServiceTest {
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
 
         when(mapper.toEquippedView(any(PlayerCharacter.class))).thenReturn(
-                new StatusVariables.EquippedMartialArtsView(java.util.List.of(), java.util.List.of()));
+                new StatusVariables.EquippedMartialArtsView(List.of(), List.of()));
     }
 
     private StatusVariables capturedVariables() {
@@ -130,8 +131,8 @@ class StatusCommandServiceTest {
     void showStatus_includesEquippedMartialArtsViewFromMapper() {
         StatusVariables.EquippedMartialArtsView expected =
                 new StatusVariables.EquippedMartialArtsView(
-                        java.util.List.of(new StatusVariables.MentalSlotLine("내공", "천뢰신공", 1, 3, java.util.List.of())),
-                        java.util.List.of());
+                        List.of(new StatusVariables.MentalSlotLine("내공", "천뢰신공", 1, 3, List.of())),
+                        List.of());
         when(mapper.toEquippedView(any(PlayerCharacter.class))).thenReturn(expected);
 
         service.showStatus(new StatusCommand(1L));

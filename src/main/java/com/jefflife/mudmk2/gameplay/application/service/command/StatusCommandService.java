@@ -16,6 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation for the StatusUseCase.
+ * Handles status commands in the game.
+ */
 @Service
 public class StatusCommandService implements StatusUseCase {
     private static final Logger logger = LoggerFactory.getLogger(StatusCommandService.class);
