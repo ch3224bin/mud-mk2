@@ -6,19 +6,16 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gameplay.application.domain.model.command.StatusCommand;
 import com.jefflife.mudmk2.gameplay.application.exception.PlayerNotFoundException;
 import com.jefflife.mudmk2.gameplay.application.exception.RoomNotFoundException;
+import com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import com.jefflife.mudmk2.gameplay.application.service.provided.StatusUseCase;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActivePlayerRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.ActiveRoomRepository;
 import com.jefflife.mudmk2.gameplay.application.service.required.SendStatusMessagePort;
-import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/**
- * Service implementation for the StatusUseCase.
- * Handles status commands in the game.
- */
 @Service
 public class StatusCommandService implements StatusUseCase {
     private static final Logger logger = LoggerFactory.getLogger(StatusCommandService.class);
@@ -26,15 +23,18 @@ public class StatusCommandService implements StatusUseCase {
     private final ActiveRoomRepository rooms;
     private final ActivePlayerRepository players;
     private final SendStatusMessagePort sendStatusMessagePort;
+    private final MartialArtViewMapper martialArtViewMapper;
 
     public StatusCommandService(
             final ActiveRoomRepository rooms,
             final ActivePlayerRepository players,
-            final SendStatusMessagePort sendStatusMessagePort
+            final SendStatusMessagePort sendStatusMessagePort,
+            final MartialArtViewMapper martialArtViewMapper
     ) {
         this.rooms = rooms;
         this.players = players;
         this.sendStatusMessagePort = sendStatusMessagePort;
+        this.martialArtViewMapper = martialArtViewMapper;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class StatusCommandService implements StatusUseCase {
                 new StatusVariables.StatValue(base.esotericWeapon(),   total.esotericWeapon()   - base.esotericWeapon()),
                 new StatusVariables.StatValue(base.archery(),          total.archery()          - base.archery()),
                 currentRoom.getName(),
-                null
+                martialArtViewMapper.toEquippedView(player)
         );
 
         sendStatusMessagePort.sendMessage(statusVariables);

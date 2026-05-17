@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class StatusCommandServiceTest {
@@ -25,6 +26,7 @@ class StatusCommandServiceTest {
     private ActivePlayerRepository players;
     private ActiveRoomRepository rooms;
     private SendStatusMessagePort sender;
+    private com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper mapper;
     private StatusCommandService service;
     private PlayerCharacter player;
     private EquippedItems equipped;
@@ -34,7 +36,8 @@ class StatusCommandServiceTest {
         players = mock(ActivePlayerRepository.class);
         rooms = mock(ActiveRoomRepository.class);
         sender = mock(SendStatusMessagePort.class);
-        service = new StatusCommandService(rooms, players, sender);
+        mapper = mock(com.jefflife.mudmk2.gameplay.application.service.command.martialart.MartialArtViewMapper.class);
+        service = new StatusCommandService(rooms, players, sender, mapper);
 
         equipped = EquippedItems.create();
         BaseCharacter base = BaseCharacter.builder()
@@ -54,6 +57,9 @@ class StatusCommandServiceTest {
         when(room.getName()).thenReturn("훈련장");
         when(rooms.findById(1L)).thenReturn(Optional.of(room));
         when(players.findByUserId(1L)).thenReturn(Optional.of(player));
+
+        when(mapper.toEquippedView(any(PlayerCharacter.class))).thenReturn(
+                new StatusVariables.EquippedMartialArtsView(java.util.List.of(), java.util.List.of()));
     }
 
     private StatusVariables capturedVariables() {
@@ -118,5 +124,19 @@ class StatusCommandServiceTest {
         assertThat(v.maxMp()).isEqualTo(44);
         // maxAp = agility * 8 = 11 * 8 = 88
         assertThat(v.maxAp()).isEqualTo(88);
+    }
+
+    @Test
+    void showStatus_includesEquippedMartialArtsViewFromMapper() {
+        StatusVariables.EquippedMartialArtsView expected =
+                new StatusVariables.EquippedMartialArtsView(
+                        java.util.List.of(new StatusVariables.MentalSlotLine("내공", "천뢰신공", 1, 3, java.util.List.of())),
+                        java.util.List.of());
+        when(mapper.toEquippedView(any(PlayerCharacter.class))).thenReturn(expected);
+
+        service.showStatus(new StatusCommand(1L));
+
+        StatusVariables v = capturedVariables();
+        assertThat(v.equippedMartialArts()).isSameAs(expected);
     }
 }
