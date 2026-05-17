@@ -73,4 +73,45 @@ class MentalMethodTemplateTest {
         assertThat(t.getKind()).isEqualTo(MentalMethodKind.LIGHT_STEP);
         assertThat(t.getLevelEffects().get(0).statModifiers()).hasSize(1);
     }
+
+    @Test
+    void effectAt_returnsEffectForGivenLevel() {
+        MentalMethodTemplate t = MentalMethodTemplate.builder()
+                .name("천뢰신공").description("d").kind(MentalMethodKind.INNER_POWER)
+                .maxLevel(3)
+                .levelEffects(List.of(
+                        new MentalMethodLevelEffect(1, List.of(new StatModifier(StatType.INNER_POWER, 1))),
+                        new MentalMethodLevelEffect(2, List.of(new StatModifier(StatType.INNER_POWER, 3))),
+                        new MentalMethodLevelEffect(3, List.of(new StatModifier(StatType.INNER_POWER, 6)))))
+                .build();
+
+        assertThat(t.effectAt(1).statModifiers().get(0).getValue()).isEqualTo(1);
+        assertThat(t.effectAt(2).statModifiers().get(0).getValue()).isEqualTo(3);
+        assertThat(t.effectAt(3).statModifiers().get(0).getValue()).isEqualTo(6);
+    }
+
+    @Test
+    void effectAt_whenLevelBelow1_throws() {
+        MentalMethodTemplate t = MentalMethodTemplate.builder()
+                .name("x").description("x").kind(MentalMethodKind.INNER_POWER)
+                .maxLevel(1)
+                .levelEffects(List.of(new MentalMethodLevelEffect(1, List.of())))
+                .build();
+
+        assertThatThrownBy(() -> t.effectAt(0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> t.effectAt(-1)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void effectAt_whenLevelAboveMaxLevel_throws() {
+        MentalMethodTemplate t = MentalMethodTemplate.builder()
+                .name("x").description("x").kind(MentalMethodKind.INNER_POWER)
+                .maxLevel(2)
+                .levelEffects(List.of(
+                        new MentalMethodLevelEffect(1, List.of()),
+                        new MentalMethodLevelEffect(2, List.of())))
+                .build();
+
+        assertThatThrownBy(() -> t.effectAt(3)).isInstanceOf(IllegalArgumentException.class);
+    }
 }

@@ -77,6 +77,14 @@ public class ExternalArtTemplate {
         }
     }
 
+    public ExternalArtLevelEffect effectAt(int level) {
+        if (level < 1 || level > maxLevel) {
+            throw new IllegalArgumentException(
+                    "level must be in 1.." + maxLevel + ", got " + level);
+        }
+        return levelEffects.get(level - 1);
+    }
+
     public static class Builder {
         private String name;
         private String description;

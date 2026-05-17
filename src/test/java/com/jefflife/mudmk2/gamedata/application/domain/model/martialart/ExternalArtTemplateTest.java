@@ -50,4 +50,42 @@ class ExternalArtTemplateTest {
         assertThat(t.getWeaponType()).isEqualTo(WeaponType.FIST);
         assertThat(t.getLevelEffects().get(0).damageMultiplier()).isEqualTo(1.5);
     }
+
+    @Test
+    void effectAt_returnsEffectForGivenLevel() {
+        ExternalArtTemplate t = ExternalArtTemplate.builder()
+                .name("천뢰검법").description("d").weaponType(WeaponType.SWORD)
+                .maxLevel(3)
+                .levelEffects(List.of(
+                        new ExternalArtLevelEffect(1, 1.0, 5, 3, 2),
+                        new ExternalArtLevelEffect(2, 1.5, 4, 3, 2),
+                        new ExternalArtLevelEffect(3, 2.0, 3, 3, 2)))
+                .build();
+
+        assertThat(t.effectAt(1).damageMultiplier()).isEqualTo(1.0);
+        assertThat(t.effectAt(2).damageMultiplier()).isEqualTo(1.5);
+        assertThat(t.effectAt(3).damageMultiplier()).isEqualTo(2.0);
+    }
+
+    @Test
+    void effectAt_whenLevelBelow1_throws() {
+        ExternalArtTemplate t = ExternalArtTemplate.builder()
+                .name("x").description("x").weaponType(WeaponType.SWORD)
+                .maxLevel(1)
+                .levelEffects(List.of(new ExternalArtLevelEffect(1, 1.0, 1, 1, 1)))
+                .build();
+
+        assertThatThrownBy(() -> t.effectAt(0)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void effectAt_whenLevelAboveMaxLevel_throws() {
+        ExternalArtTemplate t = ExternalArtTemplate.builder()
+                .name("x").description("x").weaponType(WeaponType.SWORD)
+                .maxLevel(1)
+                .levelEffects(List.of(new ExternalArtLevelEffect(1, 1.0, 1, 1, 1)))
+                .build();
+
+        assertThatThrownBy(() -> t.effectAt(2)).isInstanceOf(IllegalArgumentException.class);
+    }
 }
