@@ -8,6 +8,7 @@ import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharac
 import com.jefflife.mudmk2.gamedata.application.service.provided.ExternalArtTemplateFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.LearnedMartialArtFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.MentalMethodTemplateFinder;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.MartialArtViewVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 class MartialArtViewMapperTest {
 
-    private LearnedMartialArtFinder finder;
+    private LearnedMartialArtFinder learnedFinder;
     private MentalMethodTemplateFinder mentalTplFinder;
     private ExternalArtTemplateFinder externalTplFinder;
     private MartialArtViewMapper mapper;
@@ -31,10 +32,10 @@ class MartialArtViewMapperTest {
 
     @BeforeEach
     void setUp() {
-        finder = mock(LearnedMartialArtFinder.class);
+        learnedFinder = mock(LearnedMartialArtFinder.class);
         mentalTplFinder = mock(MentalMethodTemplateFinder.class);
         externalTplFinder = mock(ExternalArtTemplateFinder.class);
-        mapper = new MartialArtViewMapper(finder, mentalTplFinder, externalTplFinder);
+        mapper = new MartialArtViewMapper(learnedFinder, mentalTplFinder, externalTplFinder);
 
         pcId = UUID.randomUUID();
         pc = mock(PlayerCharacter.class);
@@ -52,7 +53,7 @@ class MartialArtViewMapperTest {
 
     @Test
     void toEquippedView_noEquipped_threeMentalSlotsAndSixExternalSlotsAllEmpty() {
-        when(finder.findByCharacter(pcId))
+        when(learnedFinder.findByCharacter(pcId))
                 .thenReturn(view(List.of(), List.of(), EquippedMartialArts.create()));
 
         StatusVariables.EquippedMartialArtsView v = mapper.toEquippedView(pc);
@@ -105,7 +106,7 @@ class MartialArtViewMapperTest {
         equipped.equipMental(MentalMethodKind.INNER_POWER, learnedMentalId);
         equipped.equipExternal(learnedExternalId);
 
-        when(finder.findByCharacter(pcId)).thenReturn(view(
+        when(learnedFinder.findByCharacter(pcId)).thenReturn(view(
                 List.of(learnedMental), List.of(learnedExternal), equipped));
 
         StatusVariables.EquippedMartialArtsView v = mapper.toEquippedView(pc);
@@ -140,5 +141,111 @@ class MartialArtViewMapperTest {
             assertThat(v.externalSlots().get(i).name()).isNull();
             assertThat(v.externalSlots().get(i).slotNumber()).isEqualTo(i + 1);
         }
+    }
+
+    // ---- toMartialArtVariables ----
+
+    @Test
+    void toMartialArtVariables_noLearned_returnsEmptyGroups() {
+        when(learnedFinder.findByCharacter(pcId))
+                .thenReturn(view(List.of(), List.of(), EquippedMartialArts.create()));
+
+        MartialArtViewVariables v = mapper.toMartialArtVariables(7L, pc);
+
+        assertThat(v.userId()).isEqualTo(7L);
+        assertThat(v.mentalGroups()).isEmpty();
+        assertThat(v.externalGroups()).isEmpty();
+    }
+
+    @Test
+    void toMartialArtVariables_groupsByKindAndWeaponType_equippedAndAtMaxFlagged() {
+        // 심법 학습: 천뢰신공(내공, Lv 3/3 = MAX, 장착) + 풍림보(경공, Lv 1/2)
+        UUID innerLearnedId = UUID.randomUUID();
+        LearnedMentalMethod innerLearned = mock(LearnedMentalMethod.class);
+        when(innerLearned.getId()).thenReturn(innerLearnedId);
+        when(innerLearned.getMentalMethodTemplateId()).thenReturn(11L);
+        when(innerLearned.getCurrentLevel()).thenReturn(3);
+        when(innerLearned.getCurrentExp()).thenReturn(0L);
+        MentalMethodTemplate innerTpl = mock(MentalMethodTemplate.class);
+        when(innerTpl.getKind()).thenReturn(MentalMethodKind.INNER_POWER);
+        when(innerTpl.getName()).thenReturn("천뢰신공");
+        when(innerTpl.getMaxLevel()).thenReturn(3);
+        when(innerTpl.effectAt(3)).thenReturn(new MentalMethodLevelEffect(3,
+                List.of(new StatModifier(StatType.INNER_POWER, 6))));
+        when(mentalTplFinder.findById(11L)).thenReturn(innerTpl);
+
+        UUID lightLearnedId = UUID.randomUUID();
+        LearnedMentalMethod lightLearned = mock(LearnedMentalMethod.class);
+        when(lightLearned.getId()).thenReturn(lightLearnedId);
+        when(lightLearned.getMentalMethodTemplateId()).thenReturn(12L);
+        when(lightLearned.getCurrentLevel()).thenReturn(1);
+        when(lightLearned.getCurrentExp()).thenReturn(0L);
+        MentalMethodTemplate lightTpl = mock(MentalMethodTemplate.class);
+        when(lightTpl.getKind()).thenReturn(MentalMethodKind.LIGHT_STEP);
+        when(lightTpl.getName()).thenReturn("풍림보");
+        when(lightTpl.getMaxLevel()).thenReturn(2);
+        when(lightTpl.effectAt(1)).thenReturn(new MentalMethodLevelEffect(1,
+                List.of(new StatModifier(StatType.LIGHT_STEP, 2))));
+        when(mentalTplFinder.findById(12L)).thenReturn(lightTpl);
+
+        // 외공 학습: 천뢰검법(검, Lv 1/2, 장착)
+        UUID swordLearnedId = UUID.randomUUID();
+        LearnedExternalArt swordLearned = mock(LearnedExternalArt.class);
+        when(swordLearned.getId()).thenReturn(swordLearnedId);
+        when(swordLearned.getExternalArtTemplateId()).thenReturn(21L);
+        when(swordLearned.getCurrentLevel()).thenReturn(1);
+        when(swordLearned.getCurrentExp()).thenReturn(0L);
+        ExternalArtTemplate swordTpl = mock(ExternalArtTemplate.class);
+        when(swordTpl.getName()).thenReturn("천뢰검법");
+        when(swordTpl.getWeaponType()).thenReturn(WeaponType.SWORD);
+        when(swordTpl.getMaxLevel()).thenReturn(2);
+        when(swordTpl.effectAt(1)).thenReturn(new ExternalArtLevelEffect(1, 1.5, 4, 3, 2));
+        when(externalTplFinder.findById(21L)).thenReturn(swordTpl);
+
+        EquippedMartialArts equipped = EquippedMartialArts.create();
+        equipped.equipMental(MentalMethodKind.INNER_POWER, innerLearnedId);  // 장착
+        equipped.equipExternal(swordLearnedId);                              // 장착
+        // lightLearnedId 는 장착 안 함
+
+        when(learnedFinder.findByCharacter(pcId)).thenReturn(view(
+                List.of(innerLearned, lightLearned),
+                List.of(swordLearned),
+                equipped));
+
+        MartialArtViewVariables v = mapper.toMartialArtVariables(7L, pc);
+
+        // 심법: 내공 + 경공 두 그룹 (특기 학습 0 → 그룹 없음), 엔움 선언순
+        assertThat(v.mentalGroups()).hasSize(2);
+        assertThat(v.mentalGroups().get(0).kindLabel()).isEqualTo("내공");
+        assertThat(v.mentalGroups().get(0).items()).hasSize(1);
+        MartialArtViewVariables.LearnedMentalLine innerLine = v.mentalGroups().get(0).items().get(0);
+        assertThat(innerLine.name()).isEqualTo("천뢰신공");
+        assertThat(innerLine.currentLevel()).isEqualTo(3);
+        assertThat(innerLine.maxLevel()).isEqualTo(3);
+        assertThat(innerLine.atMax()).isTrue();
+        assertThat(innerLine.equipped()).isTrue();
+        assertThat(innerLine.effects()).hasSize(1);
+        assertThat(innerLine.effects().get(0).label()).isEqualTo("내공");
+        assertThat(innerLine.effects().get(0).value()).isEqualTo(6);
+
+        assertThat(v.mentalGroups().get(1).kindLabel()).isEqualTo("경공");
+        MartialArtViewVariables.LearnedMentalLine lightLine = v.mentalGroups().get(1).items().get(0);
+        assertThat(lightLine.atMax()).isFalse();
+        assertThat(lightLine.equipped()).isFalse();
+
+        // 외공: 검 그룹만
+        assertThat(v.externalGroups()).hasSize(1);
+        assertThat(v.externalGroups().get(0).weaponLabel()).isEqualTo("검");
+        MartialArtViewVariables.LearnedExternalLine swordLine =
+                v.externalGroups().get(0).items().get(0);
+        assertThat(swordLine.name()).isEqualTo("천뢰검법");
+        assertThat(swordLine.currentLevel()).isEqualTo(1);
+        assertThat(swordLine.maxLevel()).isEqualTo(2);
+        assertThat(swordLine.atMax()).isFalse();
+        assertThat(swordLine.equipped()).isTrue();
+        assertThat(swordLine.damageMultiplier()).isEqualTo(1.5);
+        assertThat(swordLine.cooldownSeconds()).isEqualTo(4);
+        assertThat(swordLine.apCost()).isEqualTo(3);
+        assertThat(swordLine.mpCost()).isEqualTo(2);
     }
 }

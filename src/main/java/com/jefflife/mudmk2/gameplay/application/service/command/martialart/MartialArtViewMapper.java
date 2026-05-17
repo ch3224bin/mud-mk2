@@ -7,12 +7,16 @@ import com.jefflife.mudmk2.gamedata.application.service.provided.ExternalArtTemp
 import com.jefflife.mudmk2.gamedata.application.service.provided.LearnedMartialArtFinder;
 import com.jefflife.mudmk2.gamedata.application.service.provided.MentalMethodTemplateFinder;
 import com.jefflife.mudmk2.gameplay.application.service.command.look.ItemDisplayLabels;
+import com.jefflife.mudmk2.gameplay.application.service.model.template.MartialArtViewVariables;
 import com.jefflife.mudmk2.gameplay.application.service.model.template.StatusVariables;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -102,6 +106,84 @@ public class MartialArtViewMapper {
 
     private StatusVariables.StatModLine toStatusStatModLine(StatModifier mod) {
         return new StatusVariables.StatModLine(
+                ItemDisplayLabels.of(mod.getStatType()), mod.getValue());
+    }
+
+    public MartialArtViewVariables toMartialArtVariables(Long userId, PlayerCharacter pc) {
+        LearnedMartialArtFinder.CharacterMartialArtView v = learnedFinder.findByCharacter(pc.getId());
+        Set<UUID> equippedMentalIds = new HashSet<>(v.equipped().getMentalSlots().values());
+        Set<UUID> equippedExternalIds = new HashSet<>(v.equipped().getExternalSlots());
+
+        return new MartialArtViewVariables(
+                userId,
+                groupMental(v.learnedMentalMethods(), equippedMentalIds),
+                groupExternal(v.learnedExternalArts(), equippedExternalIds));
+    }
+
+    private List<MartialArtViewVariables.MentalGroup> groupMental(
+            List<LearnedMentalMethod> learned, Set<UUID> equippedIds) {
+        EnumMap<MentalMethodKind, List<MartialArtViewVariables.LearnedMentalLine>> buckets =
+                new EnumMap<>(MentalMethodKind.class);
+        for (LearnedMentalMethod m : learned) {
+            MentalMethodTemplate tpl = mentalTplFinder.findById(m.getMentalMethodTemplateId());
+            List<MartialArtViewVariables.StatModLine> effects = tpl.effectAt(m.getCurrentLevel())
+                    .statModifiers().stream()
+                    .map(this::toViewStatModLine)
+                    .toList();
+            MartialArtViewVariables.LearnedMentalLine line = new MartialArtViewVariables.LearnedMentalLine(
+                    tpl.getName(),
+                    m.getCurrentLevel(),
+                    tpl.getMaxLevel(),
+                    m.getCurrentExp(),
+                    m.getCurrentLevel() == tpl.getMaxLevel(),
+                    equippedIds.contains(m.getId()),
+                    effects);
+            buckets.computeIfAbsent(tpl.getKind(), k -> new ArrayList<>()).add(line);
+        }
+        List<MartialArtViewVariables.MentalGroup> groups = new ArrayList<>();
+        for (MentalMethodKind kind : MentalMethodKind.values()) {
+            List<MartialArtViewVariables.LearnedMentalLine> items = buckets.get(kind);
+            if (items != null && !items.isEmpty()) {
+                groups.add(new MartialArtViewVariables.MentalGroup(ItemDisplayLabels.of(kind), items));
+            }
+        }
+        return groups;
+    }
+
+    private List<MartialArtViewVariables.ExternalGroup> groupExternal(
+            List<LearnedExternalArt> learned, Set<UUID> equippedIds) {
+        EnumMap<com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType,
+                List<MartialArtViewVariables.LearnedExternalLine>> buckets =
+                new EnumMap<>(com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.class);
+        for (LearnedExternalArt e : learned) {
+            ExternalArtTemplate tpl = externalTplFinder.findById(e.getExternalArtTemplateId());
+            ExternalArtLevelEffect ef = tpl.effectAt(e.getCurrentLevel());
+            MartialArtViewVariables.LearnedExternalLine line = new MartialArtViewVariables.LearnedExternalLine(
+                    tpl.getName(),
+                    e.getCurrentLevel(),
+                    tpl.getMaxLevel(),
+                    e.getCurrentExp(),
+                    e.getCurrentLevel() == tpl.getMaxLevel(),
+                    equippedIds.contains(e.getId()),
+                    ef.damageMultiplier(),
+                    ef.cooldownSeconds(),
+                    ef.apCost(),
+                    ef.mpCost());
+            buckets.computeIfAbsent(tpl.getWeaponType(), k -> new ArrayList<>()).add(line);
+        }
+        List<MartialArtViewVariables.ExternalGroup> groups = new ArrayList<>();
+        for (com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType wt :
+                com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.values()) {
+            List<MartialArtViewVariables.LearnedExternalLine> items = buckets.get(wt);
+            if (items != null && !items.isEmpty()) {
+                groups.add(new MartialArtViewVariables.ExternalGroup(ItemDisplayLabels.of(wt), items));
+            }
+        }
+        return groups;
+    }
+
+    private MartialArtViewVariables.StatModLine toViewStatModLine(StatModifier mod) {
+        return new MartialArtViewVariables.StatModLine(
                 ItemDisplayLabels.of(mod.getStatType()), mod.getValue());
     }
 }
