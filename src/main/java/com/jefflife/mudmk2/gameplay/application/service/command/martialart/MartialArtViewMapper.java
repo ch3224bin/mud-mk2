@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command.martialart;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.StatModifier;
+import com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType;
 import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.*;
 import com.jefflife.mudmk2.gamedata.application.domain.model.player.PlayerCharacter;
 import com.jefflife.mudmk2.gamedata.application.service.provided.ExternalArtTemplateFinder;
@@ -152,9 +153,9 @@ public class MartialArtViewMapper {
 
     private List<MartialArtViewVariables.ExternalGroup> groupExternal(
             List<LearnedExternalArt> learned, Set<UUID> equippedIds) {
-        EnumMap<com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType,
+        EnumMap<WeaponType,
                 List<MartialArtViewVariables.LearnedExternalLine>> buckets =
-                new EnumMap<>(com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.class);
+                new EnumMap<>(WeaponType.class);
         for (LearnedExternalArt e : learned) {
             ExternalArtTemplate tpl = externalTplFinder.findById(e.getExternalArtTemplateId());
             ExternalArtLevelEffect ef = tpl.effectAt(e.getCurrentLevel());
@@ -172,8 +173,8 @@ public class MartialArtViewMapper {
             buckets.computeIfAbsent(tpl.getWeaponType(), k -> new ArrayList<>()).add(line);
         }
         List<MartialArtViewVariables.ExternalGroup> groups = new ArrayList<>();
-        for (com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType wt :
-                com.jefflife.mudmk2.gamedata.application.domain.model.item.WeaponType.values()) {
+        for (WeaponType wt :
+                WeaponType.values()) {
             List<MartialArtViewVariables.LearnedExternalLine> items = buckets.get(wt);
             if (items != null && !items.isEmpty()) {
                 groups.add(new MartialArtViewVariables.ExternalGroup(ItemDisplayLabels.of(wt), items));
