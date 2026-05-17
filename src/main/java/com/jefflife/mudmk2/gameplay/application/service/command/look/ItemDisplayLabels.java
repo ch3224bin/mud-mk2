@@ -1,6 +1,7 @@
 package com.jefflife.mudmk2.gameplay.application.service.command.look;
 
 import com.jefflife.mudmk2.gamedata.application.domain.model.item.*;
+import com.jefflife.mudmk2.gamedata.application.domain.model.martialart.MentalMethodKind;
 
 public final class ItemDisplayLabels {
 
@@ -54,6 +55,14 @@ public final class ItemDisplayLabels {
         return switch (type) {
             case KEY -> "열쇠";
             case QUEST_COMPLETION -> "퀘스트 완료품";
+        };
+    }
+
+    public static String of(MentalMethodKind kind) {
+        return switch (kind) {
+            case INNER_POWER       -> "내공";
+            case LIGHT_STEP        -> "경공";
+            case SPECIAL_TECHNIQUE -> "특기";
         };
     }
 
