@@ -76,6 +76,7 @@ class ExternalArtTemplateTest {
                 .build();
 
         assertThatThrownBy(() -> t.effectAt(0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> t.effectAt(-1)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
